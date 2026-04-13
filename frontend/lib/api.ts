@@ -14,7 +14,7 @@ async function request<T>(
     ...(options.headers as Record<string, string>),
   };
   if (token) headers["Authorization"] = `Bearer ${token}`;
-  if (!(options.body instanceof FormData)) {
+  if (!(options.body instanceof FormData) && !(options.body instanceof URLSearchParams)) {
     headers["Content-Type"] = "application/json";
   }
 

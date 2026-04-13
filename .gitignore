@@ -1,0 +1,22 @@
+# Entornos virtuales Python
+backend/venv/
+backend/.venv/
+
+# Node modules
+frontend/node_modules/
+
+# Variables de entorno
+**/.env
+**/.env.*
+!**/.env.example
+
+# Uploads locales
+backend/uploads/
+
+# Builds
+frontend/.next/
+frontend/out/
+
+# OS
+.DS_Store
+Thumbs.db

@@ -21,7 +21,11 @@ async function request<T>(
   const res = await fetch(`${BASE_URL}${path}`, { ...options, headers });
   if (!res.ok) {
     const err = await res.json().catch(() => ({ detail: "Error desconocido" }));
-    throw new Error(err.detail || "Error del servidor");
+    // FastAPI a veces devuelve detail como array de objetos de validación
+    const detail = Array.isArray(err.detail)
+      ? err.detail.map((e: { msg?: string }) => e.msg ?? JSON.stringify(e)).join(", ")
+      : err.detail;
+    throw new Error(detail || "Error del servidor");
   }
   if (res.status === 204) return undefined as T;
   return res.json();

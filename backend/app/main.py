@@ -6,24 +6,29 @@ from app.routers import auth, locals, professionals, posts, upload, follows, rat
 import app.models
 import os
 
-Base.metadata.create_all(bind=engine)
-
 app = FastAPI(title="Dirbook API", version="1.0.0")
 
+# CORS — permite cualquier origen (se puede restringir después)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "https://dirbook-fk6i-git-main-juan06dirs-projects.vercel.app",
-        "https://dirbook-fk6i.vercel.app",
-    ],
-    allow_credentials=True,
+    allow_origins=["*"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+# Crear tablas al iniciar (con manejo de error para no crashear)
+try:
+    Base.metadata.create_all(bind=engine)
+except Exception as e:
+    print(f"⚠️  Error al crear tablas: {e}")
+
 os.makedirs("uploads", exist_ok=True)
-app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
+
+try:
+    app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
+except Exception:
+    pass
 
 app.include_router(auth.router)
 app.include_router(locals.router)

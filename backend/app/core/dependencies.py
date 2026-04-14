@@ -1,7 +1,7 @@
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
-from jose import JWTError
+from jwt.exceptions import InvalidTokenError
 from app.database import get_db
 from app.models.user import User
 from app.core.security import decode_token
@@ -38,6 +38,6 @@ def get_optional_user(
         user_id: str = payload.get("sub")
         if not user_id:
             return None
-    except JWTError:
+    except InvalidTokenError:
         return None
     return db.query(User).filter(User.id == user_id).first()

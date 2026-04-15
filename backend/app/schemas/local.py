@@ -20,6 +20,8 @@ class LocalUpdate(BaseModel):
     city:        Optional[str] = None
     phone:       Optional[str] = None
     website:     Optional[str] = None
+    logo:        Optional[str] = None
+    cover_image: Optional[str] = None
 
 class LocalOut(BaseModel):
     id:          UUID

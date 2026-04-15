@@ -11,11 +11,13 @@ class ProfessionalCreate(BaseModel):
     website: Optional[str] = None
 
 class ProfessionalUpdate(BaseModel):
-    name: Optional[str] = None
-    profession: Optional[str] = None
-    bio: Optional[str] = None
-    phone: Optional[str] = None
-    website: Optional[str] = None
+    name:        Optional[str] = None
+    profession:  Optional[str] = None
+    bio:         Optional[str] = None
+    phone:       Optional[str] = None
+    website:     Optional[str] = None
+    avatar:      Optional[str] = None
+    cover_image: Optional[str] = None
 
 class ProfessionalOut(BaseModel):
     id: UUID

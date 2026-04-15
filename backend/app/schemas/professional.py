@@ -4,11 +4,13 @@ from datetime import datetime
 from typing import Optional
 
 class ProfessionalCreate(BaseModel):
-    name: str
-    profession: str
-    bio: Optional[str] = None
-    phone: Optional[str] = None
-    website: Optional[str] = None
+    name:        str
+    profession:  str
+    bio:         Optional[str] = None
+    phone:       Optional[str] = None
+    website:     Optional[str] = None
+    avatar:      Optional[str] = None
+    cover_image: Optional[str] = None
 
 class ProfessionalUpdate(BaseModel):
     name:        Optional[str] = None

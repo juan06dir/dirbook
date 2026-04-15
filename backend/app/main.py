@@ -41,3 +41,12 @@ app.include_router(ratings.router)
 @app.get("/")
 def root():
     return {"message": "Dirbook API funcionando 🚀"}
+
+@app.get("/health")
+def health():
+    from app.core.config import settings
+    return {
+        "status": "ok",
+        "cloudinary": bool(settings.CLOUDINARY_CLOUD_NAME),
+        "cloud_name": settings.CLOUDINARY_CLOUD_NAME or "no configurado",
+    }

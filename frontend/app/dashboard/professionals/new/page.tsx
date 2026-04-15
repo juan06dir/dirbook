@@ -40,18 +40,13 @@ export default function NewProfessionalPage() {
     if (!name || !profession) { setError("Nombre y profesión son requeridos"); return; }
     setSaving(true); setError("");
     try {
-      const prof = await createProfessional({ name, profession, bio, phone, website });
+      // Subir imágenes primero, luego crear con todo junto
+      let avatar: string | undefined;
+      let cover_image: string | undefined;
+      if (avatarFile) { const r = await uploadImage(avatarFile); avatar = r.url; }
+      if (coverFile)  { const r = await uploadImage(coverFile);  cover_image = r.url; }
 
-      // Subir imágenes si las hay
-      const updates: Record<string, string> = {};
-      if (avatarFile) { const r = await uploadImage(avatarFile); updates.avatar = r.url; }
-      if (coverFile)  { const r = await uploadImage(coverFile);  updates.cover_image = r.url; }
-
-      if (Object.keys(updates).length > 0) {
-        const { updateProfessional } = await import("@/lib/api");
-        await updateProfessional(prof.id, updates);
-      }
-
+      await createProfessional({ name, profession, bio, phone, website, avatar, cover_image });
       router.push("/dashboard");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error al crear perfil");

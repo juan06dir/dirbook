@@ -45,12 +45,12 @@ function LandingPage() {
           <Badge className="mb-4 bg-white/20 text-white hover:bg-white/30 border-0 px-3 py-1">
             🎉 ¡Nuevo! Ya está en tu ciudad
           </Badge>
-          <h1 className="mb-5 text-5xl font-extrabold leading-tight tracking-tight">
+          <h1 className="mb-5 text-3xl sm:text-5xl font-extrabold leading-tight tracking-tight">
             Descubre los mejores<br />
             <span className="text-yellow-300">locales y profesionales</span><br />
             cerca de ti
           </h1>
-          <p className="mx-auto mb-10 max-w-xl text-lg text-white/80">
+          <p className="mx-auto mb-10 max-w-xl text-base sm:text-lg text-white/80">
             Sigue tus negocios favoritos, encuentra descuentos exclusivos y conecta
             con profesionales de confianza en tu ciudad.
           </p>
@@ -180,7 +180,7 @@ function LandingPage() {
             </div>
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
               {professionals.map((p) => (
-                <ProfessionalCard key={p.id} professional={p} />
+                <ProfessionalCard key={p.id} prof={p} />
               ))}
             </div>
           </div>

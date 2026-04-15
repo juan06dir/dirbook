@@ -180,7 +180,7 @@ export default function LocalDetailPage() {
 
       <div className="mx-auto max-w-4xl px-4">
         {/* Header */}
-        <div className="relative -mt-8 mb-6 flex items-end justify-between gap-4">
+        <div className="relative -mt-8 mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div className="flex items-end gap-4">
             <div className="h-20 w-20 shrink-0 overflow-hidden rounded-2xl border-4 border-white bg-white shadow-md">
               {logo ? (
@@ -193,7 +193,7 @@ export default function LocalDetailPage() {
               )}
             </div>
             <div className="pb-1">
-              <h1 className="text-2xl font-bold leading-tight">{local.name}</h1>
+              <h1 className="text-xl sm:text-2xl font-bold leading-tight">{local.name}</h1>
               <Badge variant="secondary" className="mt-1">{local.category}</Badge>
             </div>
           </div>
@@ -203,7 +203,7 @@ export default function LocalDetailPage() {
             variant={followStatus.following ? "outline" : "default"}
             onClick={handleFollow}
             disabled={followLoading}
-            className="shrink-0"
+            className="w-full sm:w-auto"
           >
             <Heart className={`mr-2 h-4 w-4 ${followStatus.following ? "fill-red-500 text-red-500" : ""}`} />
             {followStatus.following ? "Siguiendo" : "Seguir"}
@@ -211,7 +211,7 @@ export default function LocalDetailPage() {
         </div>
 
         {/* Estrellas + seguidores */}
-        <div className="mb-6 flex items-center gap-4">
+        <div className="mb-6 flex flex-wrap items-center gap-4">
           <div className="flex flex-col gap-1">
             <p className="text-xs text-muted-foreground">
               {user ? "Tu calificación:" : "Calificación del local:"}

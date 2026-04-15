@@ -69,21 +69,25 @@ export default function DashboardPage() {
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
       {/* Header */}
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 flex items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold">Mi panel</h1>
+          <h1 className="text-xl sm:text-2xl font-bold">Mi panel</h1>
           <p className="text-muted-foreground text-sm">Gestiona tus perfiles y locales</p>
         </div>
         {tab === "locals" ? (
-          <Button asChild>
+          <Button asChild size="sm" className="shrink-0">
             <Link href="/dashboard/locals/new">
-              <Plus className="mr-2 h-4 w-4" /> Nuevo local
+              <Plus className="mr-1 h-4 w-4" />
+              <span className="hidden sm:inline">Nuevo local</span>
+              <span className="sm:hidden">Nuevo</span>
             </Link>
           </Button>
         ) : (
-          <Button asChild>
+          <Button asChild size="sm" className="shrink-0">
             <Link href="/dashboard/professionals/new">
-              <Plus className="mr-2 h-4 w-4" /> Nuevo perfil
+              <Plus className="mr-1 h-4 w-4" />
+              <span className="hidden sm:inline">Nuevo perfil</span>
+              <span className="sm:hidden">Nuevo</span>
             </Link>
           </Button>
         )}
@@ -135,7 +139,7 @@ export default function DashboardPage() {
             {locals.map((local) => {
               const logo = imageUrl(local.logo);
               return (
-                <div key={local.id} className="flex items-center gap-4 rounded-xl border bg-white p-4 shadow-sm">
+                <div key={local.id} className="flex items-center gap-3 rounded-xl border bg-white p-3 sm:p-4 shadow-sm">
                   <div className="h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-muted">
                     {logo ? (
                       // eslint-disable-next-line @next/next/no-img-element
@@ -150,7 +154,7 @@ export default function DashboardPage() {
                     <p className="font-semibold truncate">{local.name}</p>
                     <div className="flex items-center gap-2 text-sm text-muted-foreground flex-wrap">
                       <Badge variant="secondary" className="text-xs">{local.category}</Badge>
-                      {local.city && <span>{local.city}</span>}
+                      {local.city && <span className="hidden sm:inline">{local.city}</span>}
                       <span className="flex items-center gap-1"><Users className="h-3 w-3" /> {local.followers_count}</span>
                       {local.avg_rating && (
                         <span className="flex items-center gap-1">
@@ -160,11 +164,11 @@ export default function DashboardPage() {
                       )}
                     </div>
                   </div>
-                  <div className="flex items-center gap-1 shrink-0">
+                  <div className="flex items-center gap-0.5 shrink-0">
                     <Button variant="ghost" size="icon" asChild title="Nueva publicación">
                       <Link href={`/dashboard/locals/${local.id}/post`}><FilePlus className="h-4 w-4" /></Link>
                     </Button>
-                    <Button variant="ghost" size="icon" asChild title="Ver local">
+                    <Button variant="ghost" size="icon" asChild title="Ver local" className="hidden sm:inline-flex">
                       <Link href={`/locals/${local.id}`}><Eye className="h-4 w-4" /></Link>
                     </Button>
                     <Button variant="ghost" size="icon" asChild title="Editar">
@@ -203,7 +207,7 @@ export default function DashboardPage() {
             {professionals.map((prof) => {
               const avatar = imageUrl(prof.avatar);
               return (
-                <div key={prof.id} className="flex items-center gap-4 rounded-xl border bg-white p-4 shadow-sm">
+                <div key={prof.id} className="flex items-center gap-3 rounded-xl border bg-white p-3 sm:p-4 shadow-sm">
                   <div className="h-12 w-12 shrink-0 overflow-hidden rounded-full bg-muted">
                     {avatar ? (
                       // eslint-disable-next-line @next/next/no-img-element
@@ -222,11 +226,11 @@ export default function DashboardPage() {
                       </Badge>
                     </div>
                   </div>
-                  <div className="flex items-center gap-1 shrink-0">
+                  <div className="flex items-center gap-0.5 shrink-0">
                     <Button variant="ghost" size="icon" asChild title="Nueva publicación">
                       <Link href={`/dashboard/professionals/${prof.id}/post`}><FilePlus className="h-4 w-4" /></Link>
                     </Button>
-                    <Button variant="ghost" size="icon" asChild title="Ver perfil">
+                    <Button variant="ghost" size="icon" asChild title="Ver perfil" className="hidden sm:inline-flex">
                       <Link href={`/professionals/${prof.id}`}><Eye className="h-4 w-4" /></Link>
                     </Button>
                     <Button variant="ghost" size="icon" asChild title="Editar">

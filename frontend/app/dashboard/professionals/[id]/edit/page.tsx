@@ -116,7 +116,7 @@ export default function EditProfessionalPage() {
           <Textarea id="bio" value={bio} onChange={(e) => setBio(e.target.value)} rows={4} />
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div className="space-y-1">
             <Label>Teléfono</Label>
             <Input value={phone} onChange={(e) => setPhone(e.target.value)} />

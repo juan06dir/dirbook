@@ -132,7 +132,7 @@ export default function ProfessionalDetailPage() {
             )}
           </div>
           <div className="pb-1">
-            <h1 className="text-2xl font-bold leading-tight">{prof.name}</h1>
+            <h1 className="text-xl sm:text-2xl font-bold leading-tight">{prof.name}</h1>
             <Badge variant="secondary" className="mt-1">
               <Briefcase className="mr-1 h-3 w-3" />
               {prof.profession}

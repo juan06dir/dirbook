@@ -38,6 +38,6 @@ def get_optional_user(
         user_id: str = payload.get("sub")
         if not user_id:
             return None
-    except InvalidTokenError:
+    except JWTError:
         return None
     return db.query(User).filter(User.id == user_id).first()

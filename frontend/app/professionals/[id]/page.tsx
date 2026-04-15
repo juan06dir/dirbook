@@ -2,10 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import Link from "next/link";
 import { getProfessional, ProfessionalOut, getProfessionalPosts, PostOut } from "@/lib/api";
+import { useAuth } from "@/context/AuthContext";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Phone, Globe, ArrowLeft, Mail, UserCircle2, Briefcase } from "lucide-react";
+import { Phone, Globe, ArrowLeft, Mail, UserCircle2, Briefcase, Lock } from "lucide-react";
 import PostCard from "@/components/PostCard";
 import ContactModal from "@/components/ContactModal";
 
@@ -20,6 +22,7 @@ function imageUrl(path: string | null) {
 export default function ProfessionalDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router  = useRouter();
+  const { user, loading: authLoading } = useAuth();
 
   const [prof, setProf]       = useState<ProfessionalOut | null>(null);
   const [loading, setLoading] = useState(true);
@@ -40,6 +43,41 @@ export default function ProfessionalDetailPage() {
     getProfessionalPosts(id, postTab === "all" ? undefined : postTab)
       .then(setPosts).catch(() => {});
   }, [postTab, id, prof]);
+
+  if (authLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center gap-6 bg-gray-50 px-4 text-center">
+        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10">
+          <Lock className="h-10 w-10 text-primary" />
+        </div>
+        <div>
+          <h2 className="mb-2 text-2xl font-bold">Crea una cuenta para ver este perfil</h2>
+          <p className="text-muted-foreground">
+            Regístrate gratis para ver la información completa de profesionales y contactarlos.
+          </p>
+        </div>
+        <div className="flex gap-3">
+          <Link href="/auth/register">
+            <Button size="lg">Registrarme gratis</Button>
+          </Link>
+          <Link href="/auth/login">
+            <Button size="lg" variant="outline">Iniciar sesión</Button>
+          </Link>
+        </div>
+        <button onClick={() => router.back()} className="text-sm text-muted-foreground hover:underline">
+          ← Volver atrás
+        </button>
+      </div>
+    );
+  }
 
   if (loading) {
     return (

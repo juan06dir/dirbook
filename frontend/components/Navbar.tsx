@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import {
-  Building2, LogOut, LayoutDashboard, LogIn, UserPlus, Users, Menu, X,
+  Building2, LogOut, LayoutDashboard, LogIn, UserPlus, Users, Menu, X, Map,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -33,6 +33,9 @@ export default function Navbar() {
         <nav className="hidden sm:flex items-center gap-1 text-sm">
           <Link href="/" className="px-3 py-1.5 rounded-md hover:bg-muted transition-colors">Locales</Link>
           <Link href="/professionals" className="px-3 py-1.5 rounded-md hover:bg-muted transition-colors">Profesionales</Link>
+          <Link href="/explore" className="flex items-center gap-1 px-3 py-1.5 rounded-md hover:bg-muted transition-colors font-medium text-primary">
+            <Map className="h-3.5 w-3.5" /> Mapa
+          </Link>
         </nav>
 
         {/* Actions — desktop */}
@@ -79,6 +82,10 @@ export default function Navbar() {
           <Link href="/professionals" onClick={() => setMenuOpen(false)}
             className="flex items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-muted transition-colors">
             <Users className="h-4 w-4 text-muted-foreground" /> Profesionales
+          </Link>
+          <Link href="/explore" onClick={() => setMenuOpen(false)}
+            className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-primary hover:bg-primary/10 transition-colors">
+            <Map className="h-4 w-4" /> Mapa — Explorar cerca
           </Link>
           <div className="my-2 border-t" />
           {user ? (

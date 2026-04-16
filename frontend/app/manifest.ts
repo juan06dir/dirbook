@@ -30,13 +30,5 @@ export default function manifest(): MetadataRoute.Manifest {
         type: "image/png",
       },
     ],
-    screenshots: [
-      {
-        src: "/screenshot-wide.png",
-        sizes: "1280x720",
-        // @ts-expect-error – form_factor es válido en el estándar pero aún no tipado en Next.js
-        form_factor: "wide",
-      },
-    ],
   };
 }

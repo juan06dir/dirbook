@@ -1,3 +1,4 @@
+import React from "react";
 import Link from "next/link";
 import { LocalOut } from "@/lib/api";
 import { MapPin, Phone, Globe, Building2, Users } from "lucide-react";
@@ -13,13 +14,18 @@ function imageUrl(path: string | null) {
   return `${API_URL}${path}`;
 }
 
-export default function LocalCard({ local }: { local: LocalOut }) {
+export default function LocalCard({
+  local,
+  onCardClick,
+}: {
+  local: LocalOut;
+  onCardClick?: () => void;
+}) {
   const cover = imageUrl(local.cover_image);
   const logo = imageUrl(local.logo);
 
-  return (
-    <Link href={`/locals/${local.id}`} className="group block">
-      <Card className="overflow-hidden transition-shadow group-hover:shadow-md h-full">
+  const inner = (
+    <Card className="overflow-hidden transition-shadow group-hover:shadow-md h-full">
         {/* Cover */}
         <div className="relative h-44 bg-muted">
           {cover ? (
@@ -91,6 +97,19 @@ export default function LocalCard({ local }: { local: LocalOut }) {
           </div>
         </CardContent>
       </Card>
+  );
+
+  if (onCardClick) {
+    return (
+      <div onClick={onCardClick} className="group block cursor-pointer">
+        {inner}
+      </div>
+    );
+  }
+
+  return (
+    <Link href={`/locals/${local.id}`} className="group block">
+      {inner}
     </Link>
   );
 }

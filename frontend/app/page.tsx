@@ -3,7 +3,10 @@
 import { useEffect, useState, useCallback, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { getLocals, LocalOut, getActiveDiscounts, PostOut, getProfessionals, ProfessionalOut } from "@/lib/api";
+import {
+  getLocals, LocalOut, getActiveDiscounts, PostOut,
+  getProfessionals, ProfessionalOut,
+} from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
 import LocalCard from "@/components/LocalCard";
 import PostCard from "@/components/PostCard";
@@ -14,6 +17,7 @@ import { Badge } from "@/components/ui/badge";
 import {
   Search, SlidersHorizontal, Building2, Tag,
   Star, Users, MapPin, Zap, ChevronRight, ArrowRight,
+  Lock, Sparkles, X,
 } from "lucide-react";
 
 const CATEGORIES = [
@@ -21,23 +25,170 @@ const CATEGORIES = [
   "Salud", "Educación", "Tecnología", "Moda", "Otro",
 ];
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+function imageUrl(path: string | null) {
+  if (!path) return null;
+  if (path.startsWith("http")) return path;
+  return `${API_URL}${path}`;
+}
+
+/* ─── Modal de registro para visitantes ─────────────────────────────────── */
+function RegisterModal({
+  local,
+  onClose,
+}: {
+  local: LocalOut;
+  onClose: () => void;
+}) {
+  const cover = imageUrl(local.cover_image);
+  const logo  = imageUrl(local.logo);
+
+  // Cerrar con Escape
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [onClose]);
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+    >
+      {/* Backdrop blur */}
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+
+      <div className="relative w-full max-w-md rounded-3xl overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+
+        {/* Preview del local (top) */}
+        <div className="relative h-44 bg-gray-800">
+          {cover ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={cover} alt={local.name} className="h-full w-full object-cover opacity-60" />
+          ) : (
+            <div className="flex h-full items-center justify-center opacity-20">
+              <Building2 className="h-16 w-16 text-white" />
+            </div>
+          )}
+          {/* Gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/80" />
+
+          {/* Logo + nombre */}
+          <div className="absolute bottom-4 left-4 flex items-end gap-3">
+            <div className="h-12 w-12 shrink-0 overflow-hidden rounded-xl border-2 border-white/40 bg-white/20 backdrop-blur">
+              {logo ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={logo} alt="logo" className="h-full w-full object-cover" />
+              ) : (
+                <div className="flex h-full items-center justify-center">
+                  <Building2 className="h-6 w-6 text-white" />
+                </div>
+              )}
+            </div>
+            <div className="text-white drop-shadow">
+              <p className="font-bold text-lg leading-tight">{local.name}</p>
+              <p className="text-xs text-white/80">{local.category}</p>
+            </div>
+          </div>
+
+          {/* Botón cerrar */}
+          <button
+            onClick={onClose}
+            className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-black/40 text-white hover:bg-black/60 transition-colors"
+          >
+            <X className="h-4 w-4" />
+          </button>
+
+          {/* Candado central */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white/15 backdrop-blur border border-white/20 shadow-lg">
+              <Lock className="h-8 w-8 text-white drop-shadow" />
+            </div>
+          </div>
+        </div>
+
+        {/* Cuerpo del modal */}
+        <div className="bg-white px-6 pt-5 pb-7">
+          <div className="mb-5 text-center">
+            <div className="mb-2 flex justify-center">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+                <Sparkles className="h-3 w-3" />
+                Contenido exclusivo para miembros
+              </span>
+            </div>
+            <h2 className="text-xl font-extrabold text-gray-900 mb-1">
+              ¡Crea tu cuenta gratis!
+            </h2>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Únete para ver el perfil completo de{" "}
+              <span className="font-semibold text-foreground">{local.name}</span>,
+              seguir locales, calificar y acceder a descuentos exclusivos.
+            </p>
+          </div>
+
+          {/* Beneficios */}
+          <ul className="mb-5 space-y-2">
+            {[
+              "Ver información de contacto completa",
+              "Seguir tus negocios favoritos",
+              "Acceder a descuentos y eventos exclusivos",
+              "Calificar y dejar reseñas",
+            ].map((b) => (
+              <li key={b} className="flex items-center gap-2 text-sm text-gray-700">
+                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-green-100 text-green-600">
+                  ✓
+                </span>
+                {b}
+              </li>
+            ))}
+          </ul>
+
+          {/* CTAs */}
+          <div className="space-y-2">
+            <Link href="/auth/register" className="block">
+              <Button
+                size="lg"
+                className="w-full bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-500 font-bold shadow-md"
+              >
+                <Sparkles className="mr-2 h-4 w-4" />
+                Crear cuenta gratis
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </Link>
+            <Link href="/auth/login" className="block">
+              <Button size="lg" variant="outline" className="w-full">
+                Ya tengo cuenta — Iniciar sesión
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ─── Landing para visitantes no registrados ─────────────────────────── */
 function LandingPage() {
-  const [locals, setLocals]         = useState<LocalOut[]>([]);
-  const [discounts, setDiscounts]   = useState<PostOut[]>([]);
+  const [locals, setLocals]               = useState<LocalOut[]>([]);
+  const [localsLoading, setLocalsLoading] = useState(true);
+  const [discounts, setDiscounts]         = useState<PostOut[]>([]);
   const [professionals, setProfessionals] = useState<ProfessionalOut[]>([]);
+  const [selectedLocal, setSelectedLocal] = useState<LocalOut | null>(null);
 
   useEffect(() => {
-    getLocals({ limit: 6 }).then(setLocals).catch(() => {});
+    getLocals({ limit: 12 })
+      .then(setLocals)
+      .catch(() => {})
+      .finally(() => setLocalsLoading(false));
     getActiveDiscounts().then((d) => setDiscounts(d.slice(0, 4))).catch(() => {});
     getProfessionals({ limit: 4 }).then(setProfessionals).catch(() => {});
   }, []);
 
   return (
     <div className="min-h-screen bg-white">
+
       {/* ── Hero ─────────────────────────────────────────────────── */}
       <section className="relative overflow-hidden bg-gradient-to-br from-primary via-primary/90 to-primary/70 text-white">
-        {/* decorative circles */}
         <div className="pointer-events-none absolute -top-32 -right-32 h-96 w-96 rounded-full bg-white/5" />
         <div className="pointer-events-none absolute -bottom-20 -left-20 h-72 w-72 rounded-full bg-white/5" />
 
@@ -60,9 +211,9 @@ function LandingPage() {
                 Crear cuenta gratis <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
-            <Link href="/locals">
+            <Link href="/auth/login">
               <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10 px-8">
-                Explorar locales
+                Iniciar sesión
               </Button>
             </Link>
           </div>
@@ -122,15 +273,73 @@ function LandingPage() {
         </div>
       </section>
 
+      {/* ── Locales registrados ──────────────────────────────────── */}
+      <section className="py-16">
+        <div className="mx-auto max-w-7xl px-4">
+          <div className="mb-2 flex items-center justify-between">
+            <h2 className="flex items-center gap-2 text-2xl font-bold">
+              <MapPin className="h-6 w-6 text-primary" /> Locales en Dirbook
+            </h2>
+          </div>
+          <p className="mb-8 text-muted-foreground text-sm">
+            Haz clic en cualquier tarjeta para ver más información.{" "}
+            <Link href="/auth/register" className="text-primary font-medium hover:underline">
+              Regístrate gratis
+            </Link>{" "}
+            para acceder al perfil completo.
+          </p>
+
+          {localsLoading ? (
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <div key={i} className="h-64 rounded-xl bg-gray-200 animate-pulse" />
+              ))}
+            </div>
+          ) : locals.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
+              <Building2 className="mb-4 h-12 w-12 opacity-30" />
+              <p className="text-lg font-medium">Aún no hay locales registrados</p>
+              <p className="text-sm">¡Sé el primero en registrar tu negocio!</p>
+              <Link href="/auth/register" className="mt-4">
+                <Button>Registrar mi negocio</Button>
+              </Link>
+            </div>
+          ) : (
+            <>
+              <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                {locals.map((local) => (
+                  <LocalCard
+                    key={local.id}
+                    local={local}
+                    onCardClick={() => setSelectedLocal(local)}
+                  />
+                ))}
+              </div>
+              <div className="mt-10 text-center">
+                <p className="mb-3 text-muted-foreground text-sm">
+                  ¿Quieres ver todos los perfiles completos?
+                </p>
+                <Link href="/auth/register">
+                  <Button size="lg" className="px-8 font-bold shadow">
+                    <Sparkles className="mr-2 h-4 w-4" />
+                    Crear cuenta gratis — es rápido
+                  </Button>
+                </Link>
+              </div>
+            </>
+          )}
+        </div>
+      </section>
+
       {/* ── Descuentos activos ───────────────────────────────────── */}
       {discounts.length > 0 && (
-        <section className="py-16">
+        <section className="bg-gray-50 py-16">
           <div className="mx-auto max-w-7xl px-4">
             <div className="mb-6 flex items-center justify-between">
               <h2 className="flex items-center gap-2 text-2xl font-bold">
                 <Tag className="h-6 w-6 text-red-500" /> Descuentos activos
               </h2>
-              <Link href="/locals" className="flex items-center gap-1 text-sm text-primary hover:underline">
+              <Link href="/auth/register" className="flex items-center gap-1 text-sm text-primary hover:underline">
                 Ver todos <ChevronRight className="h-4 w-4" />
               </Link>
             </div>
@@ -139,27 +348,6 @@ function LandingPage() {
                 <div key={p.id} className="w-64 shrink-0">
                   <PostCard post={p} />
                 </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* ── Locales destacados ───────────────────────────────────── */}
-      {locals.length > 0 && (
-        <section className="bg-gray-50 py-16">
-          <div className="mx-auto max-w-7xl px-4">
-            <div className="mb-6 flex items-center justify-between">
-              <h2 className="flex items-center gap-2 text-2xl font-bold">
-                <MapPin className="h-6 w-6 text-primary" /> Locales destacados
-              </h2>
-              <Link href="/locals" className="flex items-center gap-1 text-sm text-primary hover:underline">
-                Ver todos <ChevronRight className="h-4 w-4" />
-              </Link>
-            </div>
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {locals.slice(0, 6).map((local) => (
-                <LocalCard key={local.id} local={local} />
               ))}
             </div>
           </div>
@@ -207,6 +395,14 @@ function LandingPage() {
       <footer className="border-t bg-gray-50 py-8 text-center text-sm text-muted-foreground">
         © {new Date().getFullYear()} Dirbook · Conectando tu ciudad
       </footer>
+
+      {/* ── Modal de registro ────────────────────────────────────── */}
+      {selectedLocal && (
+        <RegisterModal
+          local={selectedLocal}
+          onClose={() => setSelectedLocal(null)}
+        />
+      )}
     </div>
   );
 }

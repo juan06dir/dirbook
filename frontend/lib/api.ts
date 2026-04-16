@@ -72,6 +72,27 @@ export async function login(
   });
 }
 
+export async function forgotPassword(email: string): Promise<{ message: string }> {
+  return request<{ message: string }>("/auth/forgot-password", {
+    method: "POST",
+    body: JSON.stringify({ email }),
+  });
+}
+
+export async function verifyResetToken(token: string): Promise<{ valid: boolean }> {
+  return request<{ valid: boolean }>(`/auth/verify-reset-token/${encodeURIComponent(token)}`);
+}
+
+export async function resetPassword(
+  token: string,
+  new_password: string
+): Promise<{ message: string }> {
+  return request<{ message: string }>("/auth/reset-password", {
+    method: "POST",
+    body: JSON.stringify({ token, new_password }),
+  });
+}
+
 // ── Locals ────────────────────────────────────────────────────────────────────
 
 export interface LocalOut {

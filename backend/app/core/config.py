@@ -12,6 +12,14 @@ class Settings(BaseSettings):
     CLOUDINARY_API_KEY:    Optional[str] = None
     CLOUDINARY_API_SECRET: Optional[str] = None
 
+    # Email / SMTP (opcional — si no está configurado, el reset URL se imprime en consola)
+    SMTP_HOST:     Optional[str] = None
+    SMTP_PORT:     int           = 587
+    SMTP_USER:     Optional[str] = None
+    SMTP_PASSWORD: Optional[str] = None
+    SMTP_FROM:     str           = "noreply@dirbook.com"
+    FRONTEND_URL:  str           = "http://localhost:3000"
+
     class Config:
         env_file = ".env"
 

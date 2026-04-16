@@ -106,6 +106,9 @@ export interface LocalOut {
   website: string | null;
   logo: string | null;
   cover_image: string | null;
+  whatsapp: string | null;
+  facebook: string | null;
+  instagram: string | null;
   owner_id: string;
   created_at: string;
   followers_count: number;
@@ -123,6 +126,9 @@ export interface LocalCreate {
   website?: string;
   logo?: string;
   cover_image?: string;
+  whatsapp?: string;
+  facebook?: string;
+  instagram?: string;
 }
 
 export interface LocalsFilter {

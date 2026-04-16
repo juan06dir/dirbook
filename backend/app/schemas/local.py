@@ -1,4 +1,4 @@
-from pydantic import BaseModel, computed_field
+from pydantic import BaseModel
 from uuid import UUID
 from datetime import datetime
 from typing import Optional
@@ -13,6 +13,9 @@ class LocalCreate(BaseModel):
     website:     Optional[str] = None
     logo:        Optional[str] = None
     cover_image: Optional[str] = None
+    whatsapp:    Optional[str] = None
+    facebook:    Optional[str] = None
+    instagram:   Optional[str] = None
 
 class LocalUpdate(BaseModel):
     name:        Optional[str] = None
@@ -24,6 +27,9 @@ class LocalUpdate(BaseModel):
     website:     Optional[str] = None
     logo:        Optional[str] = None
     cover_image: Optional[str] = None
+    whatsapp:    Optional[str] = None
+    facebook:    Optional[str] = None
+    instagram:   Optional[str] = None
 
 class LocalOut(BaseModel):
     id:          UUID
@@ -36,6 +42,9 @@ class LocalOut(BaseModel):
     website:     Optional[str]
     logo:        Optional[str]
     cover_image: Optional[str]
+    whatsapp:    Optional[str]
+    facebook:    Optional[str]
+    instagram:   Optional[str]
     owner_id:    UUID
     created_at:  datetime
 

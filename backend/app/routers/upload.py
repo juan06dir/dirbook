@@ -1,3 +1,4 @@
+import io
 import os
 import uuid
 import cloudinary
@@ -10,7 +11,7 @@ from app.models.user import User
 router = APIRouter(prefix="/upload", tags=["Upload"])
 
 ALLOWED_TYPES = {"image/jpeg", "image/png", "image/webp", "image/gif"}
-MAX_SIZE = 5 * 1024 * 1024  # 5 MB
+MAX_SIZE = 10 * 1024 * 1024  # 10 MB antes de comprimir
 
 # Configurar Cloudinary si las variables están disponibles
 USE_CLOUDINARY = all([
@@ -27,9 +28,41 @@ if USE_CLOUDINARY:
         secure=True,
     )
 
-# Carpeta local como fallback (desarrollo)
 UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+
+def compress_image(contents: bytes, max_width: int = 1920, quality: int = 82) -> bytes:
+    """Redimensiona y comprime la imagen sin perder demasiada calidad."""
+    try:
+        from PIL import Image
+
+        img = Image.open(io.BytesIO(contents))
+
+        # Convertir a RGB si tiene canal alpha (PNG transparente)
+        if img.mode in ("RGBA", "P", "LA"):
+            background = Image.new("RGB", img.size, (255, 255, 255))
+            if img.mode == "P":
+                img = img.convert("RGBA")
+            background.paste(img, mask=img.split()[-1] if img.mode == "RGBA" else None)
+            img = background
+        elif img.mode != "RGB":
+            img = img.convert("RGB")
+
+        # Redimensionar solo si es más grande que el máximo
+        if img.width > max_width:
+            ratio = max_width / img.width
+            new_height = int(img.height * ratio)
+            img = img.resize((max_width, new_height), Image.LANCZOS)
+
+        output = io.BytesIO()
+        img.save(output, format="JPEG", quality=quality, optimize=True)
+        return output.getvalue()
+    except ImportError:
+        # Pillow no instalado — devolver tal cual
+        return contents
+    except Exception:
+        return contents
 
 
 @router.post("")
@@ -42,27 +75,31 @@ async def upload_image(
 
     contents = await file.read()
     if len(contents) > MAX_SIZE:
-        raise HTTPException(status_code=400, detail="El archivo supera el límite de 5 MB")
+        raise HTTPException(status_code=400, detail="El archivo supera el límite de 10 MB")
+
+    # Comprimir antes de subir
+    compressed = compress_image(contents, max_width=1920, quality=82)
 
     # ── Cloudinary (producción) ──────────────────────────────────────────────
     if USE_CLOUDINARY:
         try:
             result = cloudinary.uploader.upload(
-                contents,
+                compressed,
                 folder="dirbook",
                 resource_type="image",
                 public_id=str(uuid.uuid4()),
+                quality="auto:good",
+                fetch_format="auto",
             )
             return {"url": result["secure_url"]}
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Error al subir imagen: {str(e)}")
 
     # ── Local (desarrollo) ───────────────────────────────────────────────────
-    ext = file.filename.rsplit(".", 1)[-1] if "." in (file.filename or "") else "jpg"
-    filename = f"{uuid.uuid4()}.{ext}"
+    filename = f"{uuid.uuid4()}.jpg"
     filepath = os.path.join(UPLOAD_DIR, filename)
 
     with open(filepath, "wb") as f:
-        f.write(contents)
+        f.write(compressed)
 
     return {"url": f"/uploads/{filename}"}

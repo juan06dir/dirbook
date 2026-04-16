@@ -19,6 +19,34 @@ function imageUrl(path: string | null | undefined) {
   return `${API_URL}${path}`;
 }
 
+/** Comprime una imagen en el navegador antes de subirla */
+async function compressImage(file: File, maxWidth = 1920, quality = 0.82): Promise<File> {
+  return new Promise((resolve) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const scale = img.width > maxWidth ? maxWidth / img.width : 1;
+      const w = Math.round(img.width * scale);
+      const h = Math.round(img.height * scale);
+      const canvas = document.createElement("canvas");
+      canvas.width  = w;
+      canvas.height = h;
+      canvas.getContext("2d")!.drawImage(img, 0, 0, w, h);
+      canvas.toBlob(
+        (blob) => {
+          if (!blob) { resolve(file); return; }
+          resolve(new File([blob], file.name.replace(/\.[^.]+$/, ".jpg"), { type: "image/jpeg" }));
+        },
+        "image/jpeg",
+        quality
+      );
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); resolve(file); };
+    img.src = url;
+  });
+}
+
 interface Props {
   initial?: Partial<LocalCreate>;
   onSubmit: (data: LocalCreate) => Promise<void>;
@@ -27,20 +55,23 @@ interface Props {
 }
 
 export default function LocalForm({ initial = {}, onSubmit, submitLabel, loading }: Props) {
-  const [name, setName] = useState(initial.name || "");
+  const [name,        setName]        = useState(initial.name        || "");
   const [description, setDescription] = useState(initial.description || "");
-  const [category, setCategory] = useState(initial.category || "");
-  const [address, setAddress] = useState(initial.address || "");
-  const [city, setCity] = useState(initial.city || "");
-  const [phone, setPhone] = useState(initial.phone || "");
-  const [website, setWebsite] = useState(initial.website || "");
-  const [logo, setLogo] = useState(initial.logo || "");
-  const [cover, setCover] = useState(initial.cover_image || "");
-  const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [category,    setCategory]    = useState(initial.category    || "");
+  const [address,     setAddress]     = useState(initial.address     || "");
+  const [city,        setCity]        = useState(initial.city        || "");
+  const [phone,       setPhone]       = useState(initial.phone       || "");
+  const [website,     setWebsite]     = useState(initial.website     || "");
+  const [whatsapp,    setWhatsapp]    = useState(initial.whatsapp    || "");
+  const [facebook,    setFacebook]    = useState(initial.facebook    || "");
+  const [instagram,   setInstagram]   = useState(initial.instagram   || "");
+  const [logo,        setLogo]        = useState(initial.logo        || "");
+  const [cover,       setCover]       = useState(initial.cover_image || "");
+  const [uploadingLogo,  setUploadingLogo]  = useState(false);
   const [uploadingCover, setUploadingCover] = useState(false);
   const [error, setError] = useState("");
 
-  const logoRef = useRef<HTMLInputElement>(null);
+  const logoRef  = useRef<HTMLInputElement>(null);
   const coverRef = useRef<HTMLInputElement>(null);
 
   const handleUpload = async (
@@ -50,7 +81,8 @@ export default function LocalForm({ initial = {}, onSubmit, submitLabel, loading
   ) => {
     setUploading(true);
     try {
-      const res = await uploadImage(file);
+      const compressed = await compressImage(file);
+      const res = await uploadImage(compressed);
       setUrl(res.url);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Error al subir imagen");
@@ -67,15 +99,18 @@ export default function LocalForm({ initial = {}, onSubmit, submitLabel, loading
       return;
     }
     await onSubmit({
-      name: name.trim(),
+      name:        name.trim(),
       description: description.trim() || undefined,
       category,
-      address: address.trim() || undefined,
-      city: city.trim() || undefined,
-      phone: phone.trim() || undefined,
-      website: website.trim() || undefined,
-      logo: logo || undefined,
-      cover_image: cover || undefined,
+      address:     address.trim()   || undefined,
+      city:        city.trim()      || undefined,
+      phone:       phone.trim()     || undefined,
+      website:     website.trim()   || undefined,
+      whatsapp:    whatsapp.trim()  || undefined,
+      facebook:    facebook.trim()  || undefined,
+      instagram:   instagram.trim() || undefined,
+      logo:        logo             || undefined,
+      cover_image: cover            || undefined,
     });
   };
 
@@ -94,11 +129,8 @@ export default function LocalForm({ initial = {}, onSubmit, submitLabel, loading
               <>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={imageUrl(cover) || ""} alt="cover" className="h-full w-full object-cover" />
-                <button
-                  type="button"
-                  onClick={(e) => { e.stopPropagation(); setCover(""); }}
-                  className="absolute top-1 right-1 rounded-full bg-black/60 p-1 text-white"
-                >
+                <button type="button" onClick={(e) => { e.stopPropagation(); setCover(""); }}
+                  className="absolute top-1 right-1 rounded-full bg-black/60 p-1 text-white">
                   <X className="h-3 w-3" />
                 </button>
               </>
@@ -111,16 +143,8 @@ export default function LocalForm({ initial = {}, onSubmit, submitLabel, loading
               </div>
             )}
           </div>
-          <input
-            ref={coverRef}
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) handleUpload(file, setCover, setUploadingCover);
-            }}
-          />
+          <input ref={coverRef} type="file" accept="image/*" className="hidden"
+            onChange={(e) => { const f = e.target.files?.[0]; if (f) handleUpload(f, setCover, setUploadingCover); }} />
         </div>
 
         {/* Logo */}
@@ -134,11 +158,8 @@ export default function LocalForm({ initial = {}, onSubmit, submitLabel, loading
               <>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={imageUrl(logo) || ""} alt="logo" className="h-full w-full object-cover" />
-                <button
-                  type="button"
-                  onClick={(e) => { e.stopPropagation(); setLogo(""); }}
-                  className="absolute top-1 right-1 rounded-full bg-black/60 p-1 text-white"
-                >
+                <button type="button" onClick={(e) => { e.stopPropagation(); setLogo(""); }}
+                  className="absolute top-1 right-1 rounded-full bg-black/60 p-1 text-white">
                   <X className="h-3 w-3" />
                 </button>
               </>
@@ -151,16 +172,8 @@ export default function LocalForm({ initial = {}, onSubmit, submitLabel, loading
               </div>
             )}
           </div>
-          <input
-            ref={logoRef}
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) handleUpload(file, setLogo, setUploadingLogo);
-            }}
-          />
+          <input ref={logoRef} type="file" accept="image/*" className="hidden"
+            onChange={(e) => { const f = e.target.files?.[0]; if (f) handleUpload(f, setLogo, setUploadingLogo); }} />
         </div>
       </div>
 
@@ -172,29 +185,19 @@ export default function LocalForm({ initial = {}, onSubmit, submitLabel, loading
         </div>
         <div className="space-y-1">
           <label className="text-sm font-medium">Categoría *</label>
-          <select
-            required
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-          >
+          <select required value={category} onChange={(e) => setCategory(e.target.value)}
+            className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-ring">
             <option value="">Seleccionar categoría…</option>
-            {CATEGORIES.map((c) => (
-              <option key={c} value={c}>{c}</option>
-            ))}
+            {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
           </select>
         </div>
       </div>
 
       <div className="space-y-1">
         <label className="text-sm font-medium">Descripción</label>
-        <textarea
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          rows={3}
+        <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3}
           placeholder="Describe tu local, qué ofreces…"
-          className="w-full rounded-md border border-input px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-ring"
-        />
+          className="w-full rounded-md border border-input px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-ring" />
       </div>
 
       {/* Ubicación */}
@@ -205,7 +208,7 @@ export default function LocalForm({ initial = {}, onSubmit, submitLabel, loading
         </div>
         <div className="space-y-1">
           <label className="text-sm font-medium">Ciudad</label>
-          <Input value={city} onChange={(e) => setCity(e.target.value)} placeholder="Madrid" />
+          <Input value={city} onChange={(e) => setCity(e.target.value)} placeholder="Bogotá" />
         </div>
       </div>
 
@@ -213,11 +216,48 @@ export default function LocalForm({ initial = {}, onSubmit, submitLabel, loading
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-1">
           <label className="text-sm font-medium">Teléfono</label>
-          <Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+34 600 000 000" />
+          <Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+57 300 000 0000" />
         </div>
         <div className="space-y-1">
           <label className="text-sm font-medium">Sitio web</label>
           <Input value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="www.milocal.com" />
+        </div>
+      </div>
+
+      {/* Redes sociales */}
+      <div>
+        <p className="mb-3 text-sm font-semibold">Redes sociales <span className="text-muted-foreground font-normal">(opcional)</span></p>
+        <div className="grid gap-4 sm:grid-cols-3">
+          <div className="space-y-1">
+            <label className="flex items-center gap-1.5 text-sm font-medium">
+              <span className="text-green-600">●</span> WhatsApp
+            </label>
+            <Input
+              value={whatsapp}
+              onChange={(e) => setWhatsapp(e.target.value)}
+              placeholder="https://wa.me/57300..."
+            />
+          </div>
+          <div className="space-y-1">
+            <label className="flex items-center gap-1.5 text-sm font-medium">
+              <span className="text-blue-600">●</span> Facebook
+            </label>
+            <Input
+              value={facebook}
+              onChange={(e) => setFacebook(e.target.value)}
+              placeholder="https://facebook.com/tu-pagina"
+            />
+          </div>
+          <div className="space-y-1">
+            <label className="flex items-center gap-1.5 text-sm font-medium">
+              <span className="text-pink-500">●</span> Instagram
+            </label>
+            <Input
+              value={instagram}
+              onChange={(e) => setInstagram(e.target.value)}
+              placeholder="https://instagram.com/tu-cuenta"
+            />
+          </div>
         </div>
       </div>
 

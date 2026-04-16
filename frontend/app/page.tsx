@@ -193,9 +193,6 @@ function LandingPage() {
         <div className="pointer-events-none absolute -bottom-20 -left-20 h-72 w-72 rounded-full bg-white/5" />
 
         <div className="relative mx-auto max-w-4xl px-4 py-24 text-center">
-          <Badge className="mb-4 bg-yellow-400/20 text-yellow-400 hover:bg-yellow-400/30 border-0 px-3 py-1 font-semibold">
-            🎉 ¡Nuevo! Ya está en tu ciudad
-          </Badge>
           <h1 className="mb-5 text-3xl sm:text-5xl font-extrabold leading-tight tracking-tight text-white">
             Descubre los mejores<br />
             <span className="text-yellow-400">locales y profesionales</span><br />

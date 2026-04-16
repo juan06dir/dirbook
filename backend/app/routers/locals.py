@@ -109,5 +109,13 @@ def delete_local(
     local = db.query(Local).filter(Local.id == local_id, Local.owner_id == current_user.id).first()
     if not local:
         raise HTTPException(status_code=404, detail="Local no encontrado o no autorizado")
+
+    # Eliminar registros relacionados antes de borrar el local
+    # para evitar errores de clave foránea en PostgreSQL
+    from app.models.post import Post
+    db.query(Follow).filter(Follow.local_id == local_id).delete(synchronize_session=False)
+    db.query(Rating).filter(Rating.local_id == local_id).delete(synchronize_session=False)
+    db.query(Post).filter(Post.local_id == local_id).delete(synchronize_session=False)
+
     db.delete(local)
     db.commit()

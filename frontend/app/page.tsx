@@ -188,31 +188,31 @@ function LandingPage() {
     <div className="min-h-screen bg-white">
 
       {/* ── Hero ─────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-yellow-400 via-yellow-300 to-amber-400 text-black">
+      <section className="relative overflow-hidden bg-black text-white">
         <div className="pointer-events-none absolute -top-32 -right-32 h-96 w-96 rounded-full bg-white/5" />
         <div className="pointer-events-none absolute -bottom-20 -left-20 h-72 w-72 rounded-full bg-white/5" />
 
         <div className="relative mx-auto max-w-4xl px-4 py-24 text-center">
-          <Badge className="mb-4 bg-black/15 text-black hover:bg-black/25 border-0 px-3 py-1 font-semibold">
+          <Badge className="mb-4 bg-yellow-400/20 text-yellow-400 hover:bg-yellow-400/30 border-0 px-3 py-1 font-semibold">
             🎉 ¡Nuevo! Ya está en tu ciudad
           </Badge>
-          <h1 className="mb-5 text-3xl sm:text-5xl font-extrabold leading-tight tracking-tight text-black">
+          <h1 className="mb-5 text-3xl sm:text-5xl font-extrabold leading-tight tracking-tight text-white">
             Descubre los mejores<br />
-            <span className="underline decoration-black/30 decoration-4">locales y profesionales</span><br />
+            <span className="text-yellow-400">locales y profesionales</span><br />
             cerca de ti
           </h1>
-          <p className="mx-auto mb-10 max-w-xl text-base sm:text-lg text-black/70">
+          <p className="mx-auto mb-10 max-w-xl text-base sm:text-lg text-white/70">
             Sigue tus negocios favoritos, encuentra descuentos exclusivos y conecta
             con profesionales de confianza en tu ciudad.
           </p>
           <div className="flex flex-wrap justify-center gap-3">
             <Link href="/auth/register">
-              <Button size="lg" className="bg-black text-yellow-400 hover:bg-black/80 font-bold shadow-lg px-8">
+              <Button size="lg" className="bg-yellow-400 text-black hover:bg-yellow-300 font-bold shadow-lg px-8">
                 Crear cuenta gratis <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
             <Link href="/auth/login">
-              <Button size="lg" variant="outline" className="border-black text-black hover:bg-black/10 px-8">
+              <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10 px-8">
                 Iniciar sesión
               </Button>
             </Link>
@@ -226,9 +226,9 @@ function LandingPage() {
               { icon: Tag,       label: "Descuentos activos",   value: "50+"  },
             ].map(({ icon: Icon, label, value }) => (
               <div key={label} className="flex flex-col items-center gap-1">
-                <Icon className="h-6 w-6 text-black/70" />
-                <span className="text-2xl font-bold text-black">{value}</span>
-                <span className="text-sm text-black/60">{label}</span>
+                <Icon className="h-6 w-6 text-yellow-400" />
+                <span className="text-2xl font-bold text-white">{value}</span>
+                <span className="text-sm text-white/60">{label}</span>
               </div>
             ))}
           </div>

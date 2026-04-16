@@ -6,6 +6,7 @@ import { MapPin } from "lucide-react";
 interface Props {
   address: string;
   city: string;
+  name?: string;
 }
 
 interface NominatimResult {
@@ -14,9 +15,13 @@ interface NominatimResult {
   display_name: string;
 }
 
-export default function LocalMap({ address, city }: Props) {
+export default function LocalMap({ address, city, name }: Props) {
   const [coords, setCoords] = useState<[number, number] | null>(null);
-  const [Map, setMap] = useState<React.ComponentType<{ coords: [number, number]; label: string }> | null>(null);
+  const [Map, setMap] = useState<React.ComponentType<{
+    coords: [number, number];
+    label: string;
+    name?: string;
+  }> | null>(null);
 
   const query = [address, city].filter(Boolean).join(", ");
 
@@ -52,5 +57,5 @@ export default function LocalMap({ address, city }: Props) {
     return <div className="h-48 rounded-xl bg-muted animate-pulse" />;
   }
 
-  return <Map coords={coords} label={query} />;
+  return <Map coords={coords} label={query} name={name} />;
 }

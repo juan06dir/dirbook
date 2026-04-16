@@ -311,7 +311,7 @@ export default function LocalDetailPage() {
             {(local.address || local.city) && (
               <section className="rounded-xl border bg-white p-5 shadow-sm">
                 <h2 className="mb-3 font-semibold">Ubicación</h2>
-                <LocalMap address={local.address || ""} city={local.city || ""} />
+                <LocalMap address={local.address || ""} city={local.city || ""} name={local.name} />
               </section>
             )}
           </div>

@@ -287,6 +287,8 @@ export interface ProfessionalCreate {
   bio?: string;
   phone?: string;
   website?: string;
+  avatar?: string;
+  cover_image?: string;
 }
 
 export interface ProfessionalsFilter {

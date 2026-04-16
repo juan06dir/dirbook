@@ -212,7 +212,7 @@ function LandingPage() {
               </Button>
             </Link>
             <Link href="/auth/login">
-              <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10 px-8">
+              <Button size="lg" variant="outline" className="border-white text-white bg-transparent hover:bg-white/15 hover:text-white px-8">
                 Iniciar sesión
               </Button>
             </Link>

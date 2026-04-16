@@ -111,7 +111,7 @@ function RegisterModal({
         <div className="bg-white px-6 pt-5 pb-7">
           <div className="mb-5 text-center">
             <div className="mb-2 flex justify-center">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-yellow-100 px-3 py-1 text-xs font-semibold text-yellow-800">
                 <Sparkles className="h-3 w-3" />
                 Contenido exclusivo para miembros
               </span>
@@ -148,7 +148,7 @@ function RegisterModal({
             <Link href="/auth/register" className="block">
               <Button
                 size="lg"
-                className="w-full bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-500 font-bold shadow-md"
+                className="w-full bg-black text-yellow-400 hover:bg-black/80 font-bold shadow-md"
               >
                 <Sparkles className="mr-2 h-4 w-4" />
                 Crear cuenta gratis
@@ -188,31 +188,31 @@ function LandingPage() {
     <div className="min-h-screen bg-white">
 
       {/* ── Hero ─────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-primary via-primary/90 to-primary/70 text-white">
+      <section className="relative overflow-hidden bg-gradient-to-br from-yellow-400 via-yellow-300 to-amber-400 text-black">
         <div className="pointer-events-none absolute -top-32 -right-32 h-96 w-96 rounded-full bg-white/5" />
         <div className="pointer-events-none absolute -bottom-20 -left-20 h-72 w-72 rounded-full bg-white/5" />
 
         <div className="relative mx-auto max-w-4xl px-4 py-24 text-center">
-          <Badge className="mb-4 bg-white/20 text-white hover:bg-white/30 border-0 px-3 py-1">
+          <Badge className="mb-4 bg-black/15 text-black hover:bg-black/25 border-0 px-3 py-1 font-semibold">
             🎉 ¡Nuevo! Ya está en tu ciudad
           </Badge>
-          <h1 className="mb-5 text-3xl sm:text-5xl font-extrabold leading-tight tracking-tight">
+          <h1 className="mb-5 text-3xl sm:text-5xl font-extrabold leading-tight tracking-tight text-black">
             Descubre los mejores<br />
-            <span className="text-yellow-300">locales y profesionales</span><br />
+            <span className="underline decoration-black/30 decoration-4">locales y profesionales</span><br />
             cerca de ti
           </h1>
-          <p className="mx-auto mb-10 max-w-xl text-base sm:text-lg text-white/80">
+          <p className="mx-auto mb-10 max-w-xl text-base sm:text-lg text-black/70">
             Sigue tus negocios favoritos, encuentra descuentos exclusivos y conecta
             con profesionales de confianza en tu ciudad.
           </p>
           <div className="flex flex-wrap justify-center gap-3">
             <Link href="/auth/register">
-              <Button size="lg" className="bg-yellow-400 text-yellow-900 hover:bg-yellow-300 font-bold shadow-lg px-8">
+              <Button size="lg" className="bg-black text-yellow-400 hover:bg-black/80 font-bold shadow-lg px-8">
                 Crear cuenta gratis <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
             <Link href="/auth/login">
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10 px-8">
+              <Button size="lg" variant="outline" className="border-black text-black hover:bg-black/10 px-8">
                 Iniciar sesión
               </Button>
             </Link>
@@ -226,9 +226,9 @@ function LandingPage() {
               { icon: Tag,       label: "Descuentos activos",   value: "50+"  },
             ].map(({ icon: Icon, label, value }) => (
               <div key={label} className="flex flex-col items-center gap-1">
-                <Icon className="h-6 w-6 text-yellow-300" />
-                <span className="text-2xl font-bold">{value}</span>
-                <span className="text-sm text-white/70">{label}</span>
+                <Icon className="h-6 w-6 text-black/70" />
+                <span className="text-2xl font-bold text-black">{value}</span>
+                <span className="text-sm text-black/60">{label}</span>
               </div>
             ))}
           </div>
@@ -376,15 +376,15 @@ function LandingPage() {
       )}
 
       {/* ── CTA final ────────────────────────────────────────────── */}
-      <section className="bg-gradient-to-r from-primary to-primary/80 py-20 text-center text-white">
+      <section className="bg-black py-20 text-center text-yellow-400">
         <div className="mx-auto max-w-xl px-4">
-          <h2 className="mb-3 text-3xl font-bold">¿Tienes un negocio?</h2>
-          <p className="mb-8 text-white/80">
+          <h2 className="mb-3 text-3xl font-bold text-yellow-400">¿Tienes un negocio?</h2>
+          <p className="mb-8 text-yellow-100/70">
             Regístralo gratis en Dirbook y llega a más clientes en tu ciudad.
             Publica eventos, descuentos y mucho más.
           </p>
           <Link href="/auth/register">
-            <Button size="lg" className="bg-white text-primary hover:bg-gray-100 font-bold shadow-lg px-10">
+            <Button size="lg" className="bg-yellow-400 text-black hover:bg-yellow-300 font-bold shadow-lg px-10">
               Empezar ahora — es gratis
             </Button>
           </Link>
@@ -465,12 +465,12 @@ function HomeContent() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero / buscador */}
-      <section className="bg-primary py-14 text-primary-foreground">
+      <section className="bg-black py-14 text-yellow-400">
         <div className="mx-auto max-w-3xl px-4 text-center">
-          <h1 className="mb-3 text-4xl font-bold tracking-tight">
+          <h1 className="mb-3 text-4xl font-bold tracking-tight text-yellow-400">
             Encuentra locales en tu ciudad
           </h1>
-          <p className="mb-8 text-primary-foreground/80">
+          <p className="mb-8 text-yellow-100/70">
             El directorio de negocios locales más completo
           </p>
 

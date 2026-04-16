@@ -35,11 +35,11 @@ def send_reset_email(to_email: str, reset_url: str, user_name: str) -> None:
 
           <!-- Header -->
           <tr>
-            <td style="background:linear-gradient(135deg,#2563eb,#1d4ed8);padding:36px 40px;text-align:center;">
-              <p style="margin:0;font-size:28px;font-weight:800;color:#ffffff;letter-spacing:-0.5px;">
+            <td style="background:#111111;padding:36px 40px;text-align:center;">
+              <p style="margin:0;font-size:28px;font-weight:800;color:#facc15;letter-spacing:-0.5px;">
                 &#127968; Dirbook
               </p>
-              <p style="margin:8px 0 0;font-size:14px;color:rgba(255,255,255,0.8);">
+              <p style="margin:8px 0 0;font-size:14px;color:rgba(255,255,255,0.6);">
                 Conectando tu ciudad
               </p>
             </td>
@@ -61,8 +61,8 @@ def send_reset_email(to_email: str, reset_url: str, user_name: str) -> None:
                 <tr>
                   <td align="center" style="padding:8px 0 32px;">
                     <a href="{reset_url}"
-                       style="display:inline-block;background:linear-gradient(135deg,#2563eb,#1d4ed8);
-                              color:#ffffff;text-decoration:none;font-size:16px;font-weight:700;
+                       style="display:inline-block;background:#facc15;
+                              color:#111111;text-decoration:none;font-size:16px;font-weight:800;
                               padding:14px 36px;border-radius:12px;letter-spacing:0.2px;">
                       Restablecer contrase&ntilde;a
                     </a>

@@ -354,14 +354,14 @@ export default function LocalDetailPage() {
 
               {/* Redes sociales */}
               {(local.whatsapp || local.facebook || local.instagram) && (
-                <div className="flex gap-2 pt-1">
+                <div className="flex flex-col gap-2 pt-1">
                   {local.whatsapp && (
                     <a
                       href={local.whatsapp.startsWith("http") ? local.whatsapp : `https://wa.me/${local.whatsapp.replace(/\D/g, "")}`}
                       target="_blank" rel="noopener noreferrer"
-                      className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-green-500 px-3 py-2 text-xs font-semibold text-white hover:bg-green-600 transition-colors"
+                      className="flex items-center justify-center gap-2 rounded-lg bg-green-500 px-3 py-2 text-sm font-semibold text-white hover:bg-green-600 transition-colors"
                     >
-                      <WhatsAppIcon className="h-4 w-4" />
+                      <WhatsAppIcon className="h-4 w-4 shrink-0" />
                       WhatsApp
                     </a>
                   )}
@@ -369,9 +369,9 @@ export default function LocalDetailPage() {
                     <a
                       href={local.facebook.startsWith("http") ? local.facebook : `https://facebook.com/${local.facebook}`}
                       target="_blank" rel="noopener noreferrer"
-                      className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-blue-600 px-3 py-2 text-xs font-semibold text-white hover:bg-blue-700 transition-colors"
+                      className="flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold text-white hover:bg-blue-700 transition-colors"
                     >
-                      <FacebookIcon className="h-4 w-4" />
+                      <FacebookIcon className="h-4 w-4 shrink-0" />
                       Facebook
                     </a>
                   )}
@@ -379,9 +379,9 @@ export default function LocalDetailPage() {
                     <a
                       href={local.instagram.startsWith("http") ? local.instagram : `https://instagram.com/${local.instagram}`}
                       target="_blank" rel="noopener noreferrer"
-                      className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600 px-3 py-2 text-xs font-semibold text-white hover:opacity-90 transition-opacity"
+                      className="flex items-center justify-center gap-2 rounded-lg bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600 px-3 py-2 text-sm font-semibold text-white hover:opacity-90 transition-opacity"
                     >
-                      <InstagramIcon className="h-4 w-4" />
+                      <InstagramIcon className="h-4 w-4 shrink-0" />
                       Instagram
                     </a>
                   )}

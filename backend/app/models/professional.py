@@ -15,6 +15,9 @@ class ProfessionalProfile(Base):
     website    = Column(String, nullable=True)
     avatar     = Column(String, nullable=True)
     cover_image = Column(String, nullable=True)
+    whatsapp   = Column(String, nullable=True)
+    facebook   = Column(String, nullable=True)
+    instagram  = Column(String, nullable=True)
     created_at  = Column(DateTime, default=datetime.datetime.utcnow)
 
     owner_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)

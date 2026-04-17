@@ -11,6 +11,9 @@ class ProfessionalCreate(BaseModel):
     website:     Optional[str] = None
     avatar:      Optional[str] = None
     cover_image: Optional[str] = None
+    whatsapp:    Optional[str] = None
+    facebook:    Optional[str] = None
+    instagram:   Optional[str] = None
 
 class ProfessionalUpdate(BaseModel):
     name:        Optional[str] = None
@@ -20,6 +23,9 @@ class ProfessionalUpdate(BaseModel):
     website:     Optional[str] = None
     avatar:      Optional[str] = None
     cover_image: Optional[str] = None
+    whatsapp:    Optional[str] = None
+    facebook:    Optional[str] = None
+    instagram:   Optional[str] = None
 
 class ProfessionalOut(BaseModel):
     id: UUID
@@ -30,6 +36,9 @@ class ProfessionalOut(BaseModel):
     website: Optional[str]
     avatar: Optional[str]
     cover_image: Optional[str]
+    whatsapp:   Optional[str]
+    facebook:   Optional[str]
+    instagram:  Optional[str]
     owner_id: UUID
     created_at: datetime
 

@@ -34,6 +34,9 @@ export default function EditProfessionalPage() {
   const [bio, setBio]             = useState("");
   const [phone, setPhone]         = useState("");
   const [website, setWebsite]     = useState("");
+  const [whatsapp, setWhatsapp]   = useState("");
+  const [facebook, setFacebook]   = useState("");
+  const [instagram, setInstagram] = useState("");
   const [avatarFile, setAvatarFile]     = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [coverFile, setCoverFile]       = useState<File | null>(null);
@@ -55,6 +58,9 @@ export default function EditProfessionalPage() {
           setBio(p.bio ?? "");
           setPhone(p.phone ?? "");
           setWebsite(p.website ?? "");
+          setWhatsapp(p.whatsapp ?? "");
+          setFacebook(p.facebook ?? "");
+          setInstagram(p.instagram ?? "");
         })
         .catch(() => router.push("/dashboard"));
     }
@@ -71,7 +77,7 @@ export default function EditProfessionalPage() {
     if (!name || !profession) { setError("Nombre y profesión son requeridos"); return; }
     setSaving(true); setError("");
     try {
-      const updates: Record<string, string> = { name, profession, bio, phone, website };
+      const updates: Record<string, string> = { name, profession, bio, phone, website, whatsapp, facebook, instagram };
 
       if (avatarFile) { const r = await uploadImage(avatarFile); updates.avatar = r.url; }
       if (coverFile)  { const r = await uploadImage(coverFile);  updates.cover_image = r.url; }
@@ -124,6 +130,25 @@ export default function EditProfessionalPage() {
           <div className="space-y-1">
             <Label>Sitio web</Label>
             <Input value={website} onChange={(e) => setWebsite(e.target.value)} />
+          </div>
+        </div>
+
+        {/* Redes sociales */}
+        <div className="space-y-3">
+          <Label>Redes sociales (opcional)</Label>
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <span className="w-24 shrink-0 text-xs text-muted-foreground">WhatsApp</span>
+              <Input value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder="573001234567 o enlace wa.me/..." />
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="w-24 shrink-0 text-xs text-muted-foreground">Facebook</span>
+              <Input value={facebook} onChange={(e) => setFacebook(e.target.value)} placeholder="facebook.com/tu-página o @usuario" />
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="w-24 shrink-0 text-xs text-muted-foreground">Instagram</span>
+              <Input value={instagram} onChange={(e) => setInstagram(e.target.value)} placeholder="@usuario o instagram.com/..." />
+            </div>
           </div>
         </div>
 

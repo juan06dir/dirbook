@@ -22,6 +22,9 @@ export default function NewProfessionalPage() {
   const [bio, setBio]             = useState("");
   const [phone, setPhone]         = useState("");
   const [website, setWebsite]     = useState("");
+  const [whatsapp, setWhatsapp]   = useState("");
+  const [facebook, setFacebook]   = useState("");
+  const [instagram, setInstagram] = useState("");
   const [avatarFile, setAvatarFile]   = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [coverFile, setCoverFile]     = useState<File | null>(null);
@@ -46,7 +49,7 @@ export default function NewProfessionalPage() {
       if (avatarFile) { const r = await uploadImage(avatarFile); avatar = r.url; }
       if (coverFile)  { const r = await uploadImage(coverFile);  cover_image = r.url; }
 
-      await createProfessional({ name, profession, bio, phone, website, avatar, cover_image });
+      await createProfessional({ name, profession, bio, phone, website, avatar, cover_image, whatsapp, facebook, instagram });
       router.push("/dashboard");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error al crear perfil");
@@ -97,6 +100,25 @@ export default function NewProfessionalPage() {
           <div className="space-y-1">
             <Label htmlFor="website">Sitio web / LinkedIn</Label>
             <Input id="website" value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="linkedin.com/in/..." />
+          </div>
+        </div>
+
+        {/* Redes sociales */}
+        <div className="space-y-3">
+          <Label>Redes sociales (opcional)</Label>
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <span className="w-24 shrink-0 text-xs text-muted-foreground">WhatsApp</span>
+              <Input value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder="573001234567 o enlace wa.me/..." />
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="w-24 shrink-0 text-xs text-muted-foreground">Facebook</span>
+              <Input value={facebook} onChange={(e) => setFacebook(e.target.value)} placeholder="facebook.com/tu-página o @usuario" />
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="w-24 shrink-0 text-xs text-muted-foreground">Instagram</span>
+              <Input value={instagram} onChange={(e) => setInstagram(e.target.value)} placeholder="@usuario o instagram.com/..." />
+            </div>
           </div>
         </div>
 

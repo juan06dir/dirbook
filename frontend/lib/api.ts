@@ -283,6 +283,9 @@ export interface ProfessionalOut {
   website: string | null;
   avatar: string | null;
   cover_image: string | null;
+  whatsapp: string | null;
+  facebook: string | null;
+  instagram: string | null;
   owner_id: string;
   created_at: string;
 }
@@ -295,6 +298,9 @@ export interface ProfessionalCreate {
   website?: string;
   avatar?: string;
   cover_image?: string;
+  whatsapp?: string;
+  facebook?: string;
+  instagram?: string;
 }
 
 export interface ProfessionalsFilter {

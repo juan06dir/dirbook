@@ -35,6 +35,9 @@ _migrations = [
     "ALTER TABLE locals ADD COLUMN IF NOT EXISTS whatsapp  VARCHAR",
     "ALTER TABLE locals ADD COLUMN IF NOT EXISTS facebook  VARCHAR",
     "ALTER TABLE locals ADD COLUMN IF NOT EXISTS instagram VARCHAR",
+    "ALTER TABLE professional_profiles ADD COLUMN IF NOT EXISTS whatsapp  VARCHAR",
+    "ALTER TABLE professional_profiles ADD COLUMN IF NOT EXISTS facebook  VARCHAR",
+    "ALTER TABLE professional_profiles ADD COLUMN IF NOT EXISTS instagram VARCHAR",
     """CREATE TABLE IF NOT EXISTS password_reset_tokens (
         id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         user_id    UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,

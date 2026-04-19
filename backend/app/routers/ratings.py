@@ -5,6 +5,7 @@ from sqlalchemy import func
 from app.database import get_db
 from app.models.rating import Rating
 from app.models.local import Local
+from app.models.notification import Notification
 from app.core.dependencies import get_current_user, get_optional_user
 from app.models.user import User
 from pydantic import BaseModel, field_validator
@@ -60,8 +61,21 @@ def rate_local(
         )
         db.add(rating)
 
+    is_new = not existing
     try:
         db.commit()
+        # Notificar al dueño del local solo en calificaciones nuevas (no en ediciones)
+        if is_new and local.owner_id != current_user.id:
+            stars = "⭐" * data.score
+            notif = Notification(
+                user_id    = local.owner_id,
+                type       = "rating",
+                message    = f"{current_user.name} calificó tu local "{local.name}" con {data.score}/5 {stars}",
+                local_id   = local.id,
+                local_name = local.name,
+            )
+            db.add(notif)
+            db.commit()
     except IntegrityError:
         db.rollback()
         raise HTTPException(status_code=400, detail="Error al guardar calificación")

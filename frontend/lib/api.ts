@@ -345,6 +345,26 @@ export async function getProfessionalPosts(profId: string, post_type?: PostType)
   return request<PostOut[]>(`/posts/professional/${profId}${qs}`);
 }
 
+// ── Notifications ─────────────────────────────────────────────────────────────
+
+export interface NotificationOut {
+  id: string;
+  type: string;
+  message: string;
+  local_id: string | null;
+  local_name: string | null;
+  read: boolean;
+  created_at: string;
+}
+
+export async function getNotifications(): Promise<NotificationOut[]> {
+  return request<NotificationOut[]>("/notifications");
+}
+
+export async function markNotificationsRead(): Promise<void> {
+  return request<void>("/notifications/read", { method: "PUT" });
+}
+
 // ── Upload ────────────────────────────────────────────────────────────────────
 
 export async function uploadImage(file: File): Promise<{ url: string }> {

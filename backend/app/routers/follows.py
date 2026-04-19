@@ -4,6 +4,7 @@ from sqlalchemy.exc import IntegrityError
 from app.database import get_db
 from app.models.follow import Follow
 from app.models.local import Local
+from app.models.notification import Notification
 from app.core.dependencies import get_current_user, get_optional_user
 from app.models.user import User
 from pydantic import BaseModel
@@ -38,6 +39,17 @@ def follow_local(
         db.add(follow)
         try:
             db.commit()
+            # Notificar al dueño del local (si no es el mismo usuario)
+            if local.owner_id != current_user.id:
+                notif = Notification(
+                    user_id    = local.owner_id,
+                    type       = "follow",
+                    message    = f"{current_user.name} ahora sigue tu local "{local.name}"",
+                    local_id   = local.id,
+                    local_name = local.name,
+                )
+                db.add(notif)
+                db.commit()
         except IntegrityError:
             db.rollback()
 

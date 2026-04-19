@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy import text
 from app.database import engine, Base
-from app.routers import auth, locals, professionals, posts, upload, follows, ratings
+from app.routers import auth, locals, professionals, posts, upload, follows, ratings, notifications
 import app.models
 import os
 
@@ -38,6 +38,16 @@ _migrations = [
     "ALTER TABLE professional_profiles ADD COLUMN IF NOT EXISTS whatsapp  VARCHAR",
     "ALTER TABLE professional_profiles ADD COLUMN IF NOT EXISTS facebook  VARCHAR",
     "ALTER TABLE professional_profiles ADD COLUMN IF NOT EXISTS instagram VARCHAR",
+    """CREATE TABLE IF NOT EXISTS notifications (
+        id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id    UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        type       VARCHAR NOT NULL,
+        message    VARCHAR NOT NULL,
+        local_id   UUID,
+        local_name VARCHAR,
+        read       BOOLEAN DEFAULT FALSE,
+        created_at TIMESTAMP DEFAULT NOW()
+    )""",
     """CREATE TABLE IF NOT EXISTS password_reset_tokens (
         id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         user_id    UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -71,6 +81,7 @@ app.include_router(posts.router)
 app.include_router(upload.router)
 app.include_router(follows.router)
 app.include_router(ratings.router)
+app.include_router(notifications.router)
 
 @app.get("/")
 def root():

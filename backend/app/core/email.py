@@ -17,8 +17,9 @@ def send_reset_email(to_email: str, reset_url: str, user_name: str) -> None:
     year = datetime.datetime.utcnow().year
 
     msg = MIMEMultipart("alternative")
+    sender_addr = settings.SMTP_USER or settings.SMTP_FROM
     msg["Subject"] = "Recupera tu contraseña - Dirbook"
-    msg["From"]    = f"Dirbook <{settings.SMTP_FROM}>"
+    msg["From"]    = f"Dirbook <{sender_addr}>"
     msg["To"]      = to_email
 
     html = f"""<!DOCTYPE html>
@@ -113,12 +114,17 @@ def send_reset_email(to_email: str, reset_url: str, user_name: str) -> None:
     msg.attach(MIMEText(text, "plain"))
     msg.attach(MIMEText(html, "html"))
 
+    # Gmail obliga a que el remitente del sobre (envelope) coincida con la cuenta autenticada
+    envelope_from = settings.SMTP_USER or settings.SMTP_FROM
+
     try:
         with smtplib.SMTP(settings.SMTP_HOST, settings.SMTP_PORT, timeout=10) as server:
             server.ehlo()
             server.starttls()
+            server.ehlo()
             server.login(settings.SMTP_USER, settings.SMTP_PASSWORD)
-            server.sendmail(settings.SMTP_FROM, to_email, msg.as_string())
+            server.sendmail(envelope_from, to_email, msg.as_string())
+        print(f"[DIRBOOK] Email enviado a {to_email}")
     except Exception as exc:
         print(f"[DIRBOOK] Error al enviar email a {to_email}: {exc}")
         print(f"[DIRBOOK - FALLBACK] Enlace de recuperación: {reset_url}")

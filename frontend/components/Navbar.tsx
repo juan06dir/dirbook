@@ -1,18 +1,104 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import {
-  Building2, LogOut, LayoutDashboard, LogIn, UserPlus, Users, Menu, X, Map,
+  Building2, LogOut, LayoutDashboard, LogIn, UserPlus, Users, Menu, X, Map, Bell,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { getNotifications, markNotificationsRead, NotificationOut } from "@/lib/api";
+
+function NotifPanel({
+  notifs, onClose,
+}: {
+  notifs: NotificationOut[];
+  onClose: () => void;
+}) {
+  return (
+    <div className="absolute right-0 top-full mt-2 w-80 rounded-xl border bg-white shadow-xl z-[200] overflow-hidden">
+      <div className="flex items-center justify-between px-4 py-3 border-b">
+        <span className="font-semibold text-sm">Notificaciones</span>
+        <button onClick={onClose} className="text-muted-foreground hover:text-foreground">
+          <X className="h-4 w-4" />
+        </button>
+      </div>
+      <div className="max-h-80 overflow-y-auto divide-y">
+        {notifs.length === 0 ? (
+          <p className="py-8 text-center text-sm text-muted-foreground">Sin notificaciones</p>
+        ) : (
+          notifs.map((n) => (
+            <div
+              key={n.id}
+              className={`px-4 py-3 text-sm ${n.read ? "text-muted-foreground" : "bg-yellow-50 font-medium"}`}
+            >
+              <p className="leading-snug">{n.message}</p>
+              <p className="mt-0.5 text-xs text-muted-foreground">
+                {new Date(n.created_at).toLocaleDateString("es", {
+                  dateStyle: "medium",
+                })}{" "}
+                {new Date(n.created_at).toLocaleTimeString("es", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </p>
+            </div>
+          ))
+        )}
+      </div>
+      {notifs.some((n) => !n.read) && (
+        <div className="border-t px-4 py-2">
+          <button
+            onClick={onClose}
+            className="text-xs text-primary hover:underline"
+          >
+            Marcar todas como leídas
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function Navbar() {
   const { user, logout } = useAuth();
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [notifOpen, setNotifOpen] = useState(false);
+  const [notifs, setNotifs] = useState<NotificationOut[]>([]);
+  const notifRef = useRef<HTMLDivElement>(null);
+
+  const unread = notifs.filter((n) => !n.read).length;
+
+  // Cargar notificaciones cuando hay usuario
+  useEffect(() => {
+    if (!user) { setNotifs([]); return; }
+    getNotifications().then(setNotifs).catch(() => {});
+    const interval = setInterval(() => {
+      getNotifications().then(setNotifs).catch(() => {});
+    }, 30_000); // refresca cada 30 s
+    return () => clearInterval(interval);
+  }, [user]);
+
+  // Cerrar al hacer clic fuera
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (notifRef.current && !notifRef.current.contains(e.target as Node)) {
+        setNotifOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  const openNotif = async () => {
+    setNotifOpen((v) => !v);
+    if (!notifOpen && unread > 0) {
+      await markNotificationsRead().catch(() => {});
+      setNotifs((prev) => prev.map((n) => ({ ...n, read: true })));
+    }
+  };
 
   const handleLogout = () => {
     logout();
@@ -43,6 +129,26 @@ export default function Navbar() {
           {user ? (
             <>
               <span className="text-sm text-muted-foreground">Hola, {user.name.split(" ")[0]}</span>
+
+              {/* Campana */}
+              <div className="relative" ref={notifRef}>
+                <button
+                  onClick={openNotif}
+                  className="relative p-2 rounded-md hover:bg-muted transition-colors"
+                  aria-label="Notificaciones"
+                >
+                  <Bell className="h-5 w-5" />
+                  {unread > 0 && (
+                    <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+                      {unread > 9 ? "9+" : unread}
+                    </span>
+                  )}
+                </button>
+                {notifOpen && (
+                  <NotifPanel notifs={notifs} onClose={() => setNotifOpen(false)} />
+                )}
+              </div>
+
               <Button variant="ghost" size="sm" asChild>
                 <Link href="/dashboard"><LayoutDashboard className="mr-1 h-4 w-4" />Mi panel</Link>
               </Button>
@@ -63,13 +169,35 @@ export default function Navbar() {
         </nav>
 
         {/* Hamburger — móvil */}
-        <button
-          className="sm:hidden p-2 rounded-md hover:bg-muted transition-colors"
-          onClick={() => setMenuOpen((v) => !v)}
-          aria-label="Menú"
-        >
-          {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </button>
+        <div className="sm:hidden flex items-center gap-2">
+          {/* Campana móvil */}
+          {user && (
+            <div className="relative" ref={notifRef}>
+              <button
+                onClick={openNotif}
+                className="relative p-2 rounded-md hover:bg-muted transition-colors"
+                aria-label="Notificaciones"
+              >
+                <Bell className="h-5 w-5" />
+                {unread > 0 && (
+                  <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+                    {unread > 9 ? "9+" : unread}
+                  </span>
+                )}
+              </button>
+              {notifOpen && (
+                <NotifPanel notifs={notifs} onClose={() => setNotifOpen(false)} />
+              )}
+            </div>
+          )}
+          <button
+            className="p-2 rounded-md hover:bg-muted transition-colors"
+            onClick={() => setMenuOpen((v) => !v)}
+            aria-label="Menú"
+          >
+            {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
+        </div>
       </div>
 
       {/* Menú desplegable móvil */}

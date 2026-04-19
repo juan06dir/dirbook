@@ -3,12 +3,12 @@
 import { useEffect, useState, useRef } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { getLocals, LocalOut } from "@/lib/api";
+import { getLocals, LocalOut, getFeed, PostOut } from "@/lib/api";
 import { GeoLocal } from "@/components/ExploreMap";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-  MapPin, Navigation, Star, Users, Loader2, Building2,
+  MapPin, Navigation, Star, Users, Loader2, Building2, CalendarDays, Tag,
 } from "lucide-react";
 
 /* ExploreMap solo en cliente (Leaflet no soporta SSR) */
@@ -72,19 +72,62 @@ function StarRow({ rating, count }: { rating: number | null; count: number }) {
   );
 }
 
+function EventCard({ post, locals }: { post: PostOut; locals: LocalOut[] }) {
+  const local = locals.find((l) => l.id === post.local_id);
+  const logo  = local ? imageUrl(local.logo) : null;
+  const start = post.event_start ? new Date(post.event_start) : null;
+
+  return (
+    <Link
+      href={local ? `/locals/${local.id}` : "#"}
+      className="flex items-start gap-3 px-4 py-3 hover:bg-yellow-50 transition-colors"
+    >
+      {/* Logo del local */}
+      <div className="h-10 w-10 shrink-0 overflow-hidden rounded-lg bg-muted border">
+        {logo
+          ? <img src={logo} alt="" className="h-full w-full object-cover" /> // eslint-disable-line
+          : <div className="flex h-full items-center justify-center bg-yellow-400 text-black font-bold text-xs">
+              {(local?.name ?? "?").slice(0, 2).toUpperCase()}
+            </div>
+        }
+      </div>
+
+      <div className="flex-1 min-w-0">
+        <p className="font-semibold text-sm truncate">{post.title ?? post.content.slice(0, 40)}</p>
+        {local && <p className="text-xs text-muted-foreground truncate">{local.name}</p>}
+        {start && (
+          <span className="flex items-center gap-1 text-xs text-primary mt-0.5">
+            <CalendarDays className="h-3 w-3" />
+            {start.toLocaleDateString("es", { dateStyle: "medium" })}
+          </span>
+        )}
+        {post.post_type === "discount" && post.discount_pct && (
+          <span className="flex items-center gap-1 text-xs text-green-600 font-semibold mt-0.5">
+            <Tag className="h-3 w-3" />
+            {post.discount_pct}% de descuento
+          </span>
+        )}
+      </div>
+    </Link>
+  );
+}
+
 export default function ExplorePage() {
   const [locals,    setLocals]    = useState<LocalOut[]>([]);
   const [geoLocals, setGeoLocals] = useState<GeoLocal[]>([]);
+  const [events,    setEvents]    = useState<PostOut[]>([]);
   const [category,  setCategory]  = useState("Todos");
+  const [sideTab,   setSideTab]   = useState<"locales" | "eventos">("locales");
   const [userCoords, setUserCoords] = useState<[number, number] | null>(null);
   const [center,    setCenter]    = useState<[number, number]>(DEFAULT_CENTER);
   const [loadingGeo, setLoadingGeo] = useState(false);
   const [geocoding,  setGeocoding]  = useState(false);
   const cancelRef = useRef(false);
 
-  /* Cargar todos los locales */
+  /* Cargar todos los locales y eventos */
   useEffect(() => {
     getLocals({ limit: 100 }).then(setLocals).catch(() => {});
+    getFeed({ post_type: "event", limit: 50 }).then(setEvents).catch(() => {});
   }, []);
 
   /* Geocodificar secuencialmente (respeta rate-limit de Nominatim) */
@@ -130,7 +173,7 @@ export default function ExplorePage() {
     );
   };
 
-  /* Filtros */
+  /* Filtros de locales */
   const filtered = category === "Todos"
     ? geoLocals
     : geoLocals.filter((g) => g.local.category === category);
@@ -145,6 +188,14 @@ export default function ExplorePage() {
     .sort((a, b) => b.followers_count - a.followers_count);
 
   const sideList = [...topLocals, ...noRating];
+
+  /* Filtro de eventos */
+  const filteredEvents = category === "Todos"
+    ? events
+    : events.filter((e) => {
+        const local = locals.find((l) => l.id === e.local_id);
+        return local?.category === category;
+      });
 
   return (
     <div className="flex h-[calc(100vh-64px)] flex-col">
@@ -202,73 +253,112 @@ export default function ExplorePage() {
         {/* Panel lateral */}
         <aside className="w-full md:w-80 lg:w-96 border-t md:border-t-0 md:border-l bg-white flex flex-col overflow-hidden shrink-0">
 
-          {/* Header del panel */}
-          <div className="px-4 py-3 border-b shrink-0">
-            <h2 className="font-bold text-sm flex items-center gap-2">
-              <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
-              {category === "Todos" ? "Mejor calificados" : `${category} — Mejor calificados`}
-            </h2>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              {filtered.length} en el mapa · {sideList.length} en total
+          {/* Tabs */}
+          <div className="flex border-b shrink-0">
+            <button
+              onClick={() => setSideTab("locales")}
+              className={`flex-1 flex items-center justify-center gap-1.5 py-3 text-xs font-semibold transition-colors ${
+                sideTab === "locales"
+                  ? "border-b-2 border-primary text-primary"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <Star className="h-3.5 w-3.5" />
+              Top locales
+              <span className="rounded-full bg-muted px-1.5 py-0.5 text-[10px]">{sideList.length}</span>
+            </button>
+            <button
+              onClick={() => setSideTab("eventos")}
+              className={`flex-1 flex items-center justify-center gap-1.5 py-3 text-xs font-semibold transition-colors ${
+                sideTab === "eventos"
+                  ? "border-b-2 border-primary text-primary"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <CalendarDays className="h-3.5 w-3.5" />
+              Eventos
+              <span className="rounded-full bg-muted px-1.5 py-0.5 text-[10px]">{filteredEvents.length}</span>
+            </button>
+          </div>
+
+          {/* Sub-header */}
+          <div className="px-4 py-2 border-b shrink-0 bg-gray-50">
+            <p className="text-xs text-muted-foreground">
+              {sideTab === "locales"
+                ? `${filtered.length} en el mapa · ${sideList.length} en total`
+                : `${filteredEvents.length} eventos${category !== "Todos" ? ` en ${category}` : ""}`
+              }
             </p>
           </div>
 
           {/* Lista */}
           <div className="flex-1 overflow-y-auto divide-y">
-            {sideList.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
-                <Building2 className="h-10 w-10 opacity-20 mb-2" />
-                <p className="text-sm">Sin locales en esta categoría</p>
-              </div>
-            ) : (
-              sideList.map((local, idx) => {
-                const logo = imageUrl(local.logo);
-                return (
-                  <Link
-                    key={local.id}
-                    href={`/locals/${local.id}`}
-                    className="flex items-center gap-3 px-4 py-3 hover:bg-yellow-50 transition-colors"
-                  >
-                    {/* Posición */}
-                    {local.avg_rating && (
-                      <span className="w-6 shrink-0 text-center text-xs font-bold text-muted-foreground">
-                        {idx + 1}
-                      </span>
-                    )}
 
-                    {/* Logo */}
-                    <div className="h-11 w-11 shrink-0 overflow-hidden rounded-lg bg-muted border">
-                      {logo
-                        ? <img src={logo} alt="" className="h-full w-full object-cover" /> // eslint-disable-line
-                        : <div className="flex h-full items-center justify-center bg-yellow-400 text-black font-bold text-sm">
-                            {local.name.slice(0, 2).toUpperCase()}
-                          </div>
-                      }
-                    </div>
-
-                    {/* Info */}
-                    <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-sm truncate">{local.name}</p>
-                      <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                        <Badge variant="secondary" className="text-xs px-1.5 py-0">{local.category}</Badge>
-                        <StarRow rating={local.avg_rating} count={local.ratings_count} />
+            {/* ── Tab: Top locales ── */}
+            {sideTab === "locales" && (
+              sideList.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
+                  <Building2 className="h-10 w-10 opacity-20 mb-2" />
+                  <p className="text-sm">Sin locales en esta categoría</p>
+                </div>
+              ) : (
+                sideList.map((local, idx) => {
+                  const logo = imageUrl(local.logo);
+                  return (
+                    <Link
+                      key={local.id}
+                      href={`/locals/${local.id}`}
+                      className="flex items-center gap-3 px-4 py-3 hover:bg-yellow-50 transition-colors"
+                    >
+                      {local.avg_rating && (
+                        <span className="w-6 shrink-0 text-center text-xs font-bold text-muted-foreground">
+                          {idx + 1}
+                        </span>
+                      )}
+                      <div className="h-11 w-11 shrink-0 overflow-hidden rounded-lg bg-muted border">
+                        {logo
+                          ? <img src={logo} alt="" className="h-full w-full object-cover" /> // eslint-disable-line
+                          : <div className="flex h-full items-center justify-center bg-yellow-400 text-black font-bold text-sm">
+                              {local.name.slice(0, 2).toUpperCase()}
+                            </div>
+                        }
                       </div>
-                      <span className="flex items-center gap-1 text-xs text-muted-foreground mt-0.5">
-                        <Users className="h-3 w-3" /> {local.followers_count} seguidores
-                        {local.city && <> · <MapPin className="h-3 w-3" />{local.city}</>}
-                      </span>
-                    </div>
-
-                    {/* Indicador de en mapa */}
-                    {geoLocals.find((g) => g.local.id === local.id) && (
-                      <span title="Visible en el mapa" className="text-yellow-500">
-                        <MapPin className="h-4 w-4 fill-yellow-400" />
-                      </span>
-                    )}
-                  </Link>
-                );
-              })
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-sm truncate">{local.name}</p>
+                        <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                          <Badge variant="secondary" className="text-xs px-1.5 py-0">{local.category}</Badge>
+                          <StarRow rating={local.avg_rating} count={local.ratings_count} />
+                        </div>
+                        <span className="flex items-center gap-1 text-xs text-muted-foreground mt-0.5">
+                          <Users className="h-3 w-3" /> {local.followers_count} seguidores
+                          {local.city && <> · <MapPin className="h-3 w-3" />{local.city}</>}
+                        </span>
+                      </div>
+                      {geoLocals.find((g) => g.local.id === local.id) && (
+                        <span title="Visible en el mapa" className="text-yellow-500">
+                          <MapPin className="h-4 w-4 fill-yellow-400" />
+                        </span>
+                      )}
+                    </Link>
+                  );
+                })
+              )
             )}
+
+            {/* ── Tab: Eventos ── */}
+            {sideTab === "eventos" && (
+              filteredEvents.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
+                  <CalendarDays className="h-10 w-10 opacity-20 mb-2" />
+                  <p className="text-sm">Sin eventos publicados aún</p>
+                </div>
+              ) : (
+                filteredEvents.map((post) => (
+                  <EventCard key={post.id} post={post} locals={locals} />
+                ))
+              )
+            )}
+
           </div>
         </aside>
       </div>

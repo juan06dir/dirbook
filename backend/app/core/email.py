@@ -15,7 +15,7 @@ def _send_via_resend(to_email: str, subject: str, html: str, text: str, reply_to
         import resend
         resend.api_key = settings.RESEND_API_KEY
         params: resend.Emails.SendParams = {
-            "from": f"Dirbook <onboarding@resend.dev>",
+            "from": "Dirbook <noreply@dirbook.com.co>",
             "to": [to_email],
             "subject": subject,
             "html": html,

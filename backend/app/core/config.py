@@ -19,6 +19,7 @@ class Settings(BaseSettings):
     SMTP_PASSWORD: Optional[str] = None
     SMTP_FROM:     str           = "noreply@dirbook.com"
     FRONTEND_URL:  str           = "http://localhost:3000"
+    RESEND_API_KEY: Optional[str] = None
 
     class Config:
         env_file = ".env"

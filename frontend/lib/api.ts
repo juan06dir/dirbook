@@ -349,7 +349,7 @@ export async function getProfessionalPosts(profId: string, post_type?: PostType)
 
 export interface NotificationOut {
   id: string;
-  type: string;
+  notif_type: string;
   message: string;
   local_id: string | null;
   local_name: string | null;

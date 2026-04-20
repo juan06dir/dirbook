@@ -1,11 +1,18 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from sqlalchemy.orm import Session
 from sqlalchemy import text
-from app.database import engine, Base
-from app.routers import auth, locals, professionals, posts, upload, follows, ratings, notifications
+from app.database import engine, Base, get_db
+from app.routers import auth, locals, professionals, posts, upload, follows, ratings
+from app.core.dependencies import get_current_user
+from app.models.user import User
 import app.models
 import os
+import datetime
+from typing import List, Optional
+from uuid import UUID
+from pydantic import BaseModel
 
 app = FastAPI(title="Dirbook API", version="1.0.0")
 
@@ -41,13 +48,14 @@ _migrations = [
     """CREATE TABLE IF NOT EXISTS notifications (
         id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         user_id    UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-        type       VARCHAR NOT NULL,
+        notif_type VARCHAR NOT NULL,
         message    VARCHAR NOT NULL,
         local_id   UUID,
         local_name VARCHAR,
         read       BOOLEAN DEFAULT FALSE,
         created_at TIMESTAMP DEFAULT NOW()
     )""",
+    "DO $$ BEGIN IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='notifications' AND column_name='type') THEN ALTER TABLE notifications RENAME COLUMN \"type\" TO notif_type; END IF; END $$;",
     """CREATE TABLE IF NOT EXISTS password_reset_tokens (
         id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         user_id    UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -81,7 +89,61 @@ app.include_router(posts.router)
 app.include_router(upload.router)
 app.include_router(follows.router)
 app.include_router(ratings.router)
-app.include_router(notifications.router)
+
+# ── Notificaciones (inline para evitar conflicto con Pydantic v2 + FastAPI) ──
+
+class NotifOut(BaseModel):
+    id: UUID
+    notif_type: str
+    message: str
+    local_id: Optional[UUID]
+    local_name: Optional[str]
+    read: bool
+    created_at: datetime.datetime
+
+    model_config = {"from_attributes": True}
+
+
+@app.get("/notifications", response_model=List[NotifOut], tags=["Notifications"])
+def get_notifications(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    from app.models.notification import Notification
+    rows = (
+        db.query(Notification)
+        .filter(Notification.user_id == current_user.id)
+        .order_by(Notification.created_at.desc())
+        .limit(50)
+        .all()
+    )
+    return [
+        NotifOut(
+            id=r.id,
+            notif_type=r.notif_type,
+            message=r.message,
+            local_id=r.local_id,
+            local_name=r.local_name,
+            read=r.read,
+            created_at=r.created_at,
+        )
+        for r in rows
+    ]
+
+
+@app.put("/notifications/read", tags=["Notifications"])
+def mark_notifications_read(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    from app.models.notification import Notification
+    db.query(Notification).filter(
+        Notification.user_id == current_user.id,
+        Notification.read == False,  # noqa: E712
+    ).update({"read": True})
+    db.commit()
+    return {"ok": True}
+
 
 @app.get("/")
 def root():

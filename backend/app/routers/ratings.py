@@ -69,8 +69,8 @@ def rate_local(
             stars = "⭐" * data.score
             notif = Notification(
                 user_id    = local.owner_id,
-                type       = "rating",
-                message    = f"{current_user.name} calificó tu local "{local.name}" con {data.score}/5 {stars}",
+                notif_type = "rating",
+                message    = f'{current_user.name} calificó tu local "{local.name}" con {data.score}/5 {stars}',
                 local_id   = local.id,
                 local_name = local.name,
             )

@@ -9,7 +9,7 @@ class Notification(Base):
 
     id         = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     user_id    = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
-    type       = Column(String, nullable=False)   # "follow" | "rating"
+    notif_type = Column(String, nullable=False)   # "follow" | "rating"
     message    = Column(String, nullable=False)
     local_id   = Column(UUID(as_uuid=True), nullable=True)
     local_name = Column(String, nullable=True)

@@ -43,8 +43,8 @@ def follow_local(
             if local.owner_id != current_user.id:
                 notif = Notification(
                     user_id    = local.owner_id,
-                    type       = "follow",
-                    message    = f"{current_user.name} ahora sigue tu local "{local.name}"",
+                    notif_type = "follow",
+                    message    = f'{current_user.name} ahora sigue tu local "{local.name}"',
                     local_id   = local.id,
                     local_name = local.name,
                 )

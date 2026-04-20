@@ -4,6 +4,7 @@ import datetime
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
+from app.core.dependencies import get_current_user
 
 from app.database import get_db
 from app.models.user import User
@@ -116,3 +117,41 @@ def reset_password(data: ResetPasswordRequest, db: Session = Depends(get_db)):
     db.commit()
 
     return {"message": "Contraseña actualizada correctamente. Ya puedes iniciar sesión."}
+
+
+@router.delete("/me", status_code=204)
+def delete_account(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Elimina la cuenta del usuario y todos sus datos asociados."""
+    from app.models.local import Local
+    from app.models.professional import ProfessionalProfile
+    from app.models.follow import Follow
+    from app.models.rating import Rating
+    from app.models.post import Post
+    from app.models.password_reset import PasswordResetToken
+    from app.models.notification import Notification
+
+    uid = current_user.id
+
+    # Limpiar datos relacionados antes de borrar el usuario
+    locals_ = db.query(Local).filter(Local.owner_id == uid).all()
+    for local in locals_:
+        db.query(Follow).filter(Follow.local_id == local.id).delete(synchronize_session=False)
+        db.query(Rating).filter(Rating.local_id == local.id).delete(synchronize_session=False)
+        db.query(Post).filter(Post.local_id == local.id).delete(synchronize_session=False)
+    db.query(Local).filter(Local.owner_id == uid).delete(synchronize_session=False)
+
+    profs = db.query(ProfessionalProfile).filter(ProfessionalProfile.owner_id == uid).all()
+    for prof in profs:
+        db.query(Post).filter(Post.professional_id == prof.id).delete(synchronize_session=False)
+    db.query(ProfessionalProfile).filter(ProfessionalProfile.owner_id == uid).delete(synchronize_session=False)
+
+    db.query(Follow).filter(Follow.user_id == uid).delete(synchronize_session=False)
+    db.query(Rating).filter(Rating.user_id == uid).delete(synchronize_session=False)
+    db.query(PasswordResetToken).filter(PasswordResetToken.user_id == uid).delete(synchronize_session=False)
+    db.query(Notification).filter(Notification.user_id == uid).delete(synchronize_session=False)
+
+    db.delete(current_user)
+    db.commit()

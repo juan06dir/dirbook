@@ -7,10 +7,11 @@ import Link from "next/link";
 import {
   getMyLocals, deleteLocal, LocalOut,
   getMyProfessionals, deleteProfessional, ProfessionalOut,
+  deleteAccount,
 } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Pencil, Trash2, Eye, Building2, Users, Star, FilePlus, UserCircle2, Briefcase } from "lucide-react";
+import { Plus, Pencil, Trash2, Eye, Building2, Users, Star, FilePlus, UserCircle2, Briefcase, AlertTriangle } from "lucide-react";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -21,13 +22,14 @@ function imageUrl(path: string | null) {
 }
 
 export default function DashboardPage() {
-  const { user, loading } = useAuth();
+  const { user, loading, logout } = useAuth();
   const router = useRouter();
 
   const [locals, setLocals]           = useState<LocalOut[]>([]);
   const [professionals, setProfessionals] = useState<ProfessionalOut[]>([]);
   const [fetching, setFetching]       = useState(true);
   const [deleting, setDeleting]       = useState<string | null>(null);
+  const [deletingAccount, setDeletingAccount] = useState(false);
   const [tab, setTab]                 = useState<"locals" | "professionals">("locals");
 
   useEffect(() => {
@@ -62,6 +64,22 @@ export default function DashboardPage() {
     } catch (err) {
       alert(err instanceof Error ? err.message : "Error al eliminar");
     } finally { setDeleting(null); }
+  };
+
+  const handleDeleteAccount = async () => {
+    const confirmed = confirm(
+      "¿Estás seguro de que quieres eliminar tu cuenta?\n\nEsto borrará permanentemente tu cuenta, todos tus locales, perfiles profesionales y publicaciones. Esta acción NO se puede deshacer."
+    );
+    if (!confirmed) return;
+    setDeletingAccount(true);
+    try {
+      await deleteAccount();
+      logout();
+      router.push("/");
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Error al eliminar cuenta");
+      setDeletingAccount(false);
+    }
   };
 
   if (loading || !user) return null;
@@ -186,6 +204,26 @@ export default function DashboardPage() {
           </div>
         )
       )}
+
+      {/* ── Zona de peligro ── */}
+      <div className="mt-10 rounded-xl border border-red-200 bg-red-50 p-5">
+        <h2 className="flex items-center gap-2 font-semibold text-red-700 mb-1">
+          <AlertTriangle className="h-4 w-4" /> Zona de peligro
+        </h2>
+        <p className="text-sm text-red-600 mb-4">
+          Eliminar tu cuenta borrará permanentemente todos tus datos: locales, perfiles profesionales y publicaciones.
+        </p>
+        <Button
+          variant="outline"
+          size="sm"
+          className="border-red-400 text-red-600 hover:bg-red-100 hover:text-red-700"
+          onClick={handleDeleteAccount}
+          disabled={deletingAccount}
+        >
+          <Trash2 className="mr-2 h-4 w-4" />
+          {deletingAccount ? "Eliminando cuenta…" : "Eliminar mi cuenta"}
+        </Button>
+      </div>
 
       {/* ── Profesionales ── */}
       {tab === "professionals" && (

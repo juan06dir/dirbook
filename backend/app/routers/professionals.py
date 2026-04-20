@@ -87,5 +87,7 @@ def delete_professional(
     ).first()
     if not profile:
         raise HTTPException(status_code=404, detail="Perfil no encontrado o no autorizado")
+    from app.models.post import Post
+    db.query(Post).filter(Post.professional_id == profile_id).delete(synchronize_session=False)
     db.delete(profile)
     db.commit()

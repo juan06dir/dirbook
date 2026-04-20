@@ -345,6 +345,10 @@ export async function getProfessionalPosts(profId: string, post_type?: PostType)
   return request<PostOut[]>(`/posts/professional/${profId}${qs}`);
 }
 
+export async function deleteAccount(): Promise<void> {
+  return request<void>("/auth/me", { method: "DELETE" });
+}
+
 // ── Notifications ─────────────────────────────────────────────────────────────
 
 export interface NotificationOut {

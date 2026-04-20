@@ -5,7 +5,7 @@ import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import {
-  Building2, LogOut, LayoutDashboard, LogIn, UserPlus, Users, Menu, X, Map, Bell,
+  Building2, LogOut, LayoutDashboard, LogIn, UserPlus, Users, Menu, X, Map, Bell, MessageSquare,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getNotifications, markNotificationsRead, NotificationOut } from "@/lib/api";
@@ -122,6 +122,9 @@ export default function Navbar() {
           <Link href="/explore" className="flex items-center gap-1 px-3 py-1.5 rounded-md hover:bg-muted transition-colors font-medium text-primary">
             <Map className="h-3.5 w-3.5" /> Mapa
           </Link>
+          <Link href="/suggestions" className="flex items-center gap-1 px-3 py-1.5 rounded-md hover:bg-muted transition-colors">
+            <MessageSquare className="h-3.5 w-3.5" /> Sugerencias
+          </Link>
         </nav>
 
         {/* Actions — desktop */}
@@ -214,6 +217,10 @@ export default function Navbar() {
           <Link href="/explore" onClick={() => setMenuOpen(false)}
             className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-primary hover:bg-primary/10 transition-colors">
             <Map className="h-4 w-4" /> Mapa — Explorar cerca
+          </Link>
+          <Link href="/suggestions" onClick={() => setMenuOpen(false)}
+            className="flex items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-muted transition-colors">
+            <MessageSquare className="h-4 w-4 text-muted-foreground" /> Sugerencias
           </Link>
           <div className="my-2 border-t" />
           {user ? (

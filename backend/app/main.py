@@ -145,6 +145,22 @@ def mark_notifications_read(
     return {"ok": True}
 
 
+class SuggestionIn(BaseModel):
+    name: str
+    email: str
+    message: str
+
+
+@app.post("/suggestions", status_code=201, tags=["Suggestions"])
+def submit_suggestion(data: SuggestionIn):
+    from app.core.email import send_suggestion_email
+    if not data.name.strip() or not data.email.strip() or not data.message.strip():
+        from fastapi import HTTPException
+        raise HTTPException(status_code=400, detail="Todos los campos son obligatorios")
+    send_suggestion_email(data.name.strip(), data.email.strip(), data.message.strip())
+    return {"ok": True}
+
+
 @app.get("/")
 def root():
     return {"message": "Dirbook API funcionando 🚀"}

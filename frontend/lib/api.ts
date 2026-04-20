@@ -371,6 +371,21 @@ export async function markNotificationsRead(): Promise<void> {
 
 // ── Upload ────────────────────────────────────────────────────────────────────
 
+// ── Suggestions ───────────────────────────────────────────────────────────────
+
+export async function submitSuggestion(
+  name: string,
+  email: string,
+  message: string
+): Promise<{ ok: boolean }> {
+  return request<{ ok: boolean }>("/suggestions", {
+    method: "POST",
+    body: JSON.stringify({ name, email, message }),
+  });
+}
+
+// ── Upload ────────────────────────────────────────────────────────────────────
+
 export async function uploadImage(file: File): Promise<{ url: string }> {
   const form = new FormData();
   form.append("file", file);

@@ -17,6 +17,7 @@ class UserOut(BaseModel):
     name: str
     email: str
     avatar: Optional[str]
+    is_admin: bool = False
     created_at: datetime
 
     class Config:

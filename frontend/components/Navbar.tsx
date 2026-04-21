@@ -5,7 +5,7 @@ import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import {
-  Building2, LogOut, LayoutDashboard, LogIn, UserPlus, Users, Menu, X, Map, Bell, MessageSquare,
+  Building2, LogOut, LayoutDashboard, LogIn, UserPlus, Users, Menu, X, Map, Bell, MessageSquare, ShieldCheck,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getNotifications, markNotificationsRead, NotificationOut } from "@/lib/api";
@@ -152,6 +152,11 @@ export default function Navbar() {
                 )}
               </div>
 
+              {user.is_admin && (
+                <Button variant="ghost" size="sm" asChild>
+                  <Link href="/admin"><ShieldCheck className="mr-1 h-4 w-4" />Admin</Link>
+                </Button>
+              )}
               <Button variant="ghost" size="sm" asChild>
                 <Link href="/dashboard"><LayoutDashboard className="mr-1 h-4 w-4" />Mi panel</Link>
               </Button>
@@ -226,6 +231,12 @@ export default function Navbar() {
           {user ? (
             <>
               <p className="px-3 py-1 text-xs text-muted-foreground">Hola, {user.name.split(" ")[0]}</p>
+              {user.is_admin && (
+                <Link href="/admin" onClick={() => setMenuOpen(false)}
+                  className="flex items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-muted transition-colors">
+                  <ShieldCheck className="h-4 w-4 text-yellow-500" /> Admin
+                </Link>
+              )}
               <Link href="/dashboard" onClick={() => setMenuOpen(false)}
                 className="flex items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-muted transition-colors">
                 <LayoutDashboard className="h-4 w-4 text-muted-foreground" /> Mi panel

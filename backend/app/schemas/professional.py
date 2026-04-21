@@ -41,6 +41,8 @@ class ProfessionalOut(BaseModel):
     instagram:  Optional[str]
     owner_id: UUID
     created_at: datetime
+    avg_rating:    Optional[float] = None
+    ratings_count: int             = 0
 
     class Config:
         from_attributes = True

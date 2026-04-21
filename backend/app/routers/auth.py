@@ -42,6 +42,8 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
     user = db.query(User).filter(User.email == form_data.username).first()
     if not user or not verify_password(form_data.password, user.password):
         raise HTTPException(status_code=401, detail="Credenciales incorrectas")
+    if user.is_blocked:
+        raise HTTPException(status_code=403, detail="Tu cuenta ha sido suspendida. Contacta al administrador.")
     token = create_access_token({"sub": str(user.id)})
     return {"access_token": token, "token_type": "bearer", "user": user}
 

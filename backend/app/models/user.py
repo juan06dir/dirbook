@@ -12,7 +12,9 @@ class User(Base):
     email    = Column(String, unique=True, nullable=False, index=True)
     password = Column(String, nullable=False)
     avatar   = Column(String, nullable=True)
-    is_active = Column(Boolean, default=True)
+    is_active  = Column(Boolean, default=True)
+    is_admin   = Column(Boolean, default=False)
+    is_blocked = Column(Boolean, default=False)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
 
     locals                = relationship("Local", back_populates="owner")

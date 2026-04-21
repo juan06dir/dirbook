@@ -38,6 +38,7 @@ export interface UserOut {
   name: string;
   email: string;
   avatar: string | null;
+  is_admin: boolean;
   created_at: string;
 }
 
@@ -370,6 +371,42 @@ export async function markNotificationsRead(): Promise<void> {
 }
 
 // ── Upload ────────────────────────────────────────────────────────────────────
+
+// ── Professional Ratings ──────────────────────────────────────────────────────
+
+export async function rateProfessional(profId: string, score: number, comment?: string): Promise<RatingSummary> {
+  return request<RatingSummary>(`/ratings/professional/${profId}`, {
+    method: "POST",
+    body: JSON.stringify({ score, comment }),
+  });
+}
+
+export async function getProfessionalRating(profId: string): Promise<RatingSummary> {
+  return request<RatingSummary>(`/ratings/professional/${profId}`);
+}
+
+// ── Admin ─────────────────────────────────────────────────────────────────────
+
+export interface UserAdminOut {
+  id: string;
+  name: string;
+  email: string;
+  is_admin: boolean;
+  is_blocked: boolean;
+  created_at: string;
+}
+
+export async function adminGetUsers(): Promise<UserAdminOut[]> {
+  return request<UserAdminOut[]>("/admin/users");
+}
+
+export async function adminBlockUser(userId: string): Promise<{ ok: boolean }> {
+  return request<{ ok: boolean }>(`/admin/users/${userId}/block`, { method: "POST" });
+}
+
+export async function adminUnblockUser(userId: string): Promise<{ ok: boolean }> {
+  return request<{ ok: boolean }>(`/admin/users/${userId}/unblock`, { method: "POST" });
+}
 
 // ── Suggestions ───────────────────────────────────────────────────────────────
 

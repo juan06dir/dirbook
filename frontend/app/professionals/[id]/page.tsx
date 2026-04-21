@@ -3,11 +3,12 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { getProfessional, ProfessionalOut, getProfessionalPosts, PostOut } from "@/lib/api";
+import { getProfessional, ProfessionalOut, getProfessionalPosts, PostOut, rateProfessional, getProfessionalRating, RatingSummary } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Phone, Globe, ArrowLeft, Mail, UserCircle2, Briefcase, Lock } from "lucide-react";
+import { Phone, Globe, ArrowLeft, Mail, UserCircle2, Briefcase, Lock, Star } from "lucide-react";
+import StarRating from "@/components/StarRating";
 
 function WhatsAppIcon({ className }: { className?: string }) {
   return (
@@ -54,13 +55,27 @@ export default function ProfessionalDetailPage() {
   const [contactOpen, setContactOpen] = useState(false);
   const [posts, setPosts]     = useState<PostOut[]>([]);
   const [postTab, setPostTab] = useState<"all" | "event" | "discount">("all");
+  const [rating, setRating]   = useState<RatingSummary | null>(null);
+  const [ratingLoading, setRatingLoading] = useState(false);
 
   useEffect(() => {
     Promise.all([getProfessional(id), getProfessionalPosts(id)])
       .then(([p, ps]) => { setProf(p); setPosts(ps); })
       .catch(() => setNotFound(true))
       .finally(() => setLoading(false));
+    getProfessionalRating(id).then(setRating).catch(() => {});
   }, [id]);
+
+  const handleRate = async (score: number) => {
+    if (!user) return;
+    setRatingLoading(true);
+    try {
+      const r = await rateProfessional(id, score);
+      setRating(r);
+    } finally {
+      setRatingLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (!prof) return;
@@ -267,6 +282,31 @@ export default function ProfessionalDetailPage() {
                     </a>
                   )}
                 </div>
+              )}
+            </div>
+
+            {/* Calificación */}
+            <div className="rounded-xl border bg-white p-5 shadow-sm space-y-3">
+              <h2 className="font-semibold">Calificación</h2>
+              {rating && (rating.avg !== null) && (
+                <div className="flex items-center gap-2">
+                  <StarRating value={rating.avg} size="md" showValue count={rating.count} />
+                </div>
+              )}
+              {user && prof.owner_id !== user.id && (
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">
+                    {rating?.my_score ? "Tu calificación:" : "Califica este perfil:"}
+                  </p>
+                  <StarRating
+                    value={rating?.my_score ?? null}
+                    onChange={ratingLoading ? undefined : handleRate}
+                    size="lg"
+                  />
+                </div>
+              )}
+              {(!rating || rating.count === 0) && (
+                <p className="text-xs text-muted-foreground">Sin calificaciones aún</p>
               )}
             </div>
 

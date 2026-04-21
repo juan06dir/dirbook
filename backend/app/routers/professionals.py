@@ -1,12 +1,26 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from app.database import get_db
 from app.models.professional import ProfessionalProfile
+from app.models.rating import Rating
 from app.schemas.professional import ProfessionalCreate, ProfessionalUpdate, ProfessionalOut
 from app.core.dependencies import get_current_user
 from app.models.user import User
 from typing import List, Optional
 from uuid import UUID
+
+
+def _enrich(profile: ProfessionalProfile, db: Session) -> ProfessionalOut:
+    """Agrega avg_rating y ratings_count al perfil profesional."""
+    result = db.query(
+        func.avg(Rating.score).label("avg"),
+        func.count(Rating.id).label("cnt"),
+    ).filter(Rating.professional_id == profile.id).one()
+    data = ProfessionalOut.model_validate(profile)
+    data.avg_rating    = round(float(result.avg), 1) if result.avg else None
+    data.ratings_count = result.cnt or 0
+    return data
 
 router = APIRouter(prefix="/professionals", tags=["Perfiles Profesionales"])
 
@@ -27,7 +41,8 @@ def get_professionals(
         )
     if profession:
         query = query.filter(ProfessionalProfile.profession.ilike(f"%{profession}%"))
-    return query.order_by(ProfessionalProfile.created_at.desc()).offset(skip).limit(limit).all()
+    profiles = query.order_by(ProfessionalProfile.created_at.desc()).offset(skip).limit(limit).all()
+    return [_enrich(p, db) for p in profiles]
 
 
 @router.post("", response_model=ProfessionalOut, status_code=201)
@@ -40,21 +55,22 @@ def create_professional(
     db.add(profile)
     db.commit()
     db.refresh(profile)
-    return profile
+    return _enrich(profile, db)
 
 @router.get("/mine", response_model=List[ProfessionalOut])
 def get_my_professionals(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    return db.query(ProfessionalProfile).filter(ProfessionalProfile.owner_id == current_user.id).all()
+    profiles = db.query(ProfessionalProfile).filter(ProfessionalProfile.owner_id == current_user.id).all()
+    return [_enrich(p, db) for p in profiles]
 
 @router.get("/{profile_id}", response_model=ProfessionalOut)
 def get_professional(profile_id: UUID, db: Session = Depends(get_db)):
     profile = db.query(ProfessionalProfile).filter(ProfessionalProfile.id == profile_id).first()
     if not profile:
         raise HTTPException(status_code=404, detail="Perfil no encontrado")
-    return profile
+    return _enrich(profile, db)
 
 @router.put("/{profile_id}", response_model=ProfessionalOut)
 def update_professional(
@@ -73,7 +89,7 @@ def update_professional(
         setattr(profile, key, value)
     db.commit()
     db.refresh(profile)
-    return profile
+    return _enrich(profile, db)
 
 @router.delete("/{profile_id}", status_code=204)
 def delete_professional(

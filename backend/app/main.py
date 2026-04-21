@@ -39,6 +39,12 @@ except Exception as e:
 
 # ── Migraciones automáticas (columnas nuevas en tablas existentes) ─────────────
 _migrations = [
+    "ALTER TABLE users ADD COLUMN IF NOT EXISTS is_admin   BOOLEAN DEFAULT FALSE",
+    "ALTER TABLE users ADD COLUMN IF NOT EXISTS is_blocked BOOLEAN DEFAULT FALSE",
+    "ALTER TABLE ratings ADD COLUMN IF NOT EXISTS professional_id UUID REFERENCES professional_profiles(id)",
+    "ALTER TABLE ratings DROP CONSTRAINT IF EXISTS uq_rating_user_local",
+    "ALTER TABLE ratings ADD CONSTRAINT uq_rating_user_local        UNIQUE (user_id, local_id)         DEFERRABLE INITIALLY DEFERRED",
+    "ALTER TABLE ratings ADD CONSTRAINT uq_rating_user_professional UNIQUE (user_id, professional_id) DEFERRABLE INITIALLY DEFERRED",
     "ALTER TABLE locals ADD COLUMN IF NOT EXISTS whatsapp  VARCHAR",
     "ALTER TABLE locals ADD COLUMN IF NOT EXISTS facebook  VARCHAR",
     "ALTER TABLE locals ADD COLUMN IF NOT EXISTS instagram VARCHAR",
@@ -141,6 +147,121 @@ def mark_notifications_read(
         Notification.user_id == current_user.id,
         Notification.read == False,  # noqa: E712
     ).update({"read": True})
+    db.commit()
+    return {"ok": True}
+
+
+# ── Ratings para profesionales ────────────────────────────────────────────────
+
+class ProfRatingCreate(BaseModel):
+    score: int
+    comment: Optional[str] = None
+
+class ProfRatingSummary(BaseModel):
+    avg: Optional[float]
+    count: int
+    my_score: Optional[int]
+
+def _prof_summary(prof_id, user_id, db):
+    from app.models.rating import Rating
+    from sqlalchemy import func
+    result = db.query(
+        func.avg(Rating.score).label("avg"),
+        func.count(Rating.id).label("cnt"),
+    ).filter(Rating.professional_id == prof_id).one()
+    my_score = None
+    if user_id:
+        mine = db.query(Rating).filter(Rating.user_id == user_id, Rating.professional_id == prof_id).first()
+        my_score = mine.score if mine else None
+    return ProfRatingSummary(
+        avg=round(float(result.avg), 1) if result.avg else None,
+        count=result.cnt or 0,
+        my_score=my_score,
+    )
+
+@app.post("/ratings/professional/{prof_id}", response_model=ProfRatingSummary, tags=["Ratings"])
+def rate_professional(
+    prof_id: UUID,
+    data: ProfRatingCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    from app.models.rating import Rating
+    from app.models.professional import ProfessionalProfile
+    from app.models.notification import Notification
+    from fastapi import HTTPException
+    if not (1 <= data.score <= 5):
+        raise HTTPException(status_code=400, detail="El puntaje debe ser entre 1 y 5")
+    prof = db.query(ProfessionalProfile).filter(ProfessionalProfile.id == prof_id).first()
+    if not prof:
+        raise HTTPException(status_code=404, detail="Perfil no encontrado")
+    existing = db.query(Rating).filter(Rating.user_id == current_user.id, Rating.professional_id == prof_id).first()
+    is_new = not existing
+    if existing:
+        existing.score   = data.score
+        existing.comment = data.comment
+    else:
+        db.add(Rating(user_id=current_user.id, professional_id=prof_id, score=data.score, comment=data.comment))
+    db.commit()
+    if is_new and prof.owner_id != current_user.id:
+        stars = "⭐" * data.score
+        db.add(Notification(
+            user_id=prof.owner_id, notif_type="rating",
+            message=f'{current_user.name} calificó tu perfil "{prof.name}" con {data.score}/5 {stars}',
+        ))
+        db.commit()
+    return _prof_summary(prof_id, current_user.id, db)
+
+@app.get("/ratings/professional/{prof_id}", response_model=ProfRatingSummary, tags=["Ratings"])
+def get_professional_rating(
+    prof_id: UUID,
+    db: Session = Depends(get_db),
+    current_user: Optional[User] = Depends(get_current_user),
+):
+    user_id = current_user.id if current_user else None
+    return _prof_summary(prof_id, user_id, db)
+
+
+# ── Admin ─────────────────────────────────────────────────────────────────────
+
+class UserAdminOut(BaseModel):
+    id: UUID
+    name: str
+    email: str
+    is_admin: bool
+    is_blocked: bool
+    created_at: datetime.datetime
+    model_config = {"from_attributes": True}
+
+def _require_admin(current_user: User = Depends(get_current_user)):
+    from fastapi import HTTPException
+    if not current_user.is_admin:
+        raise HTTPException(status_code=403, detail="No autorizado")
+    return current_user
+
+@app.get("/admin/users", response_model=List[UserAdminOut], tags=["Admin"])
+def admin_list_users(db: Session = Depends(get_db), _: User = Depends(_require_admin)):
+    return db.query(User).order_by(User.created_at.desc()).all()
+
+@app.post("/admin/users/{user_id}/block", tags=["Admin"])
+def admin_block_user(user_id: UUID, db: Session = Depends(get_db), admin: User = Depends(_require_admin)):
+    from fastapi import HTTPException
+    target = db.query(User).filter(User.id == user_id).first()
+    if not target:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+    if target.is_admin:
+        raise HTTPException(status_code=400, detail="No puedes bloquear a un administrador")
+    target.is_blocked = True
+    db.commit()
+    return {"ok": True}
+
+@app.post("/admin/users/{user_id}/unblock", tags=["Admin"])
+def admin_unblock_user(user_id: UUID, db: Session = Depends(get_db), _: User = Depends(_require_admin)):
+    from fastapi import HTTPException
+    target = db.query(User).filter(User.id == user_id).first()
+    if not target:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+    target.is_blocked = False
     db.commit()
     return {"ok": True}
 

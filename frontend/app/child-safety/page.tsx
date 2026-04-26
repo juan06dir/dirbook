@@ -157,11 +157,11 @@ export default function ChildSafetyPage() {
             o si deseas consultar sobre el cumplimiento de estas políticas, contáctanos:
           </p>
           <a
-            href="mailto:comercialeslocales606@gmail.com"
+            href="mailto:noreply@dirbook.com.co"
             className="inline-flex items-center gap-2 rounded-lg bg-black px-4 py-2.5 text-sm font-semibold text-yellow-400 hover:bg-black/80 transition-colors"
           >
             <Mail className="h-4 w-4" />
-            comercialeslocales606@gmail.com
+            noreply@dirbook.com.co
           </a>
           <p className="mt-3 text-xs text-gray-500">
             Nos comprometemos a responder reportes relacionados con seguridad infantil
@@ -205,7 +205,7 @@ export default function ChildSafetyPage() {
           </Link>
           {" · "}
           <a
-            href="mailto:comercialeslocales606@gmail.com"
+            href="mailto:noreply@dirbook.com.co"
             className="hover:underline"
           >
             Contacto

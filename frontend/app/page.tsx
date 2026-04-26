@@ -391,9 +391,13 @@ function LandingPage() {
       {/* ── Footer ───────────────────────────────────────────────── */}
       <footer className="border-t bg-gray-50 py-8 text-center text-sm text-muted-foreground">
         <p>© {new Date().getFullYear()} Dirbook · Conectando tu ciudad</p>
-        <p className="mt-1">
+        <p className="mt-1 space-x-3">
           <Link href="/child-safety" className="hover:underline">
             Seguridad Infantil
+          </Link>
+          <span>·</span>
+          <Link href="/delete-account" className="hover:underline">
+            Eliminar cuenta
           </Link>
         </p>
       </footer>

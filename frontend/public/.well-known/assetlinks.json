@@ -2,7 +2,7 @@
   "relation": ["delegate_permission/common.handle_all_urls"],
   "target": {
     "namespace": "android_app",
-    "package_name": "com.dirbook.app",
+    "package_name": "co.dirbook.app",
     "sha256_cert_fingerprints": [
       "E6:01:CE:15:3E:F9:54:65:CD:77:0D:59:7C:34:E5:E3:F2:D2:89:57:BB:DE:51:DF:DF:86:FC:E8:D3:94:BF:4F"
     ]

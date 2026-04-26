@@ -390,7 +390,12 @@ function LandingPage() {
 
       {/* ── Footer ───────────────────────────────────────────────── */}
       <footer className="border-t bg-gray-50 py-8 text-center text-sm text-muted-foreground">
-        © {new Date().getFullYear()} Dirbook · Conectando tu ciudad
+        <p>© {new Date().getFullYear()} Dirbook · Conectando tu ciudad</p>
+        <p className="mt-1">
+          <Link href="/child-safety" className="hover:underline">
+            Seguridad Infantil
+          </Link>
+        </p>
       </footer>
 
       {/* ── Modal de registro ────────────────────────────────────── */}

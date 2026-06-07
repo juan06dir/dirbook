@@ -5,7 +5,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { register, login, getMe } from '../../api';
+import { register } from '../../api';
 import { useAuth } from '../../context/AuthContext';
 import { colors, spacing, radius, typography } from '../../theme';
 
@@ -33,10 +33,8 @@ export default function RegisterScreen({ navigation }) {
     }
     setLoading(true);
     try {
-      await register(name.trim(), email.trim().toLowerCase(), password);
-      const { access_token } = await login(email.trim().toLowerCase(), password);
-      const me = await getMe();
-      await signIn(access_token, me);
+      const { access_token, user } = await register(name.trim(), email.trim().toLowerCase(), password);
+      await signIn(access_token, user);
     } catch (e) {
       Alert.alert('Error al registrarse', e.message);
     } finally {

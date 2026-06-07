@@ -41,7 +41,8 @@ async function request(path, options = {}) {
 export const login = (email, password) =>
   request('/auth/login', {
     method: 'POST',
-    body: JSON.stringify({ email, password }),
+    body: `username=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`,
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
   });
 
 export const register = (name, email, password) =>

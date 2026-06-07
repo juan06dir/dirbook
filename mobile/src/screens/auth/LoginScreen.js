@@ -5,7 +5,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { login, getMe } from '../../api';
+import { login } from '../../api';
 import { useAuth } from '../../context/AuthContext';
 import { colors, spacing, radius, typography } from '../../theme';
 
@@ -23,9 +23,8 @@ export default function LoginScreen({ navigation }) {
     }
     setLoading(true);
     try {
-      const { access_token } = await login(email.trim().toLowerCase(), password);
-      const me = await getMe();
-      await signIn(access_token, me);
+      const { access_token, user } = await login(email.trim().toLowerCase(), password);
+      await signIn(access_token, user);
     } catch (e) {
       Alert.alert('Error al iniciar sesión', e.message);
     } finally {

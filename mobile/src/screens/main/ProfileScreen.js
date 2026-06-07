@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View, Text, Image, TouchableOpacity, FlatList,
   StyleSheet, ActivityIndicator, Alert, ScrollView,
@@ -6,7 +6,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { getLocals } from '../../api';
+import { getLocals, getMyFollows, getLocal, unfollowLocal } from '../../api';
 import { useAuth } from '../../context/AuthContext';
 import LocalCard from '../../components/LocalCard';
 import { colors, spacing, radius, typography } from '../../theme';
@@ -26,22 +26,60 @@ function getInitials(name) {
 export default function ProfileScreen({ navigation }) {
   const insets = useSafeAreaInsets();
   const { user, signOut } = useAuth();
+  const [activeTab, setActiveTab] = useState('negocios'); // 'negocios' | 'siguiendo'
   const [myLocals, setMyLocals] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [followedLocals, setFollowedLocals] = useState([]);
+  const [loadingLocals, setLoadingLocals] = useState(false);
+  const [loadingFollows, setLoadingFollows] = useState(false);
 
   useEffect(() => {
-    if (user) loadMyLocals();
+    if (user) {
+      loadMyLocals();
+      loadFollowing();
+    }
   }, [user]);
 
   async function loadMyLocals() {
-    setLoading(true);
+    setLoadingLocals(true);
     try {
       const data = await getLocals({ my_locals: true });
       setMyLocals(data || []);
     } catch (e) {
       console.warn(e);
     } finally {
-      setLoading(false);
+      setLoadingLocals(false);
+    }
+  }
+
+  async function loadFollowing() {
+    setLoadingFollows(true);
+    try {
+      const follows = await getMyFollows();
+      if (!follows || follows.length === 0) {
+        setFollowedLocals([]);
+        return;
+      }
+      // follows is array of { local_id, ... } — fetch each local
+      const locals = await Promise.all(
+        follows.map(f => getLocal(f.local_id).catch(() => null))
+      );
+      setFollowedLocals(locals.filter(Boolean));
+    } catch (e) {
+      console.warn(e);
+    } finally {
+      setLoadingFollows(false);
+    }
+  }
+
+  async function handleUnfollow(localId) {
+    // optimistic update
+    setFollowedLocals(prev => prev.filter(l => l.id !== localId));
+    try {
+      await unfollowLocal(localId);
+    } catch (e) {
+      // revert on failure
+      loadFollowing();
+      Alert.alert('Error', 'No se pudo dejar de seguir.');
     }
   }
 
@@ -119,39 +157,106 @@ export default function ProfileScreen({ navigation }) {
         </View>
         <View style={styles.statDivider} />
         <View style={styles.stat}>
-          <Text style={styles.statNum}>
-            {myLocals.filter(l => (l?.avg_rating ?? 0) > 0).length}
+          <Text style={styles.statNum}>{followedLocals.length}</Text>
+          <Text style={styles.statLabel}>Siguiendo</Text>
+        </View>
+      </View>
+
+      {/* Tabs */}
+      <View style={styles.tabs}>
+        <TouchableOpacity
+          style={[styles.tab, activeTab === 'negocios' && styles.tabActive]}
+          onPress={() => setActiveTab('negocios')}
+          activeOpacity={0.7}
+        >
+          <Ionicons
+            name="storefront-outline"
+            size={16}
+            color={activeTab === 'negocios' ? colors.primary : colors.textMuted}
+          />
+          <Text style={[styles.tabText, activeTab === 'negocios' && styles.tabTextActive]}>
+            Mis negocios
           </Text>
-          <Text style={styles.statLabel}>Calificados</Text>
-        </View>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.tab, activeTab === 'siguiendo' && styles.tabActive]}
+          onPress={() => setActiveTab('siguiendo')}
+          activeOpacity={0.7}
+        >
+          <Ionicons
+            name="heart-outline"
+            size={16}
+            color={activeTab === 'siguiendo' ? colors.primary : colors.textMuted}
+          />
+          <Text style={[styles.tabText, activeTab === 'siguiendo' && styles.tabTextActive]}>
+            Siguiendo
+          </Text>
+          {followedLocals.length > 0 && (
+            <View style={styles.tabBadge}>
+              <Text style={styles.tabBadgeText}>{followedLocals.length}</Text>
+            </View>
+          )}
+        </TouchableOpacity>
       </View>
 
-      {/* My Locals */}
-      <View style={styles.section}>
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Mis negocios</Text>
+      {/* Tab content */}
+      {activeTab === 'negocios' ? (
+        <View style={styles.section}>
+          {loadingLocals ? (
+            <ActivityIndicator color={colors.primary} style={{ marginTop: 20 }} />
+          ) : myLocals.length > 0 ? (
+            <View style={{ paddingHorizontal: spacing.lg }}>
+              {myLocals.map((l) => (
+                <LocalCard
+                  key={String(l.id)}
+                  local={l}
+                  onPress={() => navigation.navigate('LocalDetalle', { local: l })}
+                />
+              ))}
+            </View>
+          ) : (
+            <View style={styles.emptyWrap}>
+              <Ionicons name="storefront-outline" size={48} color={colors.textMuted} />
+              <Text style={styles.emptyTitle}>Sin negocios</Text>
+              <Text style={styles.emptyText}>Aún no tienes negocios registrados</Text>
+            </View>
+          )}
         </View>
-        {loading ? (
-          <ActivityIndicator color={colors.primary} style={{ marginTop: 20 }} />
-        ) : myLocals.length > 0 ? (
-          <View style={{ paddingHorizontal: spacing.lg }}>
-            {myLocals.map((l) => (
-              <LocalCard
-                key={l.id}
-                local={l}
-                onPress={() => navigation.navigate('LocalDetalle', { local: l })}
-              />
-            ))}
-          </View>
-        ) : (
-          <View style={styles.emptyLocals}>
-            <Ionicons name="storefront-outline" size={40} color={colors.textMuted} />
-            <Text style={styles.emptyText}>No tienes negocios registrados</Text>
-          </View>
-        )}
-      </View>
+      ) : (
+        <View style={styles.section}>
+          {loadingFollows ? (
+            <ActivityIndicator color={colors.primary} style={{ marginTop: 20 }} />
+          ) : followedLocals.length > 0 ? (
+            <View style={{ paddingHorizontal: spacing.lg }}>
+              {followedLocals.map((l) => (
+                <LocalCard
+                  key={String(l.id)}
+                  local={l}
+                  onPress={() => navigation.navigate('LocalDetalle', { local: l })}
+                  showFollow
+                  following
+                  onFollow={() => handleUnfollow(l.id)}
+                />
+              ))}
+            </View>
+          ) : (
+            <View style={styles.emptyWrap}>
+              <Ionicons name="heart-outline" size={48} color={colors.textMuted} />
+              <Text style={styles.emptyTitle}>Sin seguidos</Text>
+              <Text style={styles.emptyText}>Explora negocios y síguelos para verlos aquí</Text>
+              <TouchableOpacity
+                style={styles.exploreBtn}
+                onPress={() => navigation.navigate('Explorar')}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.exploreBtnText}>Explorar negocios</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
+      )}
 
-      {/* Menu items */}
+      {/* Menu */}
       <View style={styles.menuSection}>
         {[
           { icon: 'settings-outline', label: 'Configuración', onPress: () => {} },
@@ -197,6 +302,7 @@ const styles = StyleSheet.create({
     borderWidth: 1, borderColor: colors.primary + '44',
   },
   adminText: { fontSize: 12, fontWeight: '700', color: colors.primary },
+
   statsRow: {
     flexDirection: 'row', justifyContent: 'space-around',
     backgroundColor: colors.surface,
@@ -210,11 +316,71 @@ const styles = StyleSheet.create({
   statNum: { fontSize: 24, fontWeight: '800', color: colors.text },
   statLabel: { fontSize: 12, color: colors.textMuted, marginTop: 2 },
   statDivider: { width: 1, backgroundColor: colors.border },
-  section: { marginTop: spacing.xl },
-  sectionHeader: { paddingHorizontal: spacing.lg, marginBottom: spacing.md },
-  sectionTitle: { ...typography.h3 },
-  emptyLocals: { alignItems: 'center', paddingVertical: spacing.xl, gap: spacing.sm },
-  emptyText: { fontSize: 14, color: colors.textMuted },
+
+  // Tabs
+  tabs: {
+    flexDirection: 'row',
+    marginHorizontal: spacing.lg,
+    marginTop: spacing.lg,
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    borderColor: colors.border,
+    padding: 4,
+  },
+  tab: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    paddingVertical: 10,
+    borderRadius: radius.md,
+  },
+  tabActive: {
+    backgroundColor: colors.surface2,
+  },
+  tabText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.textMuted,
+  },
+  tabTextActive: {
+    color: colors.primary,
+  },
+  tabBadge: {
+    backgroundColor: colors.primary,
+    borderRadius: radius.full,
+    minWidth: 18,
+    height: 18,
+    paddingHorizontal: 4,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  tabBadgeText: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: colors.bg,
+  },
+
+  section: { marginTop: spacing.lg },
+  emptyWrap: {
+    alignItems: 'center',
+    paddingVertical: spacing.xl * 1.5,
+    gap: spacing.sm,
+    paddingHorizontal: spacing.xl,
+  },
+  emptyTitle: { ...typography.h3, marginTop: spacing.sm },
+  emptyText: { fontSize: 14, color: colors.textMuted, textAlign: 'center' },
+  exploreBtn: {
+    marginTop: spacing.md,
+    backgroundColor: colors.primary,
+    paddingHorizontal: spacing.xl,
+    paddingVertical: 12,
+    borderRadius: radius.full,
+  },
+  exploreBtnText: { fontSize: 14, fontWeight: '800', color: colors.bg },
+
   menuSection: {
     marginTop: spacing.xl,
     marginHorizontal: spacing.lg,
@@ -230,6 +396,7 @@ const styles = StyleSheet.create({
   },
   menuLabel: { flex: 1, fontSize: 15, color: colors.text },
   menuDanger: { color: colors.error },
+
   // Guest styles
   guestWrap: { justifyContent: 'center', alignItems: 'center', padding: spacing.xl, gap: spacing.lg },
   guestLogoCircle: {

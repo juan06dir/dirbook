@@ -26,8 +26,9 @@
     "plugins": [],
     "extra": {
       "eas": {
-        "projectId": ""
+        "projectId": "70904403-5c13-4867-bef9-cbd79be34f9e"
       }
-    }
+    },
+    "owner": "juan_06"
   }
 }

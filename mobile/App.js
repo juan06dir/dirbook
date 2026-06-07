@@ -2,12 +2,16 @@ import 'react-native-gesture-handler';
 import React, { useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
+import { enableScreens } from 'react-native-screens';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { AuthProvider, useAuth } from './src/context/AuthContext';
 import AppNavigator from './src/navigation';
 import { View, ActivityIndicator } from 'react-native';
 import { colors } from './src/theme';
+
+// Activa renderizado nativo de pantallas — mejora rendimiento en Android
+enableScreens(true);
 
 SplashScreen.preventAutoHideAsync();
 

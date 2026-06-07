@@ -1,10 +1,8 @@
 import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
-import { useAuth } from '../context/AuthContext';
 
 import LoginScreen from '../screens/auth/LoginScreen';
 import RegisterScreen from '../screens/auth/RegisterScreen';
@@ -19,15 +17,15 @@ import ProfessionalDetailScreen from '../screens/detail/ProfessionalDetailScreen
 
 import { colors } from '../theme';
 
-const Stack = createStackNavigator();
+const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 const TAB_ICONS = {
-  Inicio: { active: 'home', inactive: 'home-outline' },
-  Explorar: { active: 'search', inactive: 'search-outline' },
-  Eventos: { active: 'calendar', inactive: 'calendar-outline' },
-  Profesionales: { active: 'people', inactive: 'people-outline' },
-  Perfil: { active: 'person', inactive: 'person-outline' },
+  Inicio:        { active: 'home',          inactive: 'home-outline' },
+  Explorar:      { active: 'search',        inactive: 'search-outline' },
+  Eventos:       { active: 'calendar',      inactive: 'calendar-outline' },
+  Profesionales: { active: 'people',        inactive: 'people-outline' },
+  Perfil:        { active: 'person',        inactive: 'person-outline' },
 };
 
 function MainTabs() {
@@ -58,11 +56,11 @@ function MainTabs() {
         },
       })}
     >
-      <Tab.Screen name="Inicio" component={HomeScreen} />
-      <Tab.Screen name="Explorar" component={ExploreScreen} />
-      <Tab.Screen name="Eventos" component={EventsScreen} />
+      <Tab.Screen name="Inicio"        component={HomeScreen} />
+      <Tab.Screen name="Explorar"      component={ExploreScreen} />
+      <Tab.Screen name="Eventos"       component={EventsScreen} />
       <Tab.Screen name="Profesionales" component={ProfessionalsScreen} />
-      <Tab.Screen name="Perfil" component={ProfileScreen} />
+      <Tab.Screen name="Perfil"        component={ProfileScreen} />
     </Tab.Navigator>
   );
 }
@@ -73,15 +71,16 @@ export default function AppNavigator() {
       <Stack.Navigator
         screenOptions={{
           headerShown: false,
-          cardStyle: { backgroundColor: colors.bg },
+          contentStyle: { backgroundColor: colors.bg },
+          animation: 'slide_from_right',
         }}
       >
-        <Stack.Screen name="Main" component={MainTabs} />
-        <Stack.Screen name="Login" component={LoginScreen} />
-        <Stack.Screen name="Register" component={RegisterScreen} />
-        <Stack.Screen name="LocalDetalle" component={LocalDetailScreen} />
+        <Stack.Screen name="Main"              component={MainTabs} />
+        <Stack.Screen name="Login"             component={LoginScreen} />
+        <Stack.Screen name="Register"          component={RegisterScreen} />
+        <Stack.Screen name="LocalDetalle"      component={LocalDetailScreen} />
         <Stack.Screen name="ProfesionalDetalle" component={ProfessionalDetailScreen} />
-        <Stack.Screen name="Notificaciones" component={NotificationsScreen} />
+        <Stack.Screen name="Notificaciones"    component={NotificationsScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

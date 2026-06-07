@@ -87,7 +87,7 @@ export default function ProfileScreen({ navigation }) {
       <LinearGradient colors={['#151515', '#0A0A0A']} style={[styles.profileHeader, { paddingTop: insets.top + 16 }]}>
         <View style={styles.avatarWrap}>
           {avatarUri ? (
-            <Image source={{ uri: avatarUri }} style={styles.avatar} />
+            <Image source={{ uri: avatarUri }} style={styles.avatar} onError={() => {}} />
           ) : (
             <View style={styles.avatarPlaceholder}>
               <Text style={styles.initials}>{getInitials(user.name)}</Text>
@@ -113,14 +113,14 @@ export default function ProfileScreen({ navigation }) {
         <View style={styles.statDivider} />
         <View style={styles.stat}>
           <Text style={styles.statNum}>
-            {myLocals.reduce((acc, l) => acc + (l.followers_count || 0), 0)}
+            {myLocals.reduce((acc, l) => acc + (l?.followers_count || 0), 0)}
           </Text>
           <Text style={styles.statLabel}>Seguidores</Text>
         </View>
         <View style={styles.statDivider} />
         <View style={styles.stat}>
           <Text style={styles.statNum}>
-            {myLocals.filter(l => l.avg_rating > 0).length}
+            {myLocals.filter(l => (l?.avg_rating ?? 0) > 0).length}
           </Text>
           <Text style={styles.statLabel}>Calificados</Text>
         </View>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   View, Text, Image, TouchableOpacity, ScrollView, StyleSheet,
-  Linking, ActivityIndicator, Alert, TextInput, Modal,
+  Linking, ActivityIndicator, Alert, TextInput, Modal, KeyboardAvoidingView, Platform,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
@@ -117,7 +117,7 @@ export default function LocalDetailScreen({ route, navigation }) {
         {/* Cover */}
         <View style={styles.coverWrap}>
           {coverUri ? (
-            <Image source={{ uri: coverUri }} style={styles.cover} />
+            <Image source={{ uri: coverUri }} style={styles.cover} onError={() => {}} />
           ) : (
             <View style={[styles.cover, styles.coverPlaceholder]}>
               <Ionicons name="storefront" size={60} color={colors.textMuted} />
@@ -137,7 +137,7 @@ export default function LocalDetailScreen({ route, navigation }) {
           <View style={styles.logoNameRow}>
             <View style={styles.logoWrap}>
               {logoUri ? (
-                <Image source={{ uri: logoUri }} style={styles.logo} />
+                <Image source={{ uri: logoUri }} style={styles.logo} onError={() => {}} />
               ) : (
                 <View style={styles.logoPlaceholder}>
                   <Ionicons name="storefront" size={24} color={colors.primary} />
@@ -155,7 +155,7 @@ export default function LocalDetailScreen({ route, navigation }) {
             {local.avg_rating > 0 && (
               <View style={styles.statItem}>
                 <Ionicons name="star" size={14} color={colors.primary} />
-                <Text style={styles.statText}>{local.avg_rating.toFixed(1)}</Text>
+                <Text style={styles.statText}>{(local.avg_rating ?? 0).toFixed(1)}</Text>
                 <Text style={styles.statMuted}>({local.ratings_count})</Text>
               </View>
             )}
@@ -318,7 +318,10 @@ export default function LocalDetailScreen({ route, navigation }) {
 
       {/* Rating Modal */}
       <Modal visible={showRating} transparent animationType="slide">
-        <View style={styles.modalOverlay}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.modalOverlay}
+        >
           <View style={styles.modal}>
             <Text style={styles.modalTitle}>Calificar {local.name}</Text>
             <View style={styles.modalStars}>
@@ -342,7 +345,7 @@ export default function LocalDetailScreen({ route, navigation }) {
               </TouchableOpacity>
             </View>
           </View>
-        </View>
+        </KeyboardAvoidingView>
       </Modal>
     </View>
   );

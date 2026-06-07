@@ -75,7 +75,7 @@ export default function HomeScreen({ navigation }) {
       >
         <View style={styles.headerTop}>
           <View>
-            <Text style={styles.greeting}>{greeting()}{user ? `, ${user.name.split(' ')[0]}` : ''} 👋</Text>
+            <Text style={styles.greeting}>{greeting()}{user?.name ? `, ${user.name.split(' ')[0]}` : ''} 👋</Text>
             <Text style={styles.subtitle}>Descubre negocios cerca de ti</Text>
           </View>
           <TouchableOpacity

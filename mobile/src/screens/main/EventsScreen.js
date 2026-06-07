@@ -99,7 +99,7 @@ function EventCard({ event, onPress }) {
 
         {/* Title */}
         <Text style={styles.title} numberOfLines={2}>
-          {event.title || event.content.slice(0, 60)}
+          {event.title || event.content?.slice(0, 60) || 'Evento'}
         </Text>
 
         {/* Description */}

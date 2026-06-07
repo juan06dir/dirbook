@@ -40,7 +40,7 @@ export default function LocalCard({ local, onPress, horizontal = false }) {
       <TouchableOpacity style={[styles.hCard, shadow.sm]} onPress={onPress} activeOpacity={0.8}>
         <View style={styles.hLogo}>
           {logoUri ? (
-            <Image source={{ uri: logoUri }} style={styles.hLogoImg} />
+            <Image source={{ uri: logoUri }} style={styles.hLogoImg} onError={() => {}} />
           ) : (
             <View style={styles.hLogoPlaceholder}>
               <Ionicons name={getCategoryIcon(local.category)} size={22} color={colors.primary} />
@@ -75,7 +75,7 @@ export default function LocalCard({ local, onPress, horizontal = false }) {
     <TouchableOpacity style={[styles.card, shadow.md]} onPress={onPress} activeOpacity={0.85}>
       <View style={styles.cover}>
         {coverUri ? (
-          <Image source={{ uri: coverUri }} style={styles.coverImg} />
+          <Image source={{ uri: coverUri }} style={styles.coverImg} onError={() => {}} />
         ) : (
           <View style={styles.coverPlaceholder}>
             <Ionicons name={getCategoryIcon(local.category)} size={36} color={colors.primary} />
@@ -91,7 +91,7 @@ export default function LocalCard({ local, onPress, horizontal = false }) {
         <View style={styles.row}>
           <View style={styles.logoWrap}>
             {logoUri ? (
-              <Image source={{ uri: logoUri }} style={styles.logoImg} />
+              <Image source={{ uri: logoUri }} style={styles.logoImg} onError={() => {}} />
             ) : (
               <View style={styles.logoPlaceholder}>
                 <Ionicons name={getCategoryIcon(local.category)} size={16} color={colors.primary} />

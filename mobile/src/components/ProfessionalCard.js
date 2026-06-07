@@ -23,7 +23,7 @@ export default function ProfessionalCard({ professional, onPress }) {
     <TouchableOpacity style={[styles.card, shadow.sm]} onPress={onPress} activeOpacity={0.85}>
       <View style={styles.avatarWrap}>
         {avatarUri ? (
-          <Image source={{ uri: avatarUri }} style={styles.avatar} />
+          <Image source={{ uri: avatarUri }} style={styles.avatar} onError={() => {}} />
         ) : (
           <View style={styles.avatarPlaceholder}>
             <Text style={styles.initials}>{getInitials(professional.name)}</Text>

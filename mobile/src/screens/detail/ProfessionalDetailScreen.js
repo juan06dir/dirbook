@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
   View, Text, Image, TouchableOpacity, ScrollView,
   StyleSheet, Linking, Alert, TextInput, Modal, ActivityIndicator,
+  KeyboardAvoidingView, Platform,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
@@ -80,7 +81,7 @@ export default function ProfessionalDetailScreen({ route, navigation }) {
         {/* Cover */}
         <View style={styles.coverWrap}>
           {coverUri ? (
-            <Image source={{ uri: coverUri }} style={styles.cover} />
+            <Image source={{ uri: coverUri }} style={styles.cover} onError={() => {}} />
           ) : (
             <LinearGradient colors={[colors.primaryFaded, '#0A0A0A']} style={styles.cover} />
           )}
@@ -97,7 +98,7 @@ export default function ProfessionalDetailScreen({ route, navigation }) {
         <View style={styles.profile}>
           <View style={styles.avatarWrap}>
             {avatarUri ? (
-              <Image source={{ uri: avatarUri }} style={styles.avatar} />
+              <Image source={{ uri: avatarUri }} style={styles.avatar} onError={() => {}} />
             ) : (
               <View style={styles.avatarPlaceholder}>
                 <Text style={styles.initials}>{getInitials(prof.name)}</Text>
@@ -110,7 +111,7 @@ export default function ProfessionalDetailScreen({ route, navigation }) {
           {prof.avg_rating > 0 && (
             <View style={styles.ratingRow}>
               <StarRating value={Math.round(prof.avg_rating)} readonly size={16} />
-              <Text style={styles.ratingText}>{prof.avg_rating.toFixed(1)} ({prof.ratings_count} reseñas)</Text>
+              <Text style={styles.ratingText}>{(prof.avg_rating ?? 0).toFixed(1)} ({prof.ratings_count ?? 0} reseñas)</Text>
             </View>
           )}
 
@@ -192,7 +193,10 @@ export default function ProfessionalDetailScreen({ route, navigation }) {
 
       {/* Rating Modal */}
       <Modal visible={showRating} transparent animationType="slide">
-        <View style={styles.modalOverlay}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.modalOverlay}
+        >
           <View style={styles.modal}>
             <Text style={styles.modalTitle}>Calificar a {prof.name}</Text>
             <View style={styles.modalStars}>
@@ -215,7 +219,7 @@ export default function ProfessionalDetailScreen({ route, navigation }) {
               </TouchableOpacity>
             </View>
           </View>
-        </View>
+        </KeyboardAvoidingView>
       </Modal>
     </View>
   );

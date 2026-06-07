@@ -14,7 +14,6 @@
     "@expo/vector-icons": "^14.0.3",
     "expo-status-bar": "~1.12.1",
     "expo-linear-gradient": "~13.0.2",
-    "expo-font": "~12.0.10",
     "expo-splash-screen": "~0.27.5",
     "react": "18.2.0",
     "react-native": "0.74.5",

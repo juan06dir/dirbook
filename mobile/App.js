@@ -8,13 +8,33 @@ import AppNavigator from './src/navigation';
 import { View, ActivityIndicator, Text } from 'react-native';
 import { colors } from './src/theme';
 
-SplashScreen.preventAutoHideAsync();
+try { SplashScreen.preventAutoHideAsync(); } catch {}
 
-// ─── Error boundary para capturar crashes de JS ───────────────────────────────
+// ─── Captura de errores globales (async, fuera de React) ─────────────────────
+let _globalError = null;
+const _origHandler = ErrorUtils.getGlobalHandler?.();
+ErrorUtils.setGlobalHandler?.((error, isFatal) => {
+  _globalError = error;
+  _origHandler?.(error, isFatal);
+});
+
+// ─── Error boundary ───────────────────────────────────────────────────────────
 class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
     this.state = { hasError: false, error: null };
+    this._interval = null;
+  }
+  componentDidMount() {
+    // Poll for global (async) errors not caught by getDerivedStateFromError
+    this._interval = setInterval(() => {
+      if (_globalError && !this.state.hasError) {
+        this.setState({ hasError: true, error: _globalError });
+      }
+    }, 500);
+  }
+  componentWillUnmount() {
+    clearInterval(this._interval);
   }
   static getDerivedStateFromError(error) {
     return { hasError: true, error };
@@ -24,10 +44,13 @@ class ErrorBoundary extends React.Component {
       return (
         <View style={{ flex: 1, backgroundColor: '#0A0A0A', justifyContent: 'center', alignItems: 'center', padding: 24 }}>
           <Text style={{ color: '#FACC15', fontSize: 18, fontWeight: 'bold', marginBottom: 12 }}>
-            Error de inicio
+            Error detectado
           </Text>
-          <Text style={{ color: '#888', fontSize: 12, textAlign: 'center' }}>
+          <Text style={{ color: '#fff', fontSize: 11, textAlign: 'center', marginBottom: 8 }}>
             {this.state.error?.toString()}
+          </Text>
+          <Text style={{ color: '#666', fontSize: 10, textAlign: 'center' }}>
+            {this.state.error?.stack?.slice(0, 300)}
           </Text>
         </View>
       );

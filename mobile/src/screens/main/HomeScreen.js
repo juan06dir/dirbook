@@ -109,7 +109,7 @@ export default function HomeScreen({ navigation }) {
           <FlatList
             horizontal
             data={topLocals}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item) => String(item.id)}
             renderItem={({ item }) => (
               <LocalCard
                 local={item}

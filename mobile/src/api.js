@@ -2,6 +2,16 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const API_URL = 'https://dirbook.com.co';
 
+function buildQuery(params = {}) {
+  const entries = Object.entries(params).filter(
+    ([, v]) => v !== undefined && v !== null && v !== ''
+  );
+  if (!entries.length) return '';
+  return '?' + entries
+    .map(([k, v]) => encodeURIComponent(k) + '=' + encodeURIComponent(v))
+    .join('&');
+}
+
 async function getToken() {
   return await AsyncStorage.getItem('token');
 }
@@ -43,10 +53,8 @@ export const register = (name, email, password) =>
 export const getMe = () => request('/auth/me');
 
 // ─── LOCALS ──────────────────────────────────────────────────────────────────
-export const getLocals = (params = {}) => {
-  const q = new URLSearchParams(params).toString();
-  return request(`/locals${q ? '?' + q : ''}`);
-};
+export const getLocals = (params = {}) =>
+  request(`/locals${buildQuery(params)}`);
 
 export const getLocal = (id) => request(`/locals/${id}`);
 
@@ -60,18 +68,14 @@ export const deleteLocal = (id) =>
   request(`/locals/${id}`, { method: 'DELETE' });
 
 // ─── PROFESSIONALS ───────────────────────────────────────────────────────────
-export const getProfessionals = (params = {}) => {
-  const q = new URLSearchParams(params).toString();
-  return request(`/professionals${q ? '?' + q : ''}`);
-};
+export const getProfessionals = (params = {}) =>
+  request(`/professionals${buildQuery(params)}`);
 
 export const getProfessional = (id) => request(`/professionals/${id}`);
 
 // ─── POSTS ───────────────────────────────────────────────────────────────────
-export const getPosts = (params = {}) => {
-  const q = new URLSearchParams(params).toString();
-  return request(`/posts/feed${q ? '?' + q : ''}`);
-};
+export const getPosts = (params = {}) =>
+  request(`/posts/feed${buildQuery(params)}`);
 
 export const getLocalPosts = (localId) => request(`/posts/local/${localId}`);
 
@@ -102,10 +106,8 @@ export const getLocalRatings = (localId) => request(`/ratings/local/${localId}`)
 export const getProfessionalRatings = (profId) => request(`/ratings/professional/${profId}`);
 
 // ─── EVENTS ──────────────────────────────────────────────────────────────────
-export const getEvents = (params = {}) => {
-  const q = new URLSearchParams(params).toString();
-  return request(`/posts/events${q ? '?' + q : ''}`);
-};
+export const getEvents = (params = {}) =>
+  request(`/posts/events${buildQuery(params)}`);
 
 // ─── NOTIFICATIONS ───────────────────────────────────────────────────────────
 export const getNotifications = () => request('/notifications');

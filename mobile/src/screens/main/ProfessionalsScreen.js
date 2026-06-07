@@ -82,7 +82,7 @@ export default function ProfessionalsScreen({ navigation }) {
       {/* List */}
       <FlatList
         data={professionals}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => String(item.id)}
         renderItem={({ item }) => (
           <ProfessionalCard
             professional={item}

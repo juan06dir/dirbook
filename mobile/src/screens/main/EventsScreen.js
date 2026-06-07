@@ -57,7 +57,7 @@ function EventCard({ event, onPress }) {
       {/* Cover */}
       <View style={styles.cover}>
         {cover ? (
-          <Image source={{ uri: cover }} style={styles.coverImg} />
+          <Image source={{ uri: cover }} style={styles.coverImg} onError={() => {}} />
         ) : (
           <View style={styles.coverPlaceholder}>
             <Ionicons name="calendar" size={36} color={colors.primary} />
@@ -74,7 +74,7 @@ function EventCard({ event, onPress }) {
         {/* Source */}
         <View style={styles.sourceRow}>
           {logo ? (
-            <Image source={{ uri: logo }} style={styles.sourceLogo} />
+            <Image source={{ uri: logo }} style={styles.sourceLogo} onError={() => {}} />
           ) : (
             <View style={styles.sourceLogoPlaceholder}>
               <Text style={styles.sourceLogoText}>
@@ -274,7 +274,7 @@ export default function EventsScreen() {
       {/* Results */}
       <FlatList
         data={filtered}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => String(item.id)}
         renderItem={({ item }) => (
           <EventCard event={item} onPress={() => {}} />
         )}

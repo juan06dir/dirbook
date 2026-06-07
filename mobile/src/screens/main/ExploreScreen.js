@@ -111,7 +111,7 @@ export default function ExploreScreen({ navigation }) {
       {/* Results */}
       <FlatList
         data={locals}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => String(item.id)}
         renderItem={({ item }) => (
           <LocalCard
             local={item}

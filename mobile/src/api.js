@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export const API_URL = 'https://dirbook.com.co';
+export const API_URL = 'https://dirbook-backend.onrender.com';
 
 function buildQuery(params = {}) {
   const entries = Object.entries(params).filter(

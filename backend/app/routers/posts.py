@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import or_
 from app.database import get_db
 from app.models.post import Post
@@ -10,9 +10,105 @@ from app.core.dependencies import get_current_user
 from app.models.user import User
 from typing import List, Optional
 from uuid import UUID
+from pydantic import BaseModel
 import datetime
 
 router = APIRouter(prefix="/posts", tags=["Posts"])
+
+
+# ── Schema enriquecido para eventos públicos ──────────────────────────────────
+class EventOut(BaseModel):
+    id: UUID
+    post_type: str
+    title: Optional[str]
+    content: str
+    image_url: Optional[str]
+    event_start: Optional[datetime.datetime]
+    event_end: Optional[datetime.datetime]
+    discount_pct: Optional[float]
+    created_at: datetime.datetime
+    # Contexto del local
+    local_id: Optional[UUID]
+    local_name: Optional[str]
+    local_city: Optional[str]
+    local_category: Optional[str]
+    local_logo: Optional[str]
+    # Contexto del profesional
+    professional_id: Optional[UUID]
+    professional_name: Optional[str]
+    professional_profession: Optional[str]
+
+    class Config:
+        from_attributes = True
+
+
+@router.get("/events", response_model=List[EventOut], tags=["Events"])
+def get_events(
+    city: Optional[str] = Query(None, description="Filtrar por ciudad del local"),
+    category: Optional[str] = Query(None, description="Filtrar por categoría del local"),
+    profession: Optional[str] = Query(None, description="Filtrar por profesión"),
+    upcoming_only: bool = Query(False, description="Solo eventos activos o futuros"),
+    skip: int = Query(0, ge=0),
+    limit: int = Query(30, ge=1, le=100),
+    db: Session = Depends(get_db),
+):
+    """Eventos públicos con filtros por ciudad, categoría y profesión."""
+    now = datetime.datetime.utcnow()
+    query = (
+        db.query(Post)
+        .options(joinedload(Post.local), joinedload(Post.professional))
+        .filter(Post.post_type == "event")
+    )
+
+    if upcoming_only:
+        query = query.filter(
+            or_(Post.event_end == None, Post.event_end >= now)
+        )
+
+    # Filtro por ciudad (solo aplica a eventos de locales)
+    if city:
+        query = query.join(Local, Post.local_id == Local.id, isouter=True).filter(
+            Local.city.ilike(f"%{city}%")
+        )
+
+    # Filtro por categoría de local
+    if category:
+        if not city:  # evitar join doble
+            query = query.join(Local, Post.local_id == Local.id, isouter=True)
+        query = query.filter(Local.category.ilike(f"%{category}%"))
+
+    # Filtro por profesión
+    if profession:
+        query = query.join(
+            ProfessionalProfile,
+            Post.professional_id == ProfessionalProfile.id,
+            isouter=True,
+        ).filter(ProfessionalProfile.profession.ilike(f"%{profession}%"))
+
+    posts = query.order_by(Post.event_start.asc(), Post.created_at.desc()).offset(skip).limit(limit).all()
+
+    results = []
+    for p in posts:
+        results.append(EventOut(
+            id=p.id,
+            post_type=p.post_type,
+            title=p.title,
+            content=p.content,
+            image_url=p.image_url,
+            event_start=p.event_start,
+            event_end=p.event_end,
+            discount_pct=p.discount_pct,
+            created_at=p.created_at,
+            local_id=p.local_id,
+            local_name=p.local.name if p.local else None,
+            local_city=p.local.city if p.local else None,
+            local_category=p.local.category if p.local else None,
+            local_logo=p.local.logo if p.local else None,
+            professional_id=p.professional_id,
+            professional_name=p.professional.name if p.professional else None,
+            professional_profession=p.professional.profession if p.professional else None,
+        ))
+    return results
 
 
 @router.post("", response_model=PostOut, status_code=201)

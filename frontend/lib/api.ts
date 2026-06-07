@@ -431,3 +431,45 @@ export async function uploadImage(file: File): Promise<{ url: string }> {
     body: form,
   });
 }
+
+// ── Events ───────────────────────────────────────────────────────────────────
+
+export interface EventOut {
+  id: string;
+  post_type: string;
+  title: string | null;
+  content: string;
+  image_url: string | null;
+  event_start: string | null;
+  event_end: string | null;
+  discount_pct: number | null;
+  created_at: string;
+  local_id: string | null;
+  local_name: string | null;
+  local_city: string | null;
+  local_category: string | null;
+  local_logo: string | null;
+  professional_id: string | null;
+  professional_name: string | null;
+  professional_profession: string | null;
+}
+
+export interface EventsFilter {
+  city?: string;
+  category?: string;
+  profession?: string;
+  upcoming_only?: boolean;
+  skip?: number;
+  limit?: number;
+}
+
+export async function getEvents(filters: EventsFilter = {}): Promise<EventOut[]> {
+  const params = new URLSearchParams();
+  if (filters.city) params.set("city", filters.city);
+  if (filters.category) params.set("category", filters.category);
+  if (filters.profession) params.set("profession", filters.profession);
+  if (filters.upcoming_only) params.set("upcoming_only", "true");
+  if (filters.skip !== undefined) params.set("skip", String(filters.skip));
+  if (filters.limit !== undefined) params.set("limit", String(filters.limit));
+  return request<EventOut[]>(`/posts/events?${params}`);
+}

@@ -37,7 +37,7 @@ export default function PostCard({ post, showLocalName }: PostCardProps) {
   const active = isActive(post);
 
   return (
-    <Card className="overflow-hidden">
+    <Card className="card-hover overflow-hidden">
       {img && (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={img} alt={post.title ?? "post"} className="h-40 w-full object-cover" />

@@ -189,43 +189,67 @@ function LandingPage() {
 
       {/* ── Hero ─────────────────────────────────────────────────── */}
       <section className="relative overflow-hidden bg-black text-white">
-        <div className="pointer-events-none absolute -top-32 -right-32 h-96 w-96 rounded-full bg-white/5" />
-        <div className="pointer-events-none absolute -bottom-20 -left-20 h-72 w-72 rounded-full bg-white/5" />
+        {/* Fondo: cuadrícula + resplandores dorados */}
+        <div className="pointer-events-none absolute inset-0 bg-grid-dark" />
+        <div className="pointer-events-none absolute -top-40 left-1/2 h-[480px] w-[720px] -translate-x-1/2 rounded-full bg-yellow-400/15 blur-[120px] animate-float-slow" />
+        <div className="pointer-events-none absolute -bottom-32 -left-24 h-80 w-80 rounded-full bg-amber-500/10 blur-[100px] animate-float-slower" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black to-transparent" />
 
-        <div className="relative mx-auto max-w-4xl px-4 py-24 text-center">
-          <h1 className="mb-5 text-3xl sm:text-5xl font-extrabold leading-tight tracking-tight text-white">
+        <div className="relative mx-auto max-w-4xl px-4 py-24 sm:py-28 text-center">
+          <div className="animate-fade-up mb-6 flex justify-center">
+            <span className="inline-flex items-center gap-2 rounded-full border border-yellow-400/30 bg-yellow-400/10 px-4 py-1.5 text-xs sm:text-sm font-medium text-yellow-300 backdrop-blur">
+              <Sparkles className="h-3.5 w-3.5" />
+              El directorio de negocios de tu ciudad
+            </span>
+          </div>
+          <h1 className="animate-fade-up animation-delay-100 mb-5 text-4xl sm:text-6xl font-extrabold leading-tight tracking-tight text-white">
             Descubre los mejores<br />
-            <span className="text-yellow-400">locales y profesionales</span><br />
+            <span className="text-gradient-gold">locales y profesionales</span><br />
             cerca de ti
           </h1>
-          <p className="mx-auto mb-10 max-w-xl text-base sm:text-lg text-white/70">
+          <p className="animate-fade-up animation-delay-200 mx-auto mb-10 max-w-xl text-base sm:text-lg text-white/70">
             Sigue tus negocios favoritos, encuentra descuentos exclusivos y conecta
             con profesionales de confianza en tu ciudad.
           </p>
-          <div className="flex flex-wrap justify-center gap-3">
+          <div className="animate-fade-up animation-delay-300 flex flex-wrap justify-center gap-3">
             <Link href="/auth/register">
-              <Button size="lg" className="bg-yellow-400 text-black hover:bg-yellow-300 font-bold shadow-lg px-8">
+              <Button size="lg" className="bg-yellow-400 text-black hover:bg-yellow-300 font-bold px-8 shadow-[0_0_30px_-5px_rgba(250,204,21,0.5)] hover:shadow-[0_0_40px_-5px_rgba(250,204,21,0.7)] transition-shadow">
                 Crear cuenta gratis <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
             <Link href="/auth/login">
-              <Button size="lg" variant="outline" className="border-white text-white bg-transparent hover:bg-white/15 hover:text-white px-8">
+              <Button size="lg" variant="outline" className="border-white/40 text-white bg-white/5 backdrop-blur hover:bg-white/15 hover:text-white px-8">
                 Iniciar sesión
               </Button>
             </Link>
           </div>
 
+          {/* Categorías populares */}
+          <div className="animate-fade-up animation-delay-500 mt-10 flex flex-wrap justify-center gap-2">
+            {CATEGORIES.slice(0, 6).map((cat) => (
+              <span
+                key={cat}
+                className="rounded-full border border-white/15 bg-white/5 px-3.5 py-1.5 text-xs text-white/70 backdrop-blur transition-colors hover:border-yellow-400/50 hover:text-yellow-300"
+              >
+                {cat}
+              </span>
+            ))}
+          </div>
+
           {/* mini stats */}
-          <div className="mt-14 flex flex-wrap justify-center gap-8 text-center">
+          <div className="animate-fade-up animation-delay-500 mt-14 flex flex-wrap justify-center gap-4 sm:gap-6">
             {[
               { icon: Building2, label: "Negocios registrados", value: "100+" },
               { icon: Users,     label: "Usuarios activos",     value: "500+" },
               { icon: Tag,       label: "Descuentos activos",   value: "50+"  },
             ].map(({ icon: Icon, label, value }) => (
-              <div key={label} className="flex flex-col items-center gap-1">
+              <div
+                key={label}
+                className="flex min-w-[150px] flex-col items-center gap-1 rounded-2xl border border-white/10 bg-white/5 px-6 py-4 backdrop-blur"
+              >
                 <Icon className="h-6 w-6 text-yellow-400" />
                 <span className="text-2xl font-bold text-white">{value}</span>
-                <span className="text-sm text-white/60">{label}</span>
+                <span className="text-xs text-white/60">{label}</span>
               </div>
             ))}
           </div>
@@ -258,8 +282,8 @@ function LandingPage() {
                 color: "bg-yellow-100 text-yellow-600",
               },
             ].map(({ icon: Icon, title, desc, color }) => (
-              <div key={title} className="rounded-2xl bg-white p-8 shadow-sm text-center">
-                <div className={`mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full ${color}`}>
+              <div key={title} className="card-hover rounded-2xl border border-gray-100 bg-white p-8 shadow-sm text-center">
+                <div className={`mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl ${color}`}>
                   <Icon className="h-7 w-7" />
                 </div>
                 <h3 className="mb-2 text-lg font-semibold">{title}</h3>
@@ -373,15 +397,22 @@ function LandingPage() {
       )}
 
       {/* ── CTA final ────────────────────────────────────────────── */}
-      <section className="bg-black py-20 text-center text-yellow-400">
-        <div className="mx-auto max-w-xl px-4">
-          <h2 className="mb-3 text-3xl font-bold text-yellow-400">¿Tienes un negocio?</h2>
-          <p className="mb-8 text-yellow-100/70">
+      <section className="relative overflow-hidden bg-black py-24 text-center">
+        <div className="pointer-events-none absolute inset-0 bg-grid-dark" />
+        <div className="pointer-events-none absolute left-1/2 top-1/2 h-72 w-[560px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-yellow-400/15 blur-[110px]" />
+        <div className="relative mx-auto max-w-xl px-4">
+          <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-yellow-400/30 bg-yellow-400/10 px-4 py-1.5 text-xs font-medium text-yellow-300">
+            <Building2 className="h-3.5 w-3.5" /> Para dueños de negocios
+          </span>
+          <h2 className="mb-3 text-3xl sm:text-4xl font-extrabold text-white">
+            ¿Tienes un <span className="text-gradient-gold">negocio</span>?
+          </h2>
+          <p className="mb-8 text-white/65">
             Regístralo gratis en Dirbook y llega a más clientes en tu ciudad.
             Publica eventos, descuentos y mucho más.
           </p>
           <Link href="/auth/register">
-            <Button size="lg" className="bg-yellow-400 text-black hover:bg-yellow-300 font-bold shadow-lg px-10">
+            <Button size="lg" className="bg-yellow-400 text-black hover:bg-yellow-300 font-bold px-10 shadow-[0_0_30px_-5px_rgba(250,204,21,0.5)] hover:shadow-[0_0_40px_-5px_rgba(250,204,21,0.7)] transition-shadow">
               Empezar ahora — es gratis
             </Button>
           </Link>
@@ -389,17 +420,38 @@ function LandingPage() {
       </section>
 
       {/* ── Footer ───────────────────────────────────────────────── */}
-      <footer className="border-t bg-gray-50 py-8 text-center text-sm text-muted-foreground">
-        <p>© {new Date().getFullYear()} Dirbook · Conectando tu ciudad</p>
-        <p className="mt-1 space-x-3">
-          <Link href="/child-safety" className="hover:underline">
-            Seguridad Infantil
-          </Link>
-          <span>·</span>
-          <Link href="/delete-account" className="hover:underline">
-            Eliminar cuenta
-          </Link>
-        </p>
+      <footer className="border-t border-white/10 bg-black text-sm text-white/60">
+        <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:grid-cols-3">
+          <div>
+            <p className="mb-2 text-xl font-extrabold text-white">
+              Dir<span className="text-yellow-400">book</span>
+            </p>
+            <p className="max-w-xs text-white/50">
+              El directorio que conecta a las personas con los mejores locales y
+              profesionales de su ciudad.
+            </p>
+          </div>
+          <div>
+            <p className="mb-3 font-semibold text-white">Explora</p>
+            <ul className="space-y-2">
+              <li><Link href="/explore" className="hover:text-yellow-300 transition-colors">Locales</Link></li>
+              <li><Link href="/professionals" className="hover:text-yellow-300 transition-colors">Profesionales</Link></li>
+              <li><Link href="/events" className="hover:text-yellow-300 transition-colors">Eventos y descuentos</Link></li>
+              <li><Link href="/auth/register" className="hover:text-yellow-300 transition-colors">Registra tu negocio</Link></li>
+            </ul>
+          </div>
+          <div>
+            <p className="mb-3 font-semibold text-white">Legal</p>
+            <ul className="space-y-2">
+              <li><Link href="/child-safety" className="hover:text-yellow-300 transition-colors">Seguridad infantil</Link></li>
+              <li><Link href="/delete-account" className="hover:text-yellow-300 transition-colors">Eliminar cuenta</Link></li>
+              <li><Link href="/delete-data" className="hover:text-yellow-300 transition-colors">Eliminar datos</Link></li>
+            </ul>
+          </div>
+        </div>
+        <div className="border-t border-white/10 py-5 text-center text-xs text-white/40">
+          © {new Date().getFullYear()} Dirbook · Conectando tu ciudad
+        </div>
       </footer>
 
       {/* ── Modal de registro ────────────────────────────────────── */}
@@ -471,36 +523,38 @@ function HomeContent() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero / buscador */}
-      <section className="bg-black py-14 text-yellow-400">
-        <div className="mx-auto max-w-3xl px-4 text-center">
-          <h1 className="mb-3 text-4xl font-bold tracking-tight text-yellow-400">
-            Encuentra locales en tu ciudad
+      <section className="relative overflow-hidden bg-black py-16">
+        <div className="pointer-events-none absolute inset-0 bg-grid-dark" />
+        <div className="pointer-events-none absolute -top-32 left-1/2 h-72 w-[560px] -translate-x-1/2 rounded-full bg-yellow-400/15 blur-[100px]" />
+        <div className="relative mx-auto max-w-3xl px-4 text-center">
+          <h1 className="mb-3 text-3xl sm:text-4xl font-extrabold tracking-tight text-white">
+            Encuentra <span className="text-gradient-gold">locales</span> en tu ciudad
           </h1>
-          <p className="mb-8 text-yellow-100/70">
+          <p className="mb-8 text-white/60">
             El directorio de negocios locales más completo
           </p>
 
-          <form onSubmit={handleSearch} className="flex gap-2">
+          <form onSubmit={handleSearch} className="flex gap-2 rounded-2xl border border-white/10 bg-white/5 p-2 backdrop-blur">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Restaurantes, peluquerías, tiendas…"
-                className="pl-9 bg-white text-foreground"
+                className="pl-9 bg-white text-foreground border-0 shadow-none focus-visible:ring-yellow-400"
               />
             </div>
-            <Button type="submit" variant="secondary">Buscar</Button>
+            <Button type="submit" className="bg-yellow-400 text-black hover:bg-yellow-300 font-semibold">Buscar</Button>
             <Button type="button" variant="secondary" size="icon" onClick={() => setShowFilters((v) => !v)}>
               <SlidersHorizontal className="h-4 w-4" />
             </Button>
           </form>
 
           {showFilters && (
-            <div className="mt-3 flex gap-2">
+            <div className="mt-3 flex gap-2 animate-in fade-in slide-in-from-top-2 duration-200">
               <Input value={city} onChange={(e) => setCity(e.target.value)} placeholder="Ciudad" className="bg-white text-foreground" />
               <Button type="button" variant="secondary" onClick={() => fetchLocals(search, category, city)}>Aplicar</Button>
-              <Button type="button" variant="outline" onClick={clearFilters}>Limpiar</Button>
+              <Button type="button" variant="outline" className="text-white border-white/30 bg-transparent hover:bg-white/10 hover:text-white" onClick={clearFilters}>Limpiar</Button>
             </div>
           )}
         </div>

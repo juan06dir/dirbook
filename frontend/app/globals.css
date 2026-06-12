@@ -128,3 +128,55 @@
     @apply font-sans;
   }
 }
+/* ── Utilidades visuales Dirbook ───────────────────────────── */
+
+/* Patrón de cuadrícula sutil para fondos oscuros */
+.bg-grid-dark {
+  background-image:
+    linear-gradient(to right, rgb(255 255 255 / 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(255 255 255 / 0.04) 1px, transparent 1px);
+  background-size: 44px 44px;
+}
+
+/* Animación de entrada hacia arriba */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-up {
+  animation: fade-up 0.7s cubic-bezier(0.21, 0.47, 0.32, 0.98) both;
+}
+.animation-delay-100 { animation-delay: 100ms; }
+.animation-delay-200 { animation-delay: 200ms; }
+.animation-delay-300 { animation-delay: 300ms; }
+.animation-delay-500 { animation-delay: 500ms; }
+
+/* Blobs flotantes del hero */
+@keyframes float-slow {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50%      { transform: translate(20px, -20px) scale(1.06); }
+}
+.animate-float-slow { animation: float-slow 9s ease-in-out infinite; }
+.animate-float-slower { animation: float-slow 13s ease-in-out infinite reverse; }
+
+/* Texto con gradiente dorado */
+.text-gradient-gold {
+  background: linear-gradient(100deg, #fde047 0%, #facc15 45%, #f59e0b 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Elevación suave en hover para tarjetas */
+.card-hover {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px -8px rgb(0 0 0 / 0.18);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-up, .animate-float-slow, .animate-float-slower { animation: none; }
+  .card-hover:hover { transform: none; }
+}

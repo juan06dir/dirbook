@@ -25,21 +25,22 @@ export default function LocalCard({
   const logo = imageUrl(local.logo);
 
   const inner = (
-    <Card className="overflow-hidden transition-shadow group-hover:shadow-md h-full">
+    <Card className="card-hover overflow-hidden h-full">
         {/* Cover */}
-        <div className="relative h-44 bg-muted">
+        <div className="relative h-44 overflow-hidden bg-muted">
           {cover ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={cover}
               alt={local.name}
-              className="h-full w-full object-cover"
+              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
           ) : (
-            <div className="flex h-full items-center justify-center text-muted-foreground">
+            <div className="flex h-full items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 text-muted-foreground">
               <Building2 className="h-12 w-12 opacity-30" />
             </div>
           )}
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/40 to-transparent" />
           {logo && (
             // eslint-disable-next-line @next/next/no-img-element
             <img

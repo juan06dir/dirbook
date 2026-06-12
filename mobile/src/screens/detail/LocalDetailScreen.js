@@ -123,7 +123,7 @@ export default function LocalDetailScreen({ route, navigation }) {
               <Ionicons name="storefront" size={60} color={colors.textMuted} />
             </View>
           )}
-          <LinearGradient colors={['transparent', 'rgba(10,10,10,0.95)']} style={styles.coverGradient} />
+          <LinearGradient colors={['rgba(0,0,0,0.35)', 'transparent', 'rgba(10,10,10,0.95)']} style={styles.coverGradient} />
           <TouchableOpacity
             style={[styles.backBtn, { top: insets.top + 12 }]}
             onPress={() => navigation.goBack()}
@@ -353,7 +353,7 @@ export default function LocalDetailScreen({ route, navigation }) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.bg },
-  coverWrap: { height: 260, position: 'relative' },
+  coverWrap: { height: 320, position: 'relative' },
   cover: { width: '100%', height: '100%' },
   coverPlaceholder: { backgroundColor: colors.surface2, justifyContent: 'center', alignItems: 'center' },
   coverGradient: { ...StyleSheet.absoluteFillObject },
@@ -363,9 +363,15 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.6)',
     justifyContent: 'center', alignItems: 'center',
   },
-  infoHeader: { padding: spacing.lg, marginTop: -20 },
-  logoNameRow: { flexDirection: 'row', alignItems: 'center', marginBottom: spacing.md },
-  logoWrap: { width: 60, height: 60, borderRadius: radius.lg, overflow: 'hidden', marginRight: spacing.md, borderWidth: 2, borderColor: colors.surface },
+  infoHeader: { padding: spacing.lg, marginTop: -44 },
+  logoNameRow: { flexDirection: 'row', alignItems: 'flex-end', marginBottom: spacing.md },
+  logoWrap: {
+    width: 76, height: 76, borderRadius: radius.lg, overflow: 'hidden',
+    marginRight: spacing.md, borderWidth: 2.5, borderColor: colors.primary,
+    backgroundColor: colors.surface2,
+    shadowColor: colors.primary, shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.45, shadowRadius: 12, elevation: 8,
+  },
   logo: { width: '100%', height: '100%', resizeMode: 'cover' },
   logoPlaceholder: { width: '100%', height: '100%', backgroundColor: colors.surface2, justifyContent: 'center', alignItems: 'center' },
   nameBlock: { flex: 1 },
@@ -384,7 +390,11 @@ const styles = StyleSheet.create({
   },
   actionBtnActive: { borderColor: colors.error + '44', backgroundColor: colors.error + '11' },
   actionBtnText: { fontSize: 14, fontWeight: '600', color: colors.text },
-  actionBtnPrimary: { backgroundColor: colors.primary, borderColor: colors.primary },
+  actionBtnPrimary: {
+    backgroundColor: colors.primary, borderColor: colors.primary,
+    shadowColor: colors.primary, shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.5, shadowRadius: 14, elevation: 6,
+  },
   actionBtnPrimaryText: { fontSize: 14, fontWeight: '700', color: '#000' },
   tabs: { flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: colors.border, marginHorizontal: spacing.lg },
   tab: { flex: 1, paddingVertical: 12, alignItems: 'center' },

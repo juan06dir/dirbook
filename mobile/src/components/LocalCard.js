@@ -6,10 +6,10 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, radius, spacing, shadow } from '../theme';
 import { API_URL } from '../api';
-import StarRating from './StarRating';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -61,128 +61,139 @@ export default function LocalCard({
   const coverUri = imageUrl(local.cover_image);
   const categoryIcon = getCategoryIcon(local.category);
 
-  // ── Horizontal (compact) variant ──────────────────────────────────────────
+  // ── Horizontal (carousel) variant — Airbnb style big image ───────────────
   if (horizontal) {
     return (
       <TouchableOpacity
-        style={[styles.hCard, shadow.sm]}
+        style={[styles.hCard, shadow.md]}
         onPress={onPress}
-        activeOpacity={0.8}
+        activeOpacity={0.9}
       >
-        <View style={styles.hLogo}>
-          {logoUri ? (
-            <Image source={{ uri: logoUri }} style={styles.hLogoImg} />
+        <View style={styles.hCover}>
+          {coverUri ? (
+            <Image source={{ uri: coverUri }} style={styles.coverImg} />
+          ) : logoUri ? (
+            <Image source={{ uri: logoUri }} style={styles.coverImg} />
           ) : (
-            <View style={styles.hLogoPlaceholder}>
-              <Ionicons name={categoryIcon} size={22} color={colors.primary} />
+            <View style={styles.coverPlaceholder}>
+              <Ionicons name={categoryIcon} size={40} color={colors.primary} style={{ opacity: 0.5 }} />
             </View>
           )}
-        </View>
-        <View style={styles.hInfo}>
-          <Text style={styles.hName} numberOfLines={1}>{local.name}</Text>
-          <Text style={styles.hCategory} numberOfLines={1}>
-            {local.category || 'Negocio'}
-          </Text>
-          <View style={styles.hMeta}>
-            {rating > 0 && (
-              <View style={styles.metaItem}>
-                <Ionicons name="star" size={11} color={colors.primary} />
-                <Text style={styles.metaRating}>{rating.toFixed(1)}</Text>
+          <LinearGradient
+            colors={['transparent', 'rgba(0,0,0,0.45)', 'rgba(0,0,0,0.88)']}
+            style={styles.coverGradient}
+          />
+
+          {/* Rating badge */}
+          {rating > 0 && (
+            <View style={styles.ratingBadge}>
+              <Ionicons name="star" size={11} color={colors.primary} />
+              <Text style={styles.ratingBadgeText}>{rating.toFixed(1)}</Text>
+            </View>
+          )}
+
+          {/* Category chip */}
+          {local.category ? (
+            <View style={styles.categoryChip}>
+              <Text style={styles.categoryChipText}>{local.category}</Text>
+            </View>
+          ) : null}
+
+          {/* Name overlaid */}
+          <View style={styles.hOverlayInfo}>
+            <Text style={styles.hOverlayName} numberOfLines={1}>{local.name}</Text>
+            {local.city ? (
+              <View style={styles.overlayMetaRow}>
+                <Ionicons name="location" size={11} color="rgba(255,255,255,0.85)" />
+                <Text style={styles.overlayMetaText} numberOfLines={1}>{local.city}</Text>
               </View>
-            )}
-            {local.city && (
-              <View style={styles.metaItem}>
-                <Ionicons name="location" size={11} color={colors.textMuted} />
-                <Text style={styles.metaCity}>{local.city}</Text>
-              </View>
-            )}
+            ) : null}
           </View>
         </View>
       </TouchableOpacity>
     );
   }
 
-  // ── Vertical (full) variant ───────────────────────────────────────────────
+  // ── Vertical (full) variant — image-forward Airbnb style ─────────────────
   return (
     <TouchableOpacity
       style={[styles.card, shadow.md]}
       onPress={onPress}
-      activeOpacity={0.88}
+      activeOpacity={0.92}
     >
-      {/* Cover image */}
+      {/* Cover image with overlay */}
       <View style={styles.cover}>
         {coverUri ? (
           <Image source={{ uri: coverUri }} style={styles.coverImg} />
         ) : (
           <View style={styles.coverPlaceholder}>
-            <Ionicons name={categoryIcon} size={44} color={colors.primary} style={{ opacity: 0.6 }} />
+            <Ionicons name={categoryIcon} size={48} color={colors.primary} style={{ opacity: 0.5 }} />
+          </View>
+        )}
+        <LinearGradient
+          colors={['transparent', 'rgba(0,0,0,0.4)', 'rgba(0,0,0,0.85)']}
+          style={styles.coverGradient}
+        />
+
+        {/* Category chip — top-left, gold */}
+        {local.category ? (
+          <View style={styles.categoryChip}>
+            <Text style={styles.categoryChipText}>{local.category}</Text>
+          </View>
+        ) : null}
+
+        {/* Rating badge — top-right */}
+        {rating > 0 && (
+          <View style={styles.ratingBadge}>
+            <Ionicons name="star" size={12} color={colors.primary} />
+            <Text style={styles.ratingBadgeText}>
+              {rating.toFixed(1)}
+              {local.ratings_count > 0 ? `  (${local.ratings_count})` : ''}
+            </Text>
           </View>
         )}
 
-        {/* Category badge — top-right */}
-        {local.category && (
-          <View style={styles.badge}>
-            <Text style={styles.badgeText}>{local.category}</Text>
+        {/* Name + city overlaid on gradient */}
+        <View style={styles.overlayInfo}>
+          <View style={styles.overlayNameRow}>
+            <View style={styles.logoWrap}>
+              {logoUri ? (
+                <Image source={{ uri: logoUri }} style={styles.logoImg} />
+              ) : (
+                <View style={styles.logoPlaceholder}>
+                  <Ionicons name={categoryIcon} size={16} color={colors.primary} />
+                </View>
+              )}
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.overlayName} numberOfLines={1}>{local.name}</Text>
+              {local.city ? (
+                <View style={styles.overlayMetaRow}>
+                  <Ionicons name="location" size={11} color="rgba(255,255,255,0.85)" />
+                  <Text style={styles.overlayMetaText}>{local.city}</Text>
+                </View>
+              ) : null}
+            </View>
           </View>
-        )}
+        </View>
       </View>
 
       {/* Card body */}
       <View style={styles.body}>
-
-        {/* Logo + name row */}
-        <View style={styles.headerRow}>
-          <View style={styles.logoWrap}>
-            {logoUri ? (
-              <Image source={{ uri: logoUri }} style={styles.logoImg} />
-            ) : (
-              <View style={styles.logoPlaceholder}>
-                <Ionicons name={categoryIcon} size={18} color={colors.primary} />
-              </View>
-            )}
-          </View>
-          <View style={styles.nameWrap}>
-            <Text style={styles.name} numberOfLines={1}>{local.name}</Text>
-            {local.city ? (
-              <View style={styles.locationRow}>
-                <Ionicons name="location-outline" size={11} color={colors.textMuted} />
-                <Text style={styles.locationText}>{local.city}</Text>
-              </View>
-            ) : null}
-          </View>
-        </View>
-
-        {/* Star rating row */}
-        {rating > 0 && (
-          <View style={styles.ratingRow}>
-            <StarRating value={Math.round(rating)} readonly size={13} />
-            <Text style={styles.ratingNumber}>{rating.toFixed(1)}</Text>
-            {local.ratings_count > 0 && (
-              <Text style={styles.ratingCount}>
-                ({local.ratings_count})
-              </Text>
-            )}
-          </View>
-        )}
-
-        {/* Description */}
         {local.description ? (
           <Text style={styles.description} numberOfLines={2}>
             {local.description}
           </Text>
         ) : null}
 
-        {/* Action row */}
         <View style={styles.actionRow}>
-          {/* Left: heart + followers */}
           <View style={styles.likesWrap}>
             <Ionicons name="heart" size={15} color={colors.error} />
             <Text style={styles.likesText}>
-              {formatCount(local.followers_count)}
+              {formatCount(local.followers_count)} seguidores
             </Text>
           </View>
 
-          {/* Right: follow button */}
           {showFollow && onFollow ? (
             <TouchableOpacity
               style={[
@@ -214,19 +225,16 @@ const styles = StyleSheet.create({
   // ── Vertical card ──
   card: {
     backgroundColor: colors.surface,
-    borderRadius: radius.lg,
+    borderRadius: radius.xl,
     overflow: 'hidden',
     borderWidth: 1,
     borderColor: colors.border,
     marginBottom: spacing.md,
   },
 
-  // Cover
   cover: {
-    height: 200,
+    height: 210,
     backgroundColor: colors.surface2,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   coverImg: {
     width: '100%',
@@ -238,25 +246,98 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     width: '100%',
+    backgroundColor: colors.surface2,
+  },
+  coverGradient: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: '65%',
   },
 
-  // Category badge
-  badge: {
+  // Gold category chip — top-left
+  categoryChip: {
     position: 'absolute',
     top: 12,
-    right: 12,
-    backgroundColor: 'rgba(0,0,0,0.72)',
+    left: 12,
+    backgroundColor: colors.primary,
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: radius.full,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.12)',
   },
-  badgeText: {
-    color: colors.textSecondary,
+  categoryChipText: {
+    color: '#000',
     fontSize: 11,
-    fontWeight: '600',
+    fontWeight: '800',
     letterSpacing: 0.3,
+  },
+
+  // Rating badge — top-right
+  ratingBadge: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: 'rgba(0,0,0,0.65)',
+    paddingHorizontal: 9,
+    paddingVertical: 4,
+    borderRadius: radius.full,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.15)',
+  },
+  ratingBadgeText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+
+  // Overlaid info on gradient
+  overlayInfo: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    padding: spacing.md,
+  },
+  overlayNameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
+  logoWrap: {
+    width: 38,
+    height: 38,
+    borderRadius: radius.full,
+    overflow: 'hidden',
+    borderWidth: 1.5,
+    borderColor: 'rgba(250,204,21,0.7)',
+    backgroundColor: colors.surface2,
+  },
+  logoImg: { width: '100%', height: '100%', resizeMode: 'cover' },
+  logoPlaceholder: {
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  overlayName: {
+    fontSize: 17,
+    fontWeight: '800',
+    color: '#fff',
+    letterSpacing: -0.3,
+  },
+  overlayMetaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+    marginTop: 1,
+  },
+  overlayMetaText: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.85)',
   },
 
   // Body
@@ -264,79 +345,15 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     gap: spacing.sm,
   },
-
-  // Logo + name
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-  },
-  logoWrap: {
-    width: 40,
-    height: 40,
-    borderRadius: radius.full,
-    overflow: 'hidden',
-    borderWidth: 1.5,
-    borderColor: colors.border,
-  },
-  logoImg: {
-    width: '100%',
-    height: '100%',
-    resizeMode: 'cover',
-  },
-  logoPlaceholder: {
-    width: '100%',
-    height: '100%',
-    backgroundColor: colors.surface2,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  nameWrap: { flex: 1 },
-  name: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: colors.text,
-    marginBottom: 2,
-  },
-  locationRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 3,
-  },
-  locationText: {
-    fontSize: 12,
-    color: colors.textMuted,
-  },
-
-  // Ratings
-  ratingRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  ratingNumber: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: colors.primary,
-  },
-  ratingCount: {
-    fontSize: 12,
-    color: colors.textMuted,
-  },
-
-  // Description
   description: {
     fontSize: 13,
     color: colors.textSecondary,
     lineHeight: 19,
   },
-
-  // Action row
   actionRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: 2,
   },
   likesWrap: {
     flexDirection: 'row',
@@ -375,40 +392,31 @@ const styles = StyleSheet.create({
     color: colors.bg,
   },
 
-  // ── Horizontal card ──
+  // ── Horizontal (carousel) card ──
   hCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    padding: spacing.md,
+    width: 270,
     marginRight: spacing.md,
-    width: 200,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  hLogo: {
-    width: 50,
-    height: 50,
-    borderRadius: radius.md,
+    borderRadius: radius.xl,
     overflow: 'hidden',
-    marginRight: spacing.sm,
+    backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.border,
   },
-  hLogoImg: { width: '100%', height: '100%', resizeMode: 'cover' },
-  hLogoPlaceholder: {
-    width: '100%',
-    height: '100%',
+  hCover: {
+    height: 170,
     backgroundColor: colors.surface2,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
-  hInfo: { flex: 1 },
-  hName: { fontSize: 13, fontWeight: '700', color: colors.text, marginBottom: 2 },
-  hCategory: { fontSize: 11, color: colors.textMuted, marginBottom: 4 },
-  hMeta: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  metaItem: { flexDirection: 'row', alignItems: 'center', gap: 2 },
-  metaRating: { fontSize: 11, fontWeight: '600', color: colors.primary },
-  metaCity: { fontSize: 11, color: colors.textMuted },
+  hOverlayInfo: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    padding: spacing.md,
+  },
+  hOverlayName: {
+    fontSize: 15,
+    fontWeight: '800',
+    color: '#fff',
+    letterSpacing: -0.2,
+  },
 });

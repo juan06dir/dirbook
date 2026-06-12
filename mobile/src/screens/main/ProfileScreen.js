@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   View, Text, Image, TouchableOpacity, FlatList,
-  StyleSheet, ActivityIndicator, Alert, ScrollView,
+  StyleSheet, ActivityIndicator, Alert, ScrollView, Linking,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { getLocals, getMyFollows, getLocal, unfollowLocal } from '../../api';
+import { getMyLocals, getMyFollows, getLocal, unfollowLocal } from '../../api';
 import { useAuth } from '../../context/AuthContext';
 import LocalCard from '../../components/LocalCard';
 import { colors, spacing, radius, typography } from '../../theme';
@@ -42,7 +42,7 @@ export default function ProfileScreen({ navigation }) {
   async function loadMyLocals() {
     setLoadingLocals(true);
     try {
-      const data = await getLocals({ my_locals: true });
+      const data = await getMyLocals();
       setMyLocals(data || []);
     } catch (e) {
       console.warn(e);
@@ -162,6 +162,24 @@ export default function ProfileScreen({ navigation }) {
         </View>
       </View>
 
+      {/* Accesos rápidos */}
+      <View style={styles.quickGrid}>
+        {[
+          { icon: 'storefront', label: 'Mis negocios', sub: `${myLocals.length} registrados`, onPress: () => setActiveTab('negocios') },
+          { icon: 'notifications', label: 'Notificaciones', sub: 'Ver actividad', onPress: () => navigation.navigate('Notificaciones') },
+          { icon: 'compass', label: 'Explorar', sub: 'Descubre negocios', onPress: () => navigation.navigate('Explorar') },
+          { icon: 'calendar', label: 'Eventos', sub: 'Próximos eventos', onPress: () => navigation.navigate('Eventos') },
+        ].map((item) => (
+          <TouchableOpacity key={item.label} style={styles.quickCard} onPress={item.onPress} activeOpacity={0.8}>
+            <View style={styles.quickIconCircle}>
+              <Ionicons name={item.icon} size={20} color={colors.primary} />
+            </View>
+            <Text style={styles.quickLabel}>{item.label}</Text>
+            <Text style={styles.quickSub}>{item.sub}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+
       {/* Tabs */}
       <View style={styles.tabs}>
         <TouchableOpacity
@@ -259,8 +277,8 @@ export default function ProfileScreen({ navigation }) {
       {/* Menu */}
       <View style={styles.menuSection}>
         {[
-          { icon: 'settings-outline', label: 'Configuración', onPress: () => {} },
-          { icon: 'help-circle-outline', label: 'Ayuda', onPress: () => {} },
+          { icon: 'globe-outline', label: 'Visitar dirbook.com.co', onPress: () => Linking.openURL('https://dirbook.com.co') },
+          { icon: 'help-circle-outline', label: 'Ayuda y soporte', onPress: () => Linking.openURL('https://dirbook.com.co/suggestions') },
           { icon: 'log-out-outline', label: 'Cerrar sesión', onPress: handleLogout, danger: true },
         ].map((item) => (
           <TouchableOpacity
@@ -316,6 +334,33 @@ const styles = StyleSheet.create({
   statNum: { fontSize: 24, fontWeight: '800', color: colors.text },
   statLabel: { fontSize: 12, color: colors.textMuted, marginTop: 2 },
   statDivider: { width: 1, backgroundColor: colors.border },
+
+  // Quick actions
+  quickGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    paddingHorizontal: spacing.lg,
+    marginTop: spacing.lg,
+    gap: spacing.sm,
+  },
+  quickCard: {
+    width: '48%',
+    flexGrow: 1,
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    borderColor: colors.border,
+    padding: spacing.md,
+  },
+  quickIconCircle: {
+    width: 40, height: 40, borderRadius: 20,
+    backgroundColor: colors.primaryFaded,
+    borderWidth: 1, borderColor: 'rgba(250,204,21,0.25)',
+    justifyContent: 'center', alignItems: 'center',
+    marginBottom: spacing.sm,
+  },
+  quickLabel: { fontSize: 14, fontWeight: '700', color: colors.text },
+  quickSub: { fontSize: 11, color: colors.textMuted, marginTop: 2 },
 
   // Tabs
   tabs: {

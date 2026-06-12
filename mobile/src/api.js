@@ -59,6 +59,8 @@ export const getLocals = (params = {}) =>
 
 export const getLocal = (id) => request(`/locals/${id}`);
 
+export const getMyLocals = () => request('/locals/mine');
+
 export const createLocal = (data) =>
   request('/locals', { method: 'POST', body: JSON.stringify(data) });
 

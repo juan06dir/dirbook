@@ -67,15 +67,15 @@ export default function PostCard({ post }) {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.surface2,
-    borderRadius: radius.md,
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
     overflow: 'hidden',
-    marginBottom: spacing.sm,
+    marginBottom: spacing.md,
     borderWidth: 1,
     borderColor: colors.border,
   },
   expired: { opacity: 0.5 },
-  image: { width: '100%', height: 160, resizeMode: 'cover' },
+  image: { width: '100%', height: 180, resizeMode: 'cover' },
   body: { padding: spacing.md },
   header: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, marginBottom: spacing.sm },
   typeBadge: {

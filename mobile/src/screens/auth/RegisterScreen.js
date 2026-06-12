@@ -35,6 +35,7 @@ export default function RegisterScreen({ navigation }) {
     try {
       const { access_token, user } = await register(name.trim(), email.trim().toLowerCase(), password);
       await signIn(access_token, user);
+      navigation.reset({ index: 0, routes: [{ name: 'Main' }] });
     } catch (e) {
       Alert.alert('Error al registrarse', e.message);
     } finally {

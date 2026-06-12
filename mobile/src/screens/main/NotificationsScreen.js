@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   View, Text, FlatList, TouchableOpacity,
-  StyleSheet, ActivityIndicator,
+  StyleSheet, ActivityIndicator, RefreshControl,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -27,11 +27,12 @@ function timeAgo(dateStr) {
   return `hace ${days}d`;
 }
 
-export default function NotificationsScreen() {
+export default function NotificationsScreen({ navigation }) {
   const insets = useSafeAreaInsets();
   const { user } = useAuth();
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     if (!user) { setLoading(false); return; }
@@ -47,7 +48,13 @@ export default function NotificationsScreen() {
       console.warn(e);
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
+  }
+
+  function onRefresh() {
+    setRefreshing(true);
+    loadNotifications();
   }
 
   if (!user) {
@@ -90,6 +97,11 @@ export default function NotificationsScreen() {
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.header}>
+        {navigation?.canGoBack?.() ? (
+          <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()} activeOpacity={0.8}>
+            <Ionicons name="arrow-back" size={20} color={colors.text} />
+          </TouchableOpacity>
+        ) : null}
         <Text style={styles.title}>Notificaciones</Text>
       </View>
       <FlatList
@@ -98,6 +110,7 @@ export default function NotificationsScreen() {
         renderItem={renderItem}
         contentContainerStyle={{ paddingBottom: 100 }}
         showsVerticalScrollIndicator={false}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />}
         ListEmptyComponent={
           <View style={styles.center}>
             <Ionicons name="notifications-outline" size={56} color={colors.textMuted} />
@@ -113,7 +126,16 @@ export default function NotificationsScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.bg },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center', gap: spacing.sm, padding: spacing.xl },
-  header: { paddingHorizontal: spacing.lg, paddingTop: spacing.md, paddingBottom: spacing.lg },
+  header: {
+    flexDirection: 'row', alignItems: 'center', gap: spacing.md,
+    paddingHorizontal: spacing.lg, paddingTop: spacing.md, paddingBottom: spacing.lg,
+  },
+  backBtn: {
+    width: 38, height: 38, borderRadius: 19,
+    backgroundColor: colors.surface,
+    borderWidth: 1, borderColor: colors.border,
+    justifyContent: 'center', alignItems: 'center',
+  },
   title: { ...typography.h2 },
   item: {
     flexDirection: 'row', alignItems: 'flex-start',
@@ -121,7 +143,11 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1, borderBottomColor: colors.border,
     gap: spacing.md,
   },
-  unread: { backgroundColor: colors.primaryFaded },
+  unread: {
+    backgroundColor: colors.primaryFaded,
+    borderLeftWidth: 3,
+    borderLeftColor: colors.primary,
+  },
   iconWrap: {
     width: 40, height: 40, borderRadius: radius.full,
     justifyContent: 'center', alignItems: 'center',

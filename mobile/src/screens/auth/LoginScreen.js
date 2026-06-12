@@ -25,6 +25,7 @@ export default function LoginScreen({ navigation }) {
     try {
       const { access_token, user } = await login(email.trim().toLowerCase(), password);
       await signIn(access_token, user);
+      navigation.reset({ index: 0, routes: [{ name: 'Main' }] });
     } catch (e) {
       Alert.alert('Error al iniciar sesión', e.message);
     } finally {

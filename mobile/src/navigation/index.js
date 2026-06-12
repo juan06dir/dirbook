@@ -34,12 +34,12 @@ function MainTabs() {
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: colors.surface,
-          borderTopColor: colors.border,
+          backgroundColor: '#0D0D0D',
+          borderTopColor: 'rgba(250,204,21,0.15)',
           borderTopWidth: 1,
-          height: 62,
-          paddingBottom: 8,
-          paddingTop: 6,
+          height: 64,
+          paddingBottom: 9,
+          paddingTop: 7,
         },
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.textMuted,

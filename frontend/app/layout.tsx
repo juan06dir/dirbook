@@ -3,6 +3,7 @@ import { Geist } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 import Navbar from "@/components/Navbar";
+import { SITE_URL, SITE_DESCRIPTION } from "@/lib/site";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -17,8 +18,17 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Dirbook — Directorio de locales comerciales",
-  description: "Encuentra y conecta con locales y profesionales en tu ciudad",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "Dirbook — Directorio de locales y profesionales",
+    template: "%s | Dirbook",
+  },
+  description: SITE_DESCRIPTION,
+  keywords: [
+    "directorio de negocios", "locales comerciales", "profesionales",
+    "restaurantes", "servicios", "Colombia", "directorio local",
+    "negocios cerca de mí", "Dirbook",
+  ],
   applicationName: "Dirbook",
   appleWebApp: {
     capable: true,
@@ -26,10 +36,24 @@ export const metadata: Metadata = {
     title: "Dirbook",
   },
   formatDetection: { telephone: false },
+  alternates: { canonical: "/" },
   openGraph: {
     type: "website",
-    title: "Dirbook",
-    description: "Directorio de locales y profesionales en tu ciudad",
+    url: SITE_URL,
+    siteName: "Dirbook",
+    locale: "es_CO",
+    title: "Dirbook — Directorio de locales y profesionales",
+    description: SITE_DESCRIPTION,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Dirbook — Directorio de locales y profesionales",
+    description: SITE_DESCRIPTION,
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, "max-image-preview": "large" },
   },
 };
 

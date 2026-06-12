@@ -13,7 +13,10 @@
     },
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.dirbook.mobile"
+      "bundleIdentifier": "com.dirbook.mobile",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -22,7 +25,15 @@
       },
       "package": "com.dirbook.mobile"
     },
-    "plugins": [],
+    "plugins": [
+      "expo-font",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Dirbook usa tu ubicación para mostrarte locales y profesionales cerca de ti."
+        }
+      ]
+    ],
     "extra": {
       "eas": {
         "projectId": "70904403-5c13-4867-bef9-cbd79be34f9e"

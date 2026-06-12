@@ -49,7 +49,7 @@ export default function StarRating({
                 "transition-colors",
                 star <= active
                   ? "fill-amber-400 text-amber-400"
-                  : "fill-none text-gray-300"
+                  : "fill-none text-white/25"
               )}
             />
           </button>

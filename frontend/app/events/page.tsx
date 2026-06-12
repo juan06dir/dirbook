@@ -38,9 +38,9 @@ function eventStatus(start: string | null, end: string | null) {
   const s = start ? new Date(start).getTime() : null;
   const e = end ? new Date(end).getTime() : null;
 
-  if (e && e < now) return { label: "Finalizado", className: "bg-gray-100 text-gray-500" };
-  if (s && s > now) return { label: "Próximamente", className: "bg-blue-50 text-blue-600" };
-  return { label: "En curso", className: "bg-green-50 text-green-600" };
+  if (e && e < now) return { label: "Finalizado", className: "bg-muted text-muted-foreground" };
+  if (s && s > now) return { label: "Próximamente", className: "bg-blue-500/15 text-blue-400 backdrop-blur" };
+  return { label: "En curso", className: "bg-green-500/15 text-green-400 backdrop-blur" };
 }
 
 function EventCard({ event }: { event: EventOut }) {
@@ -50,9 +50,9 @@ function EventCard({ event }: { event: EventOut }) {
   const isExpired = status.label === "Finalizado";
 
   return (
-    <div className={`group rounded-2xl border bg-white overflow-hidden shadow-sm hover:shadow-md transition-shadow ${isExpired ? "opacity-60" : ""}`}>
+    <div className={`group rounded-2xl border border-white/10 bg-card overflow-hidden shadow-sm hover:shadow-md transition-shadow ${isExpired ? "opacity-60" : ""}`}>
       {/* Cover image */}
-      <div className="relative h-44 bg-gradient-to-br from-yellow-50 to-amber-100 flex items-center justify-center overflow-hidden">
+      <div className="relative h-44 bg-gradient-to-br from-yellow-400/10 to-amber-400/15 flex items-center justify-center overflow-hidden">
         {cover ? (
           <img src={cover} alt={event.title ?? ""} className="w-full h-full object-cover" />
         ) : (
@@ -70,8 +70,8 @@ function EventCard({ event }: { event: EventOut }) {
           {logo ? (
             <img src={logo} alt="" className="h-6 w-6 rounded-full object-cover border" />
           ) : (
-            <div className="h-6 w-6 rounded-full bg-yellow-100 flex items-center justify-center">
-              <span className="text-[10px] font-bold text-yellow-600">
+            <div className="h-6 w-6 rounded-full bg-yellow-400/15 flex items-center justify-center">
+              <span className="text-[10px] font-bold text-yellow-300">
                 {(event.local_name || event.professional_name || "?")[0].toUpperCase()}
               </span>
             </div>
@@ -80,12 +80,12 @@ function EventCard({ event }: { event: EventOut }) {
             {event.local_name || event.professional_name || "Evento"}
           </span>
           {event.local_category && (
-            <span className="ml-auto text-[10px] font-semibold text-yellow-700 bg-yellow-50 px-2 py-0.5 rounded-full border border-yellow-200">
+            <span className="ml-auto text-[10px] font-semibold text-yellow-300 bg-yellow-400/10 px-2 py-0.5 rounded-full border border-yellow-400/30">
               {event.local_category}
             </span>
           )}
           {event.professional_profession && (
-            <span className="ml-auto text-[10px] font-semibold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200">
+            <span className="ml-auto text-[10px] font-semibold text-blue-400 bg-blue-500/15 px-2 py-0.5 rounded-full border border-blue-400/30">
               {event.professional_profession}
             </span>
           )}
@@ -186,7 +186,7 @@ export default function EventsPage() {
   const cities = [...new Set(events.map((e) => e.local_city).filter(Boolean))] as string[];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       {/* Hero */}
       <div className="bg-gradient-to-br from-black via-zinc-900 to-yellow-950 text-white px-4 py-14">
         <div className="max-w-3xl mx-auto text-center">
@@ -204,7 +204,7 @@ export default function EventsPage() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
         {/* Filters card */}
-        <div className="bg-white rounded-2xl border shadow-sm p-5 mb-8">
+        <div className="bg-card rounded-2xl border border-white/10 shadow-sm p-5 mb-8">
           <div className="flex flex-wrap gap-3 items-end">
             {/* Search */}
             <div className="flex-1 min-w-[200px]">
@@ -216,7 +216,7 @@ export default function EventsPage() {
                   placeholder="Nombre del evento o negocio..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="w-full pl-9 pr-4 py-2.5 text-sm rounded-lg border bg-gray-50 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
+                  className="w-full pl-9 pr-4 py-2.5 text-sm rounded-lg border border-white/10 bg-background focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
                 />
               </div>
             </div>
@@ -231,7 +231,7 @@ export default function EventsPage() {
                   placeholder="Ej: Bogotá"
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
-                  className="w-full pl-9 pr-4 py-2.5 text-sm rounded-lg border bg-gray-50 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
+                  className="w-full pl-9 pr-4 py-2.5 text-sm rounded-lg border border-white/10 bg-background focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
                 />
                 <datalist id="cities-list">
                   {cities.map((c) => <option key={c} value={c} />)}
@@ -247,7 +247,7 @@ export default function EventsPage() {
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  className="w-full pl-9 pr-4 py-2.5 text-sm rounded-lg border bg-gray-50 focus:outline-none focus:ring-2 focus:ring-yellow-400 appearance-none"
+                  className="w-full pl-9 pr-4 py-2.5 text-sm rounded-lg border border-white/10 bg-background focus:outline-none focus:ring-2 focus:ring-yellow-400 appearance-none"
                 >
                   <option value="">Todos</option>
                   {LOCAL_CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
@@ -263,7 +263,7 @@ export default function EventsPage() {
                 <select
                   value={profession}
                   onChange={(e) => setProfession(e.target.value)}
-                  className="w-full pl-9 pr-4 py-2.5 text-sm rounded-lg border bg-gray-50 focus:outline-none focus:ring-2 focus:ring-yellow-400 appearance-none"
+                  className="w-full pl-9 pr-4 py-2.5 text-sm rounded-lg border border-white/10 bg-background focus:outline-none focus:ring-2 focus:ring-yellow-400 appearance-none"
                 >
                   <option value="">Todas</option>
                   {PROFESSIONS.map((p) => <option key={p} value={p}>{p}</option>)}
@@ -278,7 +278,7 @@ export default function EventsPage() {
                 className={`flex items-center gap-2 px-4 py-2.5 rounded-lg border text-sm font-semibold transition-colors ${
                   upcomingOnly
                     ? "bg-yellow-400 border-yellow-400 text-black"
-                    : "bg-gray-50 border-gray-200 text-muted-foreground hover:bg-gray-100"
+                    : "bg-white/5 border-white/10 text-muted-foreground hover:bg-white/10"
                 }`}
               >
                 <Clock className="h-4 w-4" />
@@ -312,18 +312,18 @@ export default function EventsPage() {
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {[...Array(8)].map((_, i) => (
-              <div key={i} className="rounded-2xl border bg-white h-72 animate-pulse">
-                <div className="h-44 bg-gray-100 rounded-t-2xl" />
+              <div key={i} className="rounded-2xl border border-white/10 bg-card h-72 animate-pulse">
+                <div className="h-44 bg-muted rounded-t-2xl" />
                 <div className="p-4 space-y-2">
-                  <div className="h-4 bg-gray-100 rounded w-3/4" />
-                  <div className="h-3 bg-gray-100 rounded w-1/2" />
+                  <div className="h-4 bg-muted rounded w-3/4" />
+                  <div className="h-3 bg-muted rounded w-1/2" />
                 </div>
               </div>
             ))}
           </div>
         ) : filtered.length === 0 ? (
           <div className="text-center py-20">
-            <Calendar className="h-14 w-14 text-gray-300 mx-auto mb-4" />
+            <Calendar className="h-14 w-14 text-white/20 mx-auto mb-4" />
             <h3 className="text-lg font-semibold text-muted-foreground">No se encontraron eventos</h3>
             <p className="text-sm text-muted-foreground mt-1">Prueba con otros filtros o revisa más tarde</p>
             {hasFilters && (

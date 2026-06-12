@@ -134,7 +134,7 @@ export default function LocalDetailPage() {
 
   if (!user) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-6 bg-gray-50 px-4 text-center">
+      <div className="flex min-h-screen flex-col items-center justify-center gap-6 bg-background px-4 text-center">
         <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10">
           <Lock className="h-10 w-10 text-primary" />
         </div>
@@ -183,20 +183,22 @@ export default function LocalDetailPage() {
   const logo  = imageUrl(local.logo);
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-16">
-      {/* Cover */}
-      <div className="relative h-64 w-full bg-muted md:h-80">
+    <div className="min-h-screen bg-background pb-16">
+      {/* Cover inmersivo */}
+      <div className="relative h-[40vh] min-h-[280px] w-full overflow-hidden bg-black md:h-[48vh]">
         {cover ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={cover} alt={local.name} className="h-full w-full object-cover" />
         ) : (
-          <div className="flex h-full items-center justify-center text-muted-foreground">
+          <div className="flex h-full items-center justify-center bg-gradient-to-br from-zinc-900 to-black text-muted-foreground">
             <Building2 className="h-20 w-20 opacity-20" />
           </div>
         )}
+        {/* Degradado cinematográfico hacia el fondo */}
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background via-background/40 to-black/30" />
         <button
           onClick={() => router.back()}
-          className="absolute left-4 top-4 flex items-center gap-1 rounded-full bg-white/80 backdrop-blur px-3 py-1.5 text-sm font-medium shadow hover:bg-white transition-colors"
+          className="absolute left-4 top-4 flex items-center gap-1 rounded-full border border-white/15 bg-black/40 px-3 py-1.5 text-sm font-medium text-white backdrop-blur hover:bg-black/60 transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
           Volver
@@ -204,61 +206,66 @@ export default function LocalDetailPage() {
       </div>
 
       <div className="mx-auto max-w-4xl px-4">
-        {/* Header */}
-        <div className="relative -mt-8 mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-          <div className="flex items-end gap-4">
-            <div className="h-20 w-20 shrink-0 overflow-hidden rounded-2xl border-4 border-white bg-white shadow-md">
-              {logo ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={logo} alt="logo" className="h-full w-full object-cover" />
-              ) : (
-                <div className="flex h-full items-center justify-center bg-muted">
-                  <Building2 className="h-8 w-8 text-muted-foreground" />
-                </div>
-              )}
+        {/* Header superpuesto a la portada */}
+        <div className="relative -mt-20 mb-6 animate-fade-up">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div className="flex items-end gap-4">
+              <div className="h-24 w-24 shrink-0 overflow-hidden rounded-3xl ring-2 ring-yellow-400/60 ring-offset-4 ring-offset-background bg-card shadow-[0_8px_30px_-6px_rgba(0,0,0,0.6)]">
+                {logo ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={logo} alt="logo" className="h-full w-full object-cover" />
+                ) : (
+                  <div className="flex h-full items-center justify-center bg-muted">
+                    <Building2 className="h-8 w-8 text-muted-foreground" />
+                  </div>
+                )}
+              </div>
+              <div className="pb-1">
+                <h1 className="text-2xl sm:text-3xl font-extrabold leading-tight text-white drop-shadow">{local.name}</h1>
+                <Badge className="mt-2 border-yellow-400/30 bg-yellow-400/15 text-yellow-300">{local.category}</Badge>
+              </div>
             </div>
-            <div className="pb-1">
-              <h1 className="text-xl sm:text-2xl font-bold leading-tight">{local.name}</h1>
-              <Badge variant="secondary" className="mt-1">{local.category}</Badge>
-            </div>
-          </div>
 
-          {/* Botón Follow */}
-          <Button
-            variant={followStatus.following ? "outline" : "default"}
-            onClick={handleFollow}
-            disabled={followLoading}
-            className="w-full sm:w-auto"
-          >
-            <Heart className={`mr-2 h-4 w-4 ${followStatus.following ? "fill-red-500 text-red-500" : ""}`} />
-            {followStatus.following ? "Siguiendo" : "Seguir"}
-          </Button>
+            {/* Botón Follow */}
+            <Button
+              size="lg"
+              variant={followStatus.following ? "outline" : "default"}
+              onClick={handleFollow}
+              disabled={followLoading}
+              className={`w-full sm:w-auto font-semibold ${
+                followStatus.following
+                  ? "border-white/20 bg-white/5 text-white hover:bg-white/10 hover:text-white"
+                  : "shadow-[0_0_24px_-6px_rgba(250,204,21,0.6)]"
+              }`}
+            >
+              <Heart className={`mr-2 h-4 w-4 ${followStatus.following ? "fill-red-500 text-red-500" : ""}`} />
+              {followStatus.following ? "Siguiendo" : "Seguir"}
+            </Button>
+          </div>
         </div>
 
-        {/* Estrellas + seguidores */}
-        <div className="mb-6 flex flex-wrap items-center gap-4">
-          <div className="flex flex-col gap-1">
-            <p className="text-xs text-muted-foreground">
-              {user ? "Tu calificación:" : "Calificación del local:"}
+        {/* Stats en tarjetas de cristal */}
+        <div className="mb-8 grid grid-cols-3 gap-3 sm:max-w-md animate-fade-up animation-delay-100">
+          <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-center backdrop-blur">
+            <p className="text-xl font-bold text-yellow-400">{rating.avg?.toFixed(1) ?? "—"}</p>
+            <p className="text-[11px] text-muted-foreground">{rating.count} reseñas</p>
+          </div>
+          <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-center backdrop-blur">
+            <p className="flex items-center justify-center gap-1 text-xl font-bold text-white">
+              <Users className="h-4 w-4 text-yellow-400" />
+              {followStatus.followers_count}
             </p>
+            <p className="text-[11px] text-muted-foreground">seguidores</p>
+          </div>
+          <div className="flex flex-col items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-4 py-3 backdrop-blur">
             <StarRating
               value={user ? (rating.my_score ?? null) : rating.avg}
               onChange={user ? handleRate : undefined}
-              size="lg"
-              showValue={!user}
+              size="sm"
             />
-            {ratingLoading && <span className="text-xs text-muted-foreground">Guardando…</span>}
-          </div>
-          <div className="text-center">
-            <p className="text-xl font-bold">{rating.avg?.toFixed(1) ?? "—"}</p>
-            <p className="text-xs text-muted-foreground">{rating.count} calificaciones</p>
-          </div>
-          <div className="text-center">
-            <p className="text-xl font-bold flex items-center gap-1">
-              <Users className="h-5 w-5 text-muted-foreground" />
-              {followStatus.followers_count}
+            <p className="mt-1 text-[11px] text-muted-foreground">
+              {ratingLoading ? "Guardando…" : user ? "tu calificación" : "calificación"}
             </p>
-            <p className="text-xs text-muted-foreground">seguidores</p>
           </div>
         </div>
 
@@ -267,14 +274,14 @@ export default function LocalDetailPage() {
           <div className="space-y-6 md:col-span-2">
             {/* Descripción */}
             {local.description && (
-              <section className="rounded-xl border bg-white p-5 shadow-sm">
+              <section className="rounded-2xl border border-white/10 bg-card p-5">
                 <h2 className="mb-2 font-semibold">Sobre este local</h2>
                 <p className="text-muted-foreground leading-relaxed">{local.description}</p>
               </section>
             )}
 
             {/* Posts / Eventos / Descuentos */}
-            <section className="rounded-xl border bg-white p-5 shadow-sm">
+            <section className="rounded-2xl border border-white/10 bg-card p-5">
               <div className="mb-4 flex items-center justify-between">
                 <h2 className="font-semibold">Publicaciones</h2>
                 <div className="flex gap-1">
@@ -309,7 +316,7 @@ export default function LocalDetailPage() {
 
             {/* Mapa */}
             {(local.address || local.city) && (
-              <section className="rounded-xl border bg-white p-5 shadow-sm">
+              <section className="rounded-2xl border border-white/10 bg-card p-5">
                 <h2 className="mb-3 font-semibold">Ubicación</h2>
                 <LocalMap address={local.address || ""} city={local.city || ""} name={local.name} />
               </section>
@@ -318,7 +325,7 @@ export default function LocalDetailPage() {
 
           {/* Sidebar */}
           <div className="space-y-4">
-            <div className="rounded-xl border bg-white p-5 shadow-sm space-y-3">
+            <div className="rounded-2xl border border-white/10 bg-card p-5 space-y-3">
               <h2 className="font-semibold">Información de contacto</h2>
 
               {(local.address || local.city) && (

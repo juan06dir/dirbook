@@ -20,13 +20,13 @@ export default function ProfessionalCard({ prof }: { prof: ProfessionalOut }) {
     <Link href={`/professionals/${prof.id}`} className="group block">
       <Card className="card-hover overflow-hidden h-full">
         {/* Cover */}
-        <div className="relative h-32 overflow-hidden bg-gradient-to-br from-blue-50 to-indigo-100">
+        <div className="relative h-32 overflow-hidden bg-gradient-to-br from-zinc-800 to-zinc-900">
           {cover ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={cover} alt={prof.name} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
           ) : null}
           {/* Avatar */}
-          <div className="absolute -bottom-6 left-4 h-14 w-14 overflow-hidden rounded-full border-4 border-white bg-white shadow-md">
+          <div className="absolute -bottom-6 left-4 h-14 w-14 overflow-hidden rounded-full border-4 border-card bg-card shadow-md">
             {avatar ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={avatar} alt={prof.name} className="h-full w-full object-cover" />

@@ -80,7 +80,7 @@ function EventCard({ post, locals }: { post: PostOut; locals: LocalOut[] }) {
   return (
     <Link
       href={local ? `/locals/${local.id}` : "#"}
-      className="flex items-start gap-3 px-4 py-3 hover:bg-yellow-50 transition-colors"
+      className="flex items-start gap-3 px-4 py-3 hover:bg-yellow-400/10 transition-colors"
     >
       {/* Logo del local */}
       <div className="h-10 w-10 shrink-0 overflow-hidden rounded-lg bg-muted border">
@@ -201,7 +201,7 @@ export default function ExplorePage() {
     <div className="flex h-[calc(100vh-64px)] flex-col">
 
       {/* ── Filtros de categoría ───────────────────────────────────────────── */}
-      <div className="flex items-center gap-2 overflow-x-auto border-b bg-white px-4 py-2.5 shrink-0">
+      <div className="flex items-center gap-2 overflow-x-auto border-b border-white/10 bg-card px-4 py-2.5 shrink-0">
         <span className="shrink-0 text-xs font-semibold text-muted-foreground mr-1">Filtrar:</span>
         {CATEGORIES.map((cat) => (
           <button key={cat} onClick={() => setCategory(cat)} className="shrink-0">
@@ -251,7 +251,7 @@ export default function ExplorePage() {
         </div>
 
         {/* Panel lateral */}
-        <aside className="w-full md:w-80 lg:w-96 border-t md:border-t-0 md:border-l bg-white flex flex-col overflow-hidden shrink-0">
+        <aside className="w-full md:w-80 lg:w-96 border-t md:border-t-0 md:border-l border-white/10 bg-card flex flex-col overflow-hidden shrink-0">
 
           {/* Tabs */}
           <div className="flex border-b shrink-0">
@@ -282,7 +282,7 @@ export default function ExplorePage() {
           </div>
 
           {/* Sub-header */}
-          <div className="px-4 py-2 border-b shrink-0 bg-gray-50">
+          <div className="px-4 py-2 border-b border-white/10 shrink-0 bg-background">
             <p className="text-xs text-muted-foreground">
               {sideTab === "locales"
                 ? `${filtered.length} en el mapa · ${sideList.length} en total`
@@ -308,7 +308,7 @@ export default function ExplorePage() {
                     <Link
                       key={local.id}
                       href={`/locals/${local.id}`}
-                      className="flex items-center gap-3 px-4 py-3 hover:bg-yellow-50 transition-colors"
+                      className="flex items-center gap-3 px-4 py-3 hover:bg-yellow-400/10 transition-colors"
                     >
                       {local.avg_rating && (
                         <span className="w-6 shrink-0 text-center text-xs font-bold text-muted-foreground">

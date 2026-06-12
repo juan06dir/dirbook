@@ -40,7 +40,7 @@ const PARTIAL_OPTIONS = [
 
 export default function DeleteDataPage() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="bg-black text-white py-14">
         <div className="mx-auto max-w-3xl px-4 text-center">
@@ -76,14 +76,14 @@ export default function DeleteDataPage() {
             {PARTIAL_OPTIONS.map(({ icon: Icon, title, how, inmediato }) => (
               <div
                 key={title}
-                className="rounded-xl border border-gray-200 p-4 flex flex-col gap-2"
+                className="rounded-xl border border-white/10 bg-card p-4 flex flex-col gap-2"
               >
                 <div className="flex items-center gap-2">
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gray-100">
-                    <Icon className="h-4 w-4 text-gray-600" />
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/10">
+                    <Icon className="h-4 w-4 text-muted-foreground" />
                   </div>
                   <span className="font-semibold text-sm">{title}</span>
-                  <span className={`ml-auto text-xs rounded-full px-2 py-0.5 font-medium ${inmediato ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"}`}>
+                  <span className={`ml-auto text-xs rounded-full px-2 py-0.5 font-medium ${inmediato ? "bg-green-500/15 text-green-400" : "bg-yellow-400/15 text-yellow-300"}`}>
                     {inmediato ? "Inmediato" : "Por correo"}
                   </span>
                 </div>
@@ -96,7 +96,7 @@ export default function DeleteDataPage() {
         {/* Opción 2 — Por correo */}
         <section>
           <h2 className="text-xl font-bold mb-2">Solicitar eliminación de datos por correo</h2>
-          <p className="text-sm text-gray-600 mb-4">
+          <p className="text-sm text-muted-foreground mb-4">
             Para cualquier dato que no puedas eliminar directamente, envíanos un
             correo con la siguiente información:
           </p>
@@ -107,8 +107,8 @@ export default function DeleteDataPage() {
               "El tipo de dato que deseas eliminar (reseña, imagen, publicación, etc.).",
               "Contexto que nos ayude a identificarlo (fecha, nombre del local, etc.).",
             ].map((step, i) => (
-              <li key={i} className="flex items-start gap-3 text-sm text-gray-700">
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-black text-yellow-400 font-bold text-xs">
+              <li key={i} className="flex items-start gap-3 text-sm text-muted-foreground">
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-yellow-400/15 text-yellow-300 font-bold text-xs">
                   {i + 1}
                 </span>
                 <span className="pt-0.5">{step}</span>
@@ -117,7 +117,7 @@ export default function DeleteDataPage() {
           </ol>
           <a
             href="mailto:noreply@dirbook.com.co?subject=Solicitud%20de%20eliminación%20de%20datos%20—%20Dirbook"
-            className="inline-flex items-center gap-2 rounded-lg bg-black px-4 py-2.5 text-sm font-semibold text-yellow-400 hover:bg-black/80 transition-colors"
+            className="inline-flex items-center gap-2 rounded-lg bg-black border border-white/15 px-4 py-2.5 text-sm font-semibold text-yellow-400 hover:bg-white/5 transition-colors"
           >
             <Mail className="h-4 w-4" />
             noreply@dirbook.com.co
@@ -134,12 +134,12 @@ export default function DeleteDataPage() {
           <div className="space-y-4">
 
             {/* Eliminados */}
-            <div className="rounded-xl border border-green-200 bg-green-50 p-5">
+            <div className="rounded-xl border border-green-500/30 bg-green-500/10 p-5">
               <div className="flex items-center gap-2 mb-3">
-                <CheckCircle2 className="h-5 w-5 text-green-600" />
-                <h3 className="font-semibold text-green-800">Se elimina de forma permanente</h3>
+                <CheckCircle2 className="h-5 w-5 text-green-400" />
+                <h3 className="font-semibold text-green-300">Se elimina de forma permanente</h3>
               </div>
-              <ul className="space-y-1.5 text-sm text-green-900">
+              <ul className="space-y-1.5 text-sm text-green-200/90">
                 {[
                   "El dato específico solicitado (foto, publicación, reseña, local, etc.)",
                   "Toda referencia a ese dato en otros registros de tu perfil",
@@ -153,10 +153,10 @@ export default function DeleteDataPage() {
             </div>
 
             {/* Retenidos temporalmente */}
-            <div className="rounded-xl border border-orange-200 bg-orange-50 p-5">
+            <div className="rounded-xl border border-orange-500/30 bg-orange-500/10 p-5">
               <div className="flex items-center gap-2 mb-3">
-                <Clock className="h-5 w-5 text-orange-600" />
-                <h3 className="font-semibold text-orange-800">Puede conservarse temporalmente</h3>
+                <Clock className="h-5 w-5 text-orange-400" />
+                <h3 className="font-semibold text-orange-300">Puede conservarse temporalmente</h3>
               </div>
               <ul className="space-y-3 text-sm">
                 {[
@@ -173,20 +173,20 @@ export default function DeleteDataPage() {
                 ].map(({ dato, periodo, razon }) => (
                   <li key={dato} className="flex flex-col gap-0.5">
                     <div className="flex items-center justify-between">
-                      <span className="font-medium text-orange-900">{dato}</span>
-                      <span className="text-xs bg-orange-200 text-orange-800 rounded-full px-2 py-0.5 font-medium">
+                      <span className="font-medium text-orange-200">{dato}</span>
+                      <span className="text-xs bg-orange-500/20 text-orange-300 rounded-full px-2 py-0.5 font-medium">
                         {periodo}
                       </span>
                     </div>
-                    <span className="text-xs text-orange-700">{razon}</span>
+                    <span className="text-xs text-orange-300/80">{razon}</span>
                   </li>
                 ))}
               </ul>
             </div>
 
             {/* Tu cuenta permanece */}
-            <div className="flex gap-3 rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-800">
-              <AlertCircle className="h-5 w-5 shrink-0 mt-0.5 text-blue-500" />
+            <div className="flex gap-3 rounded-xl border border-blue-500/30 bg-blue-500/10 p-4 text-sm text-blue-300">
+              <AlertCircle className="h-5 w-5 shrink-0 mt-0.5 text-blue-400" />
               <p>
                 Tu cuenta y el resto de tus datos permanecen intactos. Solo se
                 elimina lo que solicites expresamente. Si deseas eliminar todo,
@@ -202,10 +202,10 @@ export default function DeleteDataPage() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t bg-gray-50 py-8 text-center text-sm text-gray-500">
+      <footer className="border-t border-white/10 bg-background py-8 text-center text-sm text-gray-500">
         <p>
           © {new Date().getFullYear()}{" "}
-          <Link href="/" className="font-semibold text-gray-700 hover:underline">
+          <Link href="/" className="font-semibold text-muted-foreground hover:underline">
             Dirbook
           </Link>{" "}
           · Conectando tu ciudad

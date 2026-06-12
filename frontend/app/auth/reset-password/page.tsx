@@ -67,7 +67,7 @@ function ResetPasswordContent() {
   /* ── Token inválido o expirado ── */
   if (!tokenValid) {
     return (
-      <div className="flex min-h-[calc(100vh-64px)] items-center justify-center bg-gray-50 p-4">
+      <div className="flex min-h-[calc(100vh-64px)] items-center justify-center bg-background p-4">
         <div className="w-full max-w-sm">
           <div className="mb-6 text-center">
             <div className="inline-flex items-center gap-2 text-2xl font-bold">
@@ -75,9 +75,9 @@ function ResetPasswordContent() {
               DirBook
             </div>
           </div>
-          <div className="rounded-2xl border bg-white p-6 shadow-sm text-center space-y-4">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-red-100 mx-auto">
-              <XCircle className="h-9 w-9 text-red-500" />
+          <div className="rounded-2xl border border-white/10 bg-card p-6 shadow-sm text-center space-y-4">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-red-500/15 mx-auto">
+              <XCircle className="h-9 w-9 text-red-400" />
             </div>
             <div>
               <h2 className="text-lg font-bold mb-1">Enlace inválido o expirado</h2>
@@ -102,7 +102,7 @@ function ResetPasswordContent() {
   }
 
   return (
-    <div className="flex min-h-[calc(100vh-64px)] items-center justify-center bg-gray-50 p-4">
+    <div className="flex min-h-[calc(100vh-64px)] items-center justify-center bg-background p-4">
       <div className="w-full max-w-sm">
 
         {/* Logo */}
@@ -114,12 +114,12 @@ function ResetPasswordContent() {
           <p className="mt-1 text-muted-foreground">Elige una nueva contraseña</p>
         </div>
 
-        <div className="rounded-2xl border bg-white p-6 shadow-sm">
+        <div className="rounded-2xl border border-white/10 bg-card p-6 shadow-sm">
           {success ? (
             /* ── Éxito ── */
             <div className="flex flex-col items-center gap-4 py-4 text-center">
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
-                <CheckCircle2 className="h-9 w-9 text-green-600" />
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-green-500/15">
+                <CheckCircle2 className="h-9 w-9 text-green-400" />
               </div>
               <div>
                 <h2 className="mb-1 text-lg font-bold">¡Contraseña actualizada!</h2>
@@ -197,7 +197,7 @@ function ResetPasswordContent() {
                 </div>
 
                 {error && (
-                  <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">
+                  <p className="rounded-lg bg-red-500/10 border border-red-500/30 px-3 py-2 text-sm text-red-400">
                     {error}
                   </p>
                 )}

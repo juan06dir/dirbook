@@ -50,7 +50,7 @@ function ProfessionalsContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       {/* Hero */}
       <section className="bg-indigo-600 py-12 text-white">
         <div className="mx-auto max-w-3xl px-4 text-center">
@@ -65,7 +65,7 @@ function ProfessionalsContent() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Nombre o especialidad…"
-                className="pl-9 bg-white text-foreground"
+                className="pl-9"
               />
             </div>
             <Button type="submit" variant="secondary">Buscar</Button>
@@ -74,7 +74,7 @@ function ProfessionalsContent() {
       </section>
 
       {/* Filtro por profesión */}
-      <section className="border-b bg-white py-3">
+      <section className="border-b border-white/10 bg-card py-3">
         <div className="mx-auto max-w-7xl overflow-x-auto px-4">
           <div className="flex gap-2 pb-1">
             {PROFESSIONS.map((p) => (
@@ -100,7 +100,7 @@ function ProfessionalsContent() {
         {loading ? (
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="h-52 rounded-xl bg-gray-200 animate-pulse" />
+              <div key={i} className="h-52 rounded-xl bg-muted animate-pulse" />
             ))}
           </div>
         ) : professionals.length === 0 ? (

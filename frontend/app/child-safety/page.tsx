@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 export default function ChildSafetyPage() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="bg-black text-white py-14">
         <div className="mx-auto max-w-3xl px-4 text-center">
@@ -34,12 +34,12 @@ export default function ChildSafetyPage() {
         {/* 1. Compromiso */}
         <section>
           <div className="flex items-center gap-3 mb-4">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-yellow-100">
-              <BookOpen className="h-5 w-5 text-yellow-700" />
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-yellow-400/15">
+              <BookOpen className="h-5 w-5 text-yellow-300" />
             </div>
             <h2 className="text-xl font-bold">Nuestro compromiso</h2>
           </div>
-          <div className="prose prose-sm text-gray-700 leading-relaxed space-y-3">
+          <div className="prose prose-sm text-muted-foreground leading-relaxed space-y-3">
             <p>
               Dirbook es una plataforma de directorio social que conecta personas
               con locales comerciales y profesionales en Colombia. Nos comprometemos
@@ -58,14 +58,14 @@ export default function ChildSafetyPage() {
         {/* 2. Estándares contra la EASI */}
         <section>
           <div className="flex items-center gap-3 mb-4">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-red-100">
-              <AlertTriangle className="h-5 w-5 text-red-600" />
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-red-500/15">
+              <AlertTriangle className="h-5 w-5 text-red-400" />
             </div>
             <h2 className="text-xl font-bold">
               Estándares contra la explotación y el abuso sexual infantil (EASI)
             </h2>
           </div>
-          <ul className="space-y-3 text-sm text-gray-700">
+          <ul className="space-y-3 text-sm text-muted-foreground">
             {[
               "Prohibición absoluta de subir, compartir o vincular cualquier imagen, video o texto que sexualice a menores de edad.",
               "Prohibición de crear perfiles, publicaciones o mensajes orientados a contactar, captar o manipular a menores con fines sexuales o de abuso (grooming).",
@@ -75,7 +75,7 @@ export default function ChildSafetyPage() {
               "Revisión periódica de nuestras políticas para adaptarlas a las mejores prácticas internacionales y a los cambios legislativos.",
             ].map((item, i) => (
               <li key={i} className="flex items-start gap-2.5">
-                <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-green-100 text-green-700 font-bold text-xs">
+                <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-green-500/15 text-green-400 font-bold text-xs">
                   ✓
                 </span>
                 <span>{item}</span>
@@ -87,12 +87,12 @@ export default function ChildSafetyPage() {
         {/* 3. Mecanismos de denuncia */}
         <section>
           <div className="flex items-center gap-3 mb-4">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-100">
-              <Flag className="h-5 w-5 text-blue-600" />
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-500/15">
+              <Flag className="h-5 w-5 text-blue-400" />
             </div>
             <h2 className="text-xl font-bold">Mecanismos de denuncia en la aplicación</h2>
           </div>
-          <div className="text-sm text-gray-700 space-y-3">
+          <div className="text-sm text-muted-foreground space-y-3">
             <p>
               Dirbook ofrece a sus usuarios herramientas accesibles para reportar
               contenido inapropiado o conductas que puedan poner en riesgo a menores:
@@ -116,12 +116,12 @@ export default function ChildSafetyPage() {
         {/* 4. Reporte a autoridades */}
         <section>
           <div className="flex items-center gap-3 mb-4">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-purple-100">
-              <Users className="h-5 w-5 text-purple-600" />
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-purple-500/15">
+              <Users className="h-5 w-5 text-purple-400" />
             </div>
             <h2 className="text-xl font-bold">Reporte a autoridades competentes</h2>
           </div>
-          <div className="text-sm text-gray-700 space-y-3">
+          <div className="text-sm text-muted-foreground space-y-3">
             <p>
               Dirbook cumple con todas las leyes de protección infantil aplicables en
               Colombia y, cuando corresponde, a nivel internacional. Ante cualquier
@@ -144,21 +144,21 @@ export default function ChildSafetyPage() {
         </section>
 
         {/* 5. Contacto */}
-        <section className="rounded-2xl border border-gray-200 bg-gray-50 p-6">
+        <section className="rounded-2xl border border-white/10 bg-card p-6">
           <div className="flex items-center gap-3 mb-4">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-black">
               <Mail className="h-5 w-5 text-yellow-400" />
             </div>
             <h2 className="text-xl font-bold">Contacto de seguridad</h2>
           </div>
-          <p className="text-sm text-gray-700 mb-3">
+          <p className="text-sm text-muted-foreground mb-3">
             Si tienes información sobre una posible violación a estos estándares,
             si eres investigador de seguridad o autoridad y necesitas coordinación,
             o si deseas consultar sobre el cumplimiento de estas políticas, contáctanos:
           </p>
           <a
             href="mailto:noreply@dirbook.com.co"
-            className="inline-flex items-center gap-2 rounded-lg bg-black px-4 py-2.5 text-sm font-semibold text-yellow-400 hover:bg-black/80 transition-colors"
+            className="inline-flex items-center gap-2 rounded-lg bg-black border border-white/15 px-4 py-2.5 text-sm font-semibold text-yellow-400 hover:bg-white/5 transition-colors"
           >
             <Mail className="h-4 w-4" />
             noreply@dirbook.com.co
@@ -172,7 +172,7 @@ export default function ChildSafetyPage() {
         {/* 6. Marco legal */}
         <section>
           <h2 className="text-xl font-bold mb-4">Marco legal de referencia</h2>
-          <ul className="space-y-2 text-sm text-gray-700">
+          <ul className="space-y-2 text-sm text-muted-foreground">
             {[
               "Ley 679 de 2001 (Colombia) — Estatuto para prevenir y contrarrestar la explotación, pornografía y turismo sexual con menores.",
               "Ley 1336 de 2009 (Colombia) — Adición a la Ley 679, medidas de protección contra la explotación sexual comercial de niños.",
@@ -191,10 +191,10 @@ export default function ChildSafetyPage() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t bg-gray-50 py-8 text-center text-sm text-gray-500">
+      <footer className="border-t border-white/10 bg-background py-8 text-center text-sm text-gray-500">
         <p>
           © {new Date().getFullYear()}{" "}
-          <Link href="/" className="font-semibold text-gray-700 hover:underline">
+          <Link href="/" className="font-semibold text-muted-foreground hover:underline">
             Dirbook
           </Link>{" "}
           · Conectando tu ciudad

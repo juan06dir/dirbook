@@ -93,7 +93,7 @@ export default function ProfessionalDetailPage() {
 
   if (!user) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-6 bg-gray-50 px-4 text-center">
+      <div className="flex min-h-screen flex-col items-center justify-center gap-6 bg-background px-4 text-center">
         <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10">
           <Lock className="h-10 w-10 text-primary" />
         </div>
@@ -141,9 +141,9 @@ export default function ProfessionalDetailPage() {
   const avatar = imageUrl(prof.avatar);
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-16">
+    <div className="min-h-screen bg-background pb-16">
       {/* Cover */}
-      <div className="relative h-56 w-full bg-gradient-to-br from-blue-100 to-indigo-200 md:h-72">
+      <div className="relative h-56 w-full bg-gradient-to-br from-blue-500/20 to-indigo-500/30 md:h-72">
         {cover && (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={cover} alt={prof.name} className="h-full w-full object-cover" />
@@ -160,7 +160,7 @@ export default function ProfessionalDetailPage() {
       <div className="mx-auto max-w-4xl px-4">
         {/* Header */}
         <div className="relative -mt-10 mb-6 flex items-end gap-4">
-          <div className="h-20 w-20 shrink-0 overflow-hidden rounded-full border-4 border-white bg-white shadow-md">
+          <div className="h-20 w-20 shrink-0 overflow-hidden rounded-full border-4 border-card bg-card shadow-md">
             {avatar ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={avatar} alt={prof.name} className="h-full w-full object-cover" />
@@ -183,14 +183,14 @@ export default function ProfessionalDetailPage() {
           {/* Main */}
           <div className="space-y-6 md:col-span-2">
             {prof.bio && (
-              <section className="rounded-xl border bg-white p-5 shadow-sm">
+              <section className="rounded-xl border border-white/10 bg-card p-5 shadow-sm">
                 <h2 className="mb-2 font-semibold">Sobre mí</h2>
                 <p className="text-muted-foreground leading-relaxed">{prof.bio}</p>
               </section>
             )}
 
             {/* Posts */}
-            <section className="rounded-xl border bg-white p-5 shadow-sm">
+            <section className="rounded-xl border border-white/10 bg-card p-5 shadow-sm">
               <div className="mb-4 flex items-center justify-between">
                 <h2 className="font-semibold">Publicaciones</h2>
                 <div className="flex gap-1">
@@ -221,7 +221,7 @@ export default function ProfessionalDetailPage() {
 
           {/* Sidebar */}
           <div className="space-y-4">
-            <div className="rounded-xl border bg-white p-5 shadow-sm space-y-3">
+            <div className="rounded-xl border border-white/10 bg-card p-5 shadow-sm space-y-3">
               <h2 className="font-semibold">Contacto</h2>
 
               {prof.phone && (
@@ -286,7 +286,7 @@ export default function ProfessionalDetailPage() {
             </div>
 
             {/* Calificación */}
-            <div className="rounded-xl border bg-white p-5 shadow-sm space-y-3">
+            <div className="rounded-xl border border-white/10 bg-card p-5 shadow-sm space-y-3">
               <h2 className="font-semibold">Calificación</h2>
               {rating && (rating.avg !== null) && (
                 <div className="flex items-center gap-2">

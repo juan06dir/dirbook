@@ -108,15 +108,15 @@ function RegisterModal({
         </div>
 
         {/* Cuerpo del modal */}
-        <div className="bg-white px-6 pt-5 pb-7">
+        <div className="bg-card px-6 pt-5 pb-7">
           <div className="mb-5 text-center">
             <div className="mb-2 flex justify-center">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-yellow-100 px-3 py-1 text-xs font-semibold text-yellow-800">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-yellow-400/30 bg-yellow-400/15 px-3 py-1 text-xs font-semibold text-yellow-300">
                 <Sparkles className="h-3 w-3" />
                 Contenido exclusivo para miembros
               </span>
             </div>
-            <h2 className="text-xl font-extrabold text-gray-900 mb-1">
+            <h2 className="text-xl font-extrabold text-foreground mb-1">
               ¡Crea tu cuenta gratis!
             </h2>
             <p className="text-sm text-muted-foreground leading-relaxed">
@@ -134,8 +134,8 @@ function RegisterModal({
               "Acceder a descuentos y eventos exclusivos",
               "Calificar y dejar reseñas",
             ].map((b) => (
-              <li key={b} className="flex items-center gap-2 text-sm text-gray-700">
-                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-green-100 text-green-600">
+              <li key={b} className="flex items-center gap-2 text-sm text-foreground/80">
+                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-green-500/15 text-green-500">
                   ✓
                 </span>
                 {b}
@@ -148,7 +148,7 @@ function RegisterModal({
             <Link href="/auth/register" className="block">
               <Button
                 size="lg"
-                className="w-full bg-black text-yellow-400 hover:bg-black/80 font-bold shadow-md"
+                className="w-full bg-yellow-400 text-black hover:bg-yellow-300 font-bold shadow-[0_0_24px_-6px_rgba(250,204,21,0.5)]"
               >
                 <Sparkles className="mr-2 h-4 w-4" />
                 Crear cuenta gratis
@@ -185,7 +185,7 @@ function LandingPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background">
 
       {/* ── Hero ─────────────────────────────────────────────────── */}
       <section className="relative overflow-hidden bg-black text-white">
@@ -257,7 +257,7 @@ function LandingPage() {
       </section>
 
       {/* ── Cómo funciona ────────────────────────────────────────── */}
-      <section className="bg-gray-50 py-20">
+      <section className="bg-background py-20">
         <div className="mx-auto max-w-5xl px-4 text-center">
           <h2 className="mb-2 text-3xl font-bold">¿Cómo funciona?</h2>
           <p className="mb-12 text-muted-foreground">Simple, rápido y gratuito</p>
@@ -267,22 +267,22 @@ function LandingPage() {
                 icon: Users,
                 title: "1. Regístrate",
                 desc: "Crea tu cuenta en segundos. Es completamente gratis.",
-                color: "bg-blue-100 text-blue-600",
+                color: "bg-blue-500/15 text-blue-400",
               },
               {
                 icon: Search,
                 title: "2. Explora",
                 desc: "Busca locales por categoría, ciudad o nombre. Lee reseñas reales.",
-                color: "bg-green-100 text-green-600",
+                color: "bg-green-500/15 text-green-400",
               },
               {
                 icon: Star,
                 title: "3. Conecta",
                 desc: "Sigue negocios, califica tu experiencia y no te pierdas ningún descuento.",
-                color: "bg-yellow-100 text-yellow-600",
+                color: "bg-yellow-400/15 text-yellow-400",
               },
             ].map(({ icon: Icon, title, desc, color }) => (
-              <div key={title} className="card-hover rounded-2xl border border-gray-100 bg-white p-8 shadow-sm text-center">
+              <div key={title} className="card-hover rounded-2xl border border-white/10 bg-card p-8 text-center">
                 <div className={`mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl ${color}`}>
                   <Icon className="h-7 w-7" />
                 </div>
@@ -313,7 +313,7 @@ function LandingPage() {
           {localsLoading ? (
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {Array.from({ length: 8 }).map((_, i) => (
-                <div key={i} className="h-64 rounded-xl bg-gray-200 animate-pulse" />
+                <div key={i} className="h-64 rounded-xl bg-muted animate-pulse" />
               ))}
             </div>
           ) : locals.length === 0 ? (
@@ -354,7 +354,7 @@ function LandingPage() {
 
       {/* ── Descuentos activos ───────────────────────────────────── */}
       {discounts.length > 0 && (
-        <section className="bg-gray-50 py-16">
+        <section className="border-y border-white/5 bg-white/[0.03] py-16">
           <div className="mx-auto max-w-7xl px-4">
             <div className="mb-6 flex items-center justify-between">
               <h2 className="flex items-center gap-2 text-2xl font-bold">
@@ -521,7 +521,7 @@ function HomeContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       {/* Hero / buscador */}
       <section className="relative overflow-hidden bg-black py-16">
         <div className="pointer-events-none absolute inset-0 bg-grid-dark" />
@@ -541,7 +541,7 @@ function HomeContent() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Restaurantes, peluquerías, tiendas…"
-                className="pl-9 bg-white text-foreground border-0 shadow-none focus-visible:ring-yellow-400"
+                className="pl-9 border-0 shadow-none focus-visible:ring-yellow-400"
               />
             </div>
             <Button type="submit" className="bg-yellow-400 text-black hover:bg-yellow-300 font-semibold">Buscar</Button>
@@ -552,7 +552,7 @@ function HomeContent() {
 
           {showFilters && (
             <div className="mt-3 flex gap-2 animate-in fade-in slide-in-from-top-2 duration-200">
-              <Input value={city} onChange={(e) => setCity(e.target.value)} placeholder="Ciudad" className="bg-white text-foreground" />
+              <Input value={city} onChange={(e) => setCity(e.target.value)} placeholder="Ciudad" />
               <Button type="button" variant="secondary" onClick={() => fetchLocals(search, category, city)}>Aplicar</Button>
               <Button type="button" variant="outline" className="text-white border-white/30 bg-transparent hover:bg-white/10 hover:text-white" onClick={clearFilters}>Limpiar</Button>
             </div>
@@ -561,7 +561,7 @@ function HomeContent() {
       </section>
 
       {/* Categorías */}
-      <section className="border-b bg-white py-3">
+      <section className="border-b border-white/10 bg-background py-3">
         <div className="mx-auto max-w-7xl overflow-x-auto px-4">
           <div className="flex gap-2 pb-1">
             {CATEGORIES.map((cat) => (
@@ -587,7 +587,7 @@ function HomeContent() {
           {discountsLoading ? (
             <div className="flex gap-4 overflow-x-auto pb-2">
               {Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="h-44 w-64 shrink-0 rounded-xl bg-gray-200 animate-pulse" />
+                <div key={i} className="h-44 w-64 shrink-0 rounded-xl bg-muted animate-pulse" />
               ))}
             </div>
           ) : (
@@ -614,7 +614,7 @@ function HomeContent() {
         {loading ? (
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="h-64 rounded-xl bg-gray-200 animate-pulse" />
+              <div key={i} className="h-64 rounded-xl bg-muted animate-pulse" />
             ))}
           </div>
         ) : locals.length === 0 ? (

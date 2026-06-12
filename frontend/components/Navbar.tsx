@@ -17,7 +17,7 @@ function NotifPanel({
   onClose: () => void;
 }) {
   return (
-    <div className="absolute right-0 top-full mt-2 w-80 rounded-xl border bg-white shadow-xl z-[200] overflow-hidden">
+    <div className="absolute right-0 top-full mt-2 w-80 rounded-xl border border-white/10 bg-card shadow-2xl z-[200] overflow-hidden">
       <div className="flex items-center justify-between px-4 py-3 border-b">
         <span className="font-semibold text-sm">Notificaciones</span>
         <button onClick={onClose} className="text-muted-foreground hover:text-foreground">
@@ -31,7 +31,7 @@ function NotifPanel({
           notifs.map((n) => (
             <div
               key={n.id}
-              className={`px-4 py-3 text-sm ${n.read ? "text-muted-foreground" : "bg-yellow-50 font-medium"}`}
+              className={`px-4 py-3 text-sm ${n.read ? "text-muted-foreground" : "bg-yellow-400/10 font-medium"}`}
             >
               <p className="leading-snug">{n.message}</p>
               <p className="mt-0.5 text-xs text-muted-foreground">
@@ -107,7 +107,7 @@ export default function Navbar() {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-white/90 backdrop-blur-sm">
+    <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-black/70 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 font-bold text-xl text-primary">
@@ -213,7 +213,7 @@ export default function Navbar() {
 
       {/* Menú desplegable móvil */}
       {menuOpen && (
-        <div className="sm:hidden border-t bg-white px-4 py-3 space-y-1">
+        <div className="sm:hidden border-t border-white/10 bg-black/95 backdrop-blur-xl px-4 py-3 space-y-1">
           <Link href="/" onClick={() => setMenuOpen(false)}
             className="flex items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-muted transition-colors">
             <Building2 className="h-4 w-4 text-muted-foreground" /> Locales
@@ -249,7 +249,7 @@ export default function Navbar() {
                 <LayoutDashboard className="h-4 w-4 text-muted-foreground" /> Mi panel
               </Link>
               <button onClick={handleLogout}
-                className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm text-red-500 hover:bg-red-50 transition-colors">
+                className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm text-red-500 hover:bg-red-500/10 transition-colors">
                 <LogOut className="h-4 w-4" /> Cerrar sesión
               </button>
             </>

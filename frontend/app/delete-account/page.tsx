@@ -24,7 +24,7 @@ const DELETED_DATA = [
 
 export default function DeleteAccountPage() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="bg-black text-white py-14">
         <div className="mx-auto max-w-3xl px-4 text-center">
@@ -47,7 +47,7 @@ export default function DeleteAccountPage() {
       <main className="mx-auto max-w-3xl px-4 py-14 space-y-12">
 
         {/* Aviso importante */}
-        <div className="flex gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">
+        <div className="flex gap-3 rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-300">
           <AlertCircle className="h-5 w-5 shrink-0 mt-0.5 text-red-500" />
           <p>
             La eliminación de cuenta es <strong>permanente e irreversible</strong>.
@@ -58,28 +58,28 @@ export default function DeleteAccountPage() {
         {/* Opción 1 — Desde la app */}
         <section>
           <div className="flex items-center gap-3 mb-5">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-black">
-              <Smartphone className="h-5 w-5 text-yellow-400" />
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-yellow-400/15">
+              <Smartphone className="h-5 w-5 text-yellow-300" />
             </div>
             <h2 className="text-xl font-bold">Opción 1 — Desde la aplicación</h2>
           </div>
-          <p className="text-sm text-gray-600 mb-4">
+          <p className="text-sm text-muted-foreground mb-4">
             Si tienes acceso a tu cuenta, esta es la forma más rápida. La
             eliminación es inmediata.
           </p>
           <ol className="space-y-4">
             {[
-              <>Inicia sesión en Dirbook en <Link href="/auth/login" className="text-blue-600 hover:underline font-medium">dirbook.com.co</Link> o en la app.</>,
+              <>Inicia sesión en Dirbook en <Link href="/auth/login" className="text-blue-400 hover:underline font-medium">dirbook.com.co</Link> o en la app.</>,
               "Abre el menú de tu perfil haciendo clic en tu nombre o avatar en la barra superior.",
               <>Ve a la sección <strong>Configuración</strong> dentro de tu panel de usuario.</>,
               <>Desplázate hasta la zona <strong>Zona de peligro</strong> y haz clic en <strong>«Eliminar mi cuenta»</strong>.</>,
               "Confirma la acción en el diálogo de advertencia. Tu cuenta y todos tus datos serán eliminados de forma inmediata.",
             ].map((step, i) => (
               <li key={i} className="flex items-start gap-3">
-                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-black text-yellow-400 font-bold text-sm">
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-yellow-400/15 text-yellow-300 font-bold text-sm">
                   {i + 1}
                 </span>
-                <span className="text-sm text-gray-700 pt-0.5">{step}</span>
+                <span className="text-sm text-muted-foreground pt-0.5">{step}</span>
               </li>
             ))}
           </ol>
@@ -88,16 +88,16 @@ export default function DeleteAccountPage() {
         {/* Opción 2 — Por correo */}
         <section>
           <div className="flex items-center gap-3 mb-5">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-yellow-100">
-              <Mail className="h-5 w-5 text-yellow-700" />
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-yellow-400/15">
+              <Mail className="h-5 w-5 text-yellow-300" />
             </div>
             <h2 className="text-xl font-bold">Opción 2 — Por correo electrónico</h2>
           </div>
-          <p className="text-sm text-gray-600 mb-4">
+          <p className="text-sm text-muted-foreground mb-4">
             Si no puedes acceder a tu cuenta, envíanos un correo con los
             siguientes datos:
           </p>
-          <ul className="space-y-2 text-sm text-gray-700 mb-5">
+          <ul className="space-y-2 text-sm text-muted-foreground mb-5">
             {[
               "Asunto: «Solicitud de eliminación de cuenta — Dirbook»",
               "El correo electrónico asociado a tu cuenta de Dirbook",
@@ -111,7 +111,7 @@ export default function DeleteAccountPage() {
           </ul>
           <a
             href="mailto:noreply@dirbook.com.co?subject=Solicitud%20de%20eliminación%20de%20cuenta%20—%20Dirbook"
-            className="inline-flex items-center gap-2 rounded-lg bg-black px-4 py-2.5 text-sm font-semibold text-yellow-400 hover:bg-black/80 transition-colors"
+            className="inline-flex items-center gap-2 rounded-lg bg-black border border-white/15 px-4 py-2.5 text-sm font-semibold text-yellow-400 hover:bg-white/5 transition-colors"
           >
             <Mail className="h-4 w-4" />
             noreply@dirbook.com.co
@@ -125,18 +125,18 @@ export default function DeleteAccountPage() {
         {/* Datos eliminados */}
         <section>
           <div className="flex items-center gap-3 mb-5">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-green-100">
-              <CheckCircle2 className="h-5 w-5 text-green-600" />
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-green-500/15">
+              <CheckCircle2 className="h-5 w-5 text-green-400" />
             </div>
             <h2 className="text-xl font-bold">Datos que se eliminan</h2>
           </div>
-          <p className="text-sm text-gray-600 mb-4">
+          <p className="text-sm text-muted-foreground mb-4">
             Al eliminar tu cuenta se borran de forma permanente e inmediata los
             siguientes datos:
           </p>
           <ul className="space-y-2">
             {DELETED_DATA.map((item, i) => (
-              <li key={i} className="flex items-start gap-2.5 text-sm text-gray-700">
+              <li key={i} className="flex items-start gap-2.5 text-sm text-muted-foreground">
                 <CheckCircle2 className="h-4 w-4 shrink-0 text-green-500 mt-0.5" />
                 <span>{item}</span>
               </li>
@@ -147,12 +147,12 @@ export default function DeleteAccountPage() {
         {/* Retención de datos */}
         <section>
           <div className="flex items-center gap-3 mb-5">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-orange-100">
-              <Clock className="h-5 w-5 text-orange-600" />
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-orange-500/15">
+              <Clock className="h-5 w-5 text-orange-400" />
             </div>
             <h2 className="text-xl font-bold">Datos que pueden conservarse temporalmente</h2>
           </div>
-          <div className="text-sm text-gray-700 space-y-3">
+          <div className="text-sm text-muted-foreground space-y-3">
             <p>
               Ciertos datos pueden ser retenidos durante un período limitado por
               obligaciones legales o de seguridad:
@@ -172,14 +172,14 @@ export default function DeleteAccountPage() {
                     "Si existe una orden judicial o requerimiento legal vigente, podemos estar obligados a conservar ciertos datos hasta que se resuelva el proceso.",
                 },
               ].map(({ title, period, reason }) => (
-                <li key={title} className="rounded-lg border border-orange-100 bg-orange-50 p-4">
+                <li key={title} className="rounded-lg border border-orange-400/20 bg-orange-400/10 p-4">
                   <div className="flex items-center justify-between mb-1">
-                    <span className="font-semibold text-gray-800">{title}</span>
-                    <span className="text-xs font-medium bg-orange-200 text-orange-800 rounded-full px-2.5 py-0.5">
+                    <span className="font-semibold text-foreground">{title}</span>
+                    <span className="text-xs font-medium bg-orange-500/20 text-orange-300 rounded-full px-2.5 py-0.5">
                       {period}
                     </span>
                   </div>
-                  <p className="text-xs text-gray-600">{reason}</p>
+                  <p className="text-xs text-muted-foreground">{reason}</p>
                 </li>
               ))}
             </ul>
@@ -187,16 +187,16 @@ export default function DeleteAccountPage() {
         </section>
 
         {/* Eliminación parcial */}
-        <section className="rounded-2xl border border-gray-200 bg-gray-50 p-6">
+        <section className="rounded-2xl border border-white/10 bg-card p-6">
           <div className="flex items-center gap-3 mb-3">
             <ShieldAlert className="h-5 w-5 text-gray-500" />
             <h2 className="text-lg font-bold">¿Solo quieres eliminar algunos datos?</h2>
           </div>
-          <p className="text-sm text-gray-600 mb-3">
+          <p className="text-sm text-muted-foreground mb-3">
             Puedes solicitar la eliminación de datos específicos sin borrar tu cuenta
             completa. Por ejemplo:
           </p>
-          <ul className="space-y-1 text-sm text-gray-700 mb-4">
+          <ul className="space-y-1 text-sm text-muted-foreground mb-4">
             {[
               "Eliminar un local o perfil profesional específico desde tu panel.",
               "Borrar publicaciones o descuentos individuales.",
@@ -208,11 +208,11 @@ export default function DeleteAccountPage() {
               </li>
             ))}
           </ul>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-muted-foreground">
             Para solicitudes de eliminación parcial, contáctanos en{" "}
             <a
               href="mailto:noreply@dirbook.com.co"
-              className="text-blue-600 hover:underline font-medium"
+              className="text-blue-400 hover:underline font-medium"
             >
               noreply@dirbook.com.co
             </a>
@@ -223,10 +223,10 @@ export default function DeleteAccountPage() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t bg-gray-50 py-8 text-center text-sm text-gray-500">
+      <footer className="border-t border-white/10 bg-background py-8 text-center text-sm text-gray-500">
         <p>
           © {new Date().getFullYear()}{" "}
-          <Link href="/" className="font-semibold text-gray-700 hover:underline">
+          <Link href="/" className="font-semibold text-muted-foreground hover:underline">
             Dirbook
           </Link>{" "}
           · Conectando tu ciudad

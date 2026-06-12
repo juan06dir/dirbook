@@ -3,6 +3,7 @@ import { Geist } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 import Navbar from "@/components/Navbar";
+import BottomNav from "@/components/BottomNav";
 import { SITE_URL, SITE_DESCRIPTION } from "@/lib/site";
 
 const geistSans = Geist({
@@ -63,7 +64,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es">
+    <html lang="es" className="dark">
       <head>
         <link rel="manifest" href="/manifest.webmanifest" />
         <link rel="icon" href="/icon.svg" type="image/svg+xml" />
@@ -77,7 +78,8 @@ export default function RootLayout({
       <body className={`${geistSans.variable} antialiased`}>
         <AuthProvider>
           <Navbar />
-          <main>{children}</main>
+          <main className="pb-16 sm:pb-0">{children}</main>
+          <BottomNav />
         </AuthProvider>
         {/* Registro del Service Worker */}
         <script

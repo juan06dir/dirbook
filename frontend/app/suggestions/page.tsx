@@ -45,9 +45,9 @@ export default function SuggestionsPage() {
       </div>
 
       {sent ? (
-        <div className="flex flex-col items-center gap-3 rounded-2xl border border-green-200 bg-green-50 py-14 text-center">
+        <div className="flex flex-col items-center gap-3 rounded-2xl border border-green-500/30 bg-green-500/10 py-14 text-center">
           <CheckCircle2 className="h-12 w-12 text-green-500" />
-          <p className="text-lg font-semibold text-green-800">¡Gracias por tu sugerencia!</p>
+          <p className="text-lg font-semibold text-green-400">¡Gracias por tu sugerencia!</p>
           <p className="text-sm text-green-600">La hemos recibido y la tendremos en cuenta.</p>
           <Button
             variant="outline"
@@ -58,7 +58,7 @@ export default function SuggestionsPage() {
           </Button>
         </div>
       ) : (
-        <form onSubmit={handleSubmit} className="space-y-4 rounded-2xl border bg-white p-6 shadow-sm">
+        <form onSubmit={handleSubmit} className="space-y-4 rounded-2xl border border-white/10 bg-card p-6 shadow-sm">
           <div>
             <label className="mb-1.5 block text-sm font-medium">Nombre</label>
             <input
@@ -94,7 +94,7 @@ export default function SuggestionsPage() {
           </div>
 
           {error && (
-            <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>
+            <p className="rounded-lg bg-red-500/10 border border-red-500/30 px-3 py-2 text-sm text-red-400">{error}</p>
           )}
 
           <Button type="submit" className="w-full" disabled={sending}>

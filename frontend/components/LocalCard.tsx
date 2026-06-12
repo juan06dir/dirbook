@@ -36,7 +36,7 @@ export default function LocalCard({
               className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
           ) : (
-            <div className="flex h-full items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 text-muted-foreground">
+            <div className="flex h-full items-center justify-center bg-gradient-to-br from-zinc-800 to-zinc-900 text-muted-foreground">
               <Building2 className="h-12 w-12 opacity-30" />
             </div>
           )}

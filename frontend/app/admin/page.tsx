@@ -90,8 +90,8 @@ export default function AdminPage() {
           {filtered.map((u) => (
             <div
               key={u.id}
-              className={`flex items-center gap-3 rounded-xl border bg-white p-3 shadow-sm ${
-                u.is_blocked ? "border-red-200 bg-red-50" : ""
+              className={`flex items-center gap-3 rounded-xl border border-white/10 bg-card p-3 shadow-sm ${
+                u.is_blocked ? "border-red-500/40 bg-red-500/10" : ""
               }`}
             >
               <div className="flex-1 min-w-0">
@@ -115,7 +115,7 @@ export default function AdminPage() {
                   variant={u.is_blocked ? "outline" : "destructive"}
                   disabled={acting === u.id}
                   onClick={() => handleBlock(u)}
-                  className={u.is_blocked ? "border-green-400 text-green-600 hover:bg-green-50" : ""}
+                  className={u.is_blocked ? "border-green-400/50 text-green-400 hover:bg-green-500/10" : ""}
                 >
                   {u.is_blocked ? (
                     <><CheckCircle2 className="mr-1 h-3.5 w-3.5" />Desbloquear</>

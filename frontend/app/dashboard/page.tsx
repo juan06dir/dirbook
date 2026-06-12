@@ -112,7 +112,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Tabs */}
-      <div className="mb-5 flex gap-1 rounded-lg border bg-white p-1 w-fit shadow-sm">
+      <div className="mb-5 flex gap-1 rounded-lg border border-white/10 bg-card p-1 w-fit shadow-sm">
         <button
           onClick={() => setTab("locals")}
           className={`flex items-center gap-1.5 rounded-md px-4 py-2 text-sm font-medium transition-colors ${
@@ -157,7 +157,7 @@ export default function DashboardPage() {
             {locals.map((local) => {
               const logo = imageUrl(local.logo);
               return (
-                <div key={local.id} className="flex items-center gap-3 rounded-xl border bg-white p-3 sm:p-4 shadow-sm">
+                <div key={local.id} className="flex items-center gap-3 rounded-xl border border-white/10 bg-card p-3 sm:p-4 shadow-sm">
                   <div className="h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-muted">
                     {logo ? (
                       // eslint-disable-next-line @next/next/no-img-element
@@ -194,7 +194,7 @@ export default function DashboardPage() {
                     </Button>
                     <Button variant="ghost" size="icon" title="Eliminar" disabled={deleting === local.id}
                       onClick={() => handleDeleteLocal(local.id)}
-                      className="text-red-500 hover:text-red-600 hover:bg-red-50">
+                      className="text-red-400 hover:text-red-300 hover:bg-red-500/10">
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
@@ -206,8 +206,8 @@ export default function DashboardPage() {
       )}
 
       {/* ── Zona de peligro ── */}
-      <div className="mt-10 rounded-xl border border-red-200 bg-red-50 p-5">
-        <h2 className="flex items-center gap-2 font-semibold text-red-700 mb-1">
+      <div className="mt-10 rounded-xl border border-red-500/30 bg-red-500/10 p-5">
+        <h2 className="flex items-center gap-2 font-semibold text-red-400 mb-1">
           <AlertTriangle className="h-4 w-4" /> Zona de peligro
         </h2>
         <p className="text-sm text-red-600 mb-4">
@@ -216,7 +216,7 @@ export default function DashboardPage() {
         <Button
           variant="outline"
           size="sm"
-          className="border-red-400 text-red-600 hover:bg-red-100 hover:text-red-700"
+          className="border-red-400/50 text-red-400 hover:bg-red-500/15 hover:text-red-300"
           onClick={handleDeleteAccount}
           disabled={deletingAccount}
         >
@@ -245,7 +245,7 @@ export default function DashboardPage() {
             {professionals.map((prof) => {
               const avatar = imageUrl(prof.avatar);
               return (
-                <div key={prof.id} className="flex items-center gap-3 rounded-xl border bg-white p-3 sm:p-4 shadow-sm">
+                <div key={prof.id} className="flex items-center gap-3 rounded-xl border border-white/10 bg-card p-3 sm:p-4 shadow-sm">
                   <div className="h-12 w-12 shrink-0 overflow-hidden rounded-full bg-muted">
                     {avatar ? (
                       // eslint-disable-next-line @next/next/no-img-element
@@ -276,7 +276,7 @@ export default function DashboardPage() {
                     </Button>
                     <Button variant="ghost" size="icon" title="Eliminar" disabled={deleting === prof.id}
                       onClick={() => handleDeleteProfessional(prof.id)}
-                      className="text-red-500 hover:text-red-600 hover:bg-red-50">
+                      className="text-red-400 hover:text-red-300 hover:bg-red-500/10">
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>

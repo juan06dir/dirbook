@@ -63,7 +63,7 @@ export default function EditLocalPage() {
         <p className="text-muted-foreground text-sm">{local.name}</p>
       </div>
 
-      <div className="rounded-2xl border bg-white p-6 shadow-sm">
+      <div className="rounded-2xl border border-white/10 bg-card p-6 shadow-sm">
         <LocalForm
           initial={{
             name: local.name,

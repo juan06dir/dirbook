@@ -43,7 +43,7 @@ export default function NewLocalPage() {
         <p className="text-muted-foreground text-sm">Completa la información de tu negocio</p>
       </div>
 
-      <div className="rounded-2xl border bg-white p-6 shadow-sm">
+      <div className="rounded-2xl border border-white/10 bg-card p-6 shadow-sm">
         <LocalForm
           onSubmit={handleSubmit}
           submitLabel="Publicar local"

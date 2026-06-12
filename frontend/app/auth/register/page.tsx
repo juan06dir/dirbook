@@ -36,7 +36,7 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="flex min-h-[calc(100vh-64px)] items-center justify-center bg-gray-50 p-4">
+    <div className="flex min-h-[calc(100vh-64px)] items-center justify-center bg-background p-4">
       <div className="w-full max-w-sm">
         <div className="mb-6 text-center">
           <div className="inline-flex items-center gap-2 text-2xl font-bold">
@@ -46,7 +46,7 @@ export default function RegisterPage() {
           <p className="mt-1 text-muted-foreground">Crea tu cuenta gratuita</p>
         </div>
 
-        <div className="rounded-2xl border bg-white p-6 shadow-sm">
+        <div className="rounded-2xl border border-white/10 bg-card p-6 shadow-sm">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-1">
               <label className="text-sm font-medium">Nombre completo</label>
@@ -84,7 +84,7 @@ export default function RegisterPage() {
             </div>
 
             {error && (
-              <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">
+              <p className="rounded-lg bg-red-500/10 border border-red-500/30 px-3 py-2 text-sm text-red-400">
                 {error}
               </p>
             )}

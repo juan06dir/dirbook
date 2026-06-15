@@ -205,26 +205,6 @@ export default function DashboardPage() {
         )
       )}
 
-      {/* ── Zona de peligro ── */}
-      <div className="mt-10 rounded-xl border border-red-500/30 bg-red-500/10 p-5">
-        <h2 className="flex items-center gap-2 font-semibold text-red-400 mb-1">
-          <AlertTriangle className="h-4 w-4" /> Zona de peligro
-        </h2>
-        <p className="text-sm text-red-600 mb-4">
-          Eliminar tu cuenta borrará permanentemente todos tus datos: locales, perfiles profesionales y publicaciones.
-        </p>
-        <Button
-          variant="outline"
-          size="sm"
-          className="border-red-400/50 text-red-400 hover:bg-red-500/15 hover:text-red-300"
-          onClick={handleDeleteAccount}
-          disabled={deletingAccount}
-        >
-          <Trash2 className="mr-2 h-4 w-4" />
-          {deletingAccount ? "Eliminando cuenta…" : "Eliminar mi cuenta"}
-        </Button>
-      </div>
-
       {/* ── Profesionales ── */}
       {tab === "professionals" && (
         fetching ? (
@@ -286,6 +266,26 @@ export default function DashboardPage() {
           </div>
         )
       )}
+
+      {/* ── Zona de peligro (siempre al final) ── */}
+      <div className="mt-10 rounded-xl border border-red-500/30 bg-red-500/10 p-5">
+        <h2 className="flex items-center gap-2 font-semibold text-red-400 mb-1">
+          <AlertTriangle className="h-4 w-4" /> Zona de peligro
+        </h2>
+        <p className="text-sm text-red-600 mb-4">
+          Eliminar tu cuenta borrará permanentemente todos tus datos: locales, perfiles profesionales y publicaciones.
+        </p>
+        <Button
+          variant="outline"
+          size="sm"
+          className="border-red-400/50 text-red-400 hover:bg-red-500/15 hover:text-red-300"
+          onClick={handleDeleteAccount}
+          disabled={deletingAccount}
+        >
+          <Trash2 className="mr-2 h-4 w-4" />
+          {deletingAccount ? "Eliminando cuenta…" : "Eliminar mi cuenta"}
+        </Button>
+      </div>
     </div>
   );
 }

@@ -4,7 +4,7 @@ from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 from app.database import engine, Base, get_db
-from app.routers import auth, locals, professionals, posts, upload, follows, ratings
+from app.routers import auth, locals, professionals, posts, upload, follows, ratings, social
 from app.core.dependencies import get_current_user
 from app.models.user import User
 import app.models
@@ -70,15 +70,36 @@ _migrations = [
         used       BOOLEAN DEFAULT FALSE,
         created_at TIMESTAMP DEFAULT NOW()
     )""",
+    """CREATE TABLE IF NOT EXISTS post_likes (
+        id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id    UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        post_id    UUID NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
+        created_at TIMESTAMP DEFAULT NOW(),
+        CONSTRAINT uq_like_user_post UNIQUE (user_id, post_id)
+    )""",
+    """CREATE TABLE IF NOT EXISTS post_comments (
+        id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id    UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        post_id    UUID NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
+        content    VARCHAR NOT NULL,
+        created_at TIMESTAMP DEFAULT NOW()
+    )""",
+    "CREATE INDEX IF NOT EXISTS ix_post_likes_post    ON post_likes(post_id)",
+    "CREATE INDEX IF NOT EXISTS ix_post_comments_post ON post_comments(post_id)",
 ]
 
-try:
-    with engine.begin() as conn:
-        for sql in _migrations:
+# Cada sentencia corre en su propia transacción: si una falla (p. ej. una
+# constraint que ya existe), no aborta a las demás.
+_ok, _fail = 0, 0
+for sql in _migrations:
+    try:
+        with engine.begin() as conn:
             conn.execute(text(sql))
-    print("✅  Migraciones aplicadas correctamente.")
-except Exception as e:
-    print(f"⚠️  Error en migraciones: {e}")
+        _ok += 1
+    except Exception as e:
+        _fail += 1
+        print(f"[migracion omitida] {str(e).splitlines()[0]}")
+print(f"Migraciones: {_ok} aplicadas, {_fail} omitidas.")
 
 # ── Archivos estáticos ────────────────────────────────────────────────────────
 os.makedirs("uploads", exist_ok=True)
@@ -95,6 +116,7 @@ app.include_router(posts.router)
 app.include_router(upload.router)
 app.include_router(follows.router)
 app.include_router(ratings.router)
+app.include_router(social.router)
 
 # ── Notificaciones (inline para evitar conflicto con Pydantic v2 + FastAPI) ──
 

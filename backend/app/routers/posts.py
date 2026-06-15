@@ -6,14 +6,100 @@ from app.models.post import Post
 from app.models.local import Local
 from app.models.professional import ProfessionalProfile
 from app.schemas.post import PostCreate, PostOut
-from app.core.dependencies import get_current_user
+from app.core.dependencies import get_current_user, get_optional_user
 from app.models.user import User
+from app.models.like import PostLike
+from app.models.comment import PostComment
 from typing import List, Optional
 from uuid import UUID
 from pydantic import BaseModel
 import datetime
 
 router = APIRouter(prefix="/posts", tags=["Posts"])
+
+
+# ── Feed enriquecido (red social) ─────────────────────────────────────────────
+class FeedPostOut(BaseModel):
+    id: UUID
+    post_type: str
+    title: Optional[str]
+    content: str
+    image_url: Optional[str]
+    event_start: Optional[datetime.datetime]
+    event_end: Optional[datetime.datetime]
+    discount_pct: Optional[float]
+    created_at: datetime.datetime
+    # Autor (la "cara" = el local o el profesional)
+    local_id: Optional[UUID]
+    local_name: Optional[str]
+    local_category: Optional[str]
+    local_city: Optional[str]
+    local_logo: Optional[str]
+    local_cover: Optional[str]
+    professional_id: Optional[UUID]
+    professional_name: Optional[str]
+    professional_profession: Optional[str]
+    professional_avatar: Optional[str]
+    # Métricas sociales
+    likes_count: int
+    comments_count: int
+    liked_by_me: bool
+
+    model_config = {"from_attributes": True}
+
+
+def _build_feed_items(posts, current_user, db) -> List[FeedPostOut]:
+    from sqlalchemy import func
+    post_ids = [p.id for p in posts]
+    if not post_ids:
+        return []
+
+    like_rows = (
+        db.query(PostLike.post_id, func.count(PostLike.id))
+        .filter(PostLike.post_id.in_(post_ids))
+        .group_by(PostLike.post_id)
+        .all()
+    )
+    likes_map = {pid: cnt for pid, cnt in like_rows}
+
+    comment_rows = (
+        db.query(PostComment.post_id, func.count(PostComment.id))
+        .filter(PostComment.post_id.in_(post_ids))
+        .group_by(PostComment.post_id)
+        .all()
+    )
+    comments_map = {pid: cnt for pid, cnt in comment_rows}
+
+    mine = set()
+    if current_user:
+        my_rows = (
+            db.query(PostLike.post_id)
+            .filter(PostLike.post_id.in_(post_ids), PostLike.user_id == current_user.id)
+            .all()
+        )
+        mine = {r[0] for r in my_rows}
+
+    items = []
+    for p in posts:
+        items.append(FeedPostOut(
+            id=p.id, post_type=p.post_type, title=p.title, content=p.content,
+            image_url=p.image_url, event_start=p.event_start, event_end=p.event_end,
+            discount_pct=p.discount_pct, created_at=p.created_at,
+            local_id=p.local_id,
+            local_name=p.local.name if p.local else None,
+            local_category=p.local.category if p.local else None,
+            local_city=p.local.city if p.local else None,
+            local_logo=p.local.logo if p.local else None,
+            local_cover=p.local.cover_image if p.local else None,
+            professional_id=p.professional_id,
+            professional_name=p.professional.name if p.professional else None,
+            professional_profession=p.professional.profession if p.professional else None,
+            professional_avatar=p.professional.avatar if p.professional else None,
+            likes_count=likes_map.get(p.id, 0),
+            comments_count=comments_map.get(p.id, 0),
+            liked_by_me=p.id in mine,
+        ))
+    return items
 
 
 # ── Schema enriquecido para eventos públicos ──────────────────────────────────
@@ -143,18 +229,20 @@ def create_post(
     return post
 
 
-@router.get("/feed", response_model=List[PostOut])
+@router.get("/feed", response_model=List[FeedPostOut])
 def get_feed(
     skip: int = Query(0, ge=0),
     limit: int = Query(20, ge=1, le=100),
     post_type: Optional[str] = Query(None),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: Optional[User] = Depends(get_optional_user),
 ):
-    """Feed público: todos los posts ordenados por fecha."""
-    query = db.query(Post)
+    """Feed estilo red social: posts con autor, likes y comentarios."""
+    query = db.query(Post).options(joinedload(Post.local), joinedload(Post.professional))
     if post_type:
         query = query.filter(Post.post_type == post_type)
-    return query.order_by(Post.created_at.desc()).offset(skip).limit(limit).all()
+    posts = query.order_by(Post.created_at.desc()).offset(skip).limit(limit).all()
+    return _build_feed_items(posts, current_user, db)
 
 
 @router.get("/active-discounts", response_model=List[PostOut])

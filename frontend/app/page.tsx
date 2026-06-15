@@ -1,16 +1,19 @@
 "use client";
 
-import { useEffect, useState, useCallback, Suspense } from "react";
+import { useEffect, useState, useCallback, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   getLocals, LocalOut, getActiveDiscounts, PostOut,
   getProfessionals, ProfessionalOut,
+  getFeed, FeedPost,
 } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
 import LocalCard from "@/components/LocalCard";
 import PostCard from "@/components/PostCard";
 import ProfessionalCard from "@/components/ProfessionalCard";
+import FeedCard from "@/components/FeedCard";
+import StoriesBar from "@/components/StoriesBar";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -19,6 +22,9 @@ import {
   Star, Users, MapPin, Zap, ChevronRight, ArrowRight,
   Lock, Sparkles, X,
 } from "lucide-react";
+
+type FeedFilter = "" | "discount" | "event";
+const PAGE = 10;
 
 const CATEGORIES = [
   "Restaurante", "Cafetería", "Bar", "Tienda", "Servicio",
@@ -465,6 +471,112 @@ function LandingPage() {
   );
 }
 
+/* ─── Feed social con scroll infinito ───────────────────────────────── */
+function SocialFeed() {
+  const [filter, setFilter]   = useState<FeedFilter>("");
+  const [posts, setPosts]     = useState<FeedPost[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [more, setMore]       = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const sentinel = useRef<HTMLDivElement | null>(null);
+
+  const load = useCallback(async (f: FeedFilter, reset: boolean) => {
+    if (reset) { setLoading(true); }
+    else { setLoadingMore(true); }
+    try {
+      const skip = reset ? 0 : posts.length;
+      const data = await getFeed({
+        skip, limit: PAGE,
+        post_type: f || undefined,
+      });
+      setMore(data.length === PAGE);
+      setPosts((prev) => (reset ? data : [...prev, ...data]));
+    } catch {
+      if (reset) setPosts([]);
+      setMore(false);
+    } finally {
+      setLoading(false);
+      setLoadingMore(false);
+    }
+  }, [posts.length]);
+
+  // Carga inicial / cambio de filtro
+  useEffect(() => {
+    load(filter, true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filter]);
+
+  // Scroll infinito
+  useEffect(() => {
+    if (!sentinel.current || loading || !more) return;
+    const el = sentinel.current;
+    const obs = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && !loadingMore) load(filter, false);
+    }, { rootMargin: "400px" });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [filter, loading, more, loadingMore, load]);
+
+  const FILTERS: { key: FeedFilter; label: string }[] = [
+    { key: "",         label: "Para ti" },
+    { key: "discount", label: "Descuentos" },
+    { key: "event",    label: "Eventos" },
+  ];
+
+  return (
+    <div className="mx-auto max-w-xl px-4 py-6">
+      {/* Stories */}
+      {!loading && posts.length > 0 && (
+        <div className="mb-5">
+          <StoriesBar posts={posts} />
+        </div>
+      )}
+
+      {/* Filtros del feed */}
+      <div className="mb-5 flex gap-2">
+        {FILTERS.map((f) => (
+          <button key={f.key} onClick={() => setFilter(f.key)}>
+            <Badge
+              variant={filter === f.key ? "default" : "outline"}
+              className="cursor-pointer px-4 py-1.5 text-sm transition-colors hover:border-yellow-400/50"
+            >
+              {f.label}
+            </Badge>
+          </button>
+        ))}
+      </div>
+
+      {/* Feed */}
+      {loading ? (
+        <div className="space-y-5">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="skeleton-shimmer h-96 rounded-2xl" />
+          ))}
+        </div>
+      ) : posts.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-24 text-center text-muted-foreground">
+          <Sparkles className="mb-4 h-12 w-12 opacity-30" />
+          <p className="text-lg font-medium">Aún no hay publicaciones</p>
+          <p className="text-sm">Sigue locales y vuelve pronto para ver novedades.</p>
+        </div>
+      ) : (
+        <div className="space-y-5">
+          {posts.map((p) => (
+            <FeedCard key={p.id} post={p} />
+          ))}
+          {loadingMore && (
+            <div className="skeleton-shimmer h-96 rounded-2xl" />
+          )}
+          <div ref={sentinel} className="h-4" />
+          {!more && (
+            <p className="py-6 text-center text-xs text-muted-foreground">Estás al día ✨</p>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 /* ─── Vista para usuarios autenticados (buscador + listado) ──────────── */
 function HomeContent() {
   const router = useRouter();
@@ -578,57 +690,62 @@ function HomeContent() {
         </div>
       </section>
 
-      {/* Descuentos */}
-      {(discountsLoading || discounts.length > 0) && (
-        <section className="mx-auto max-w-7xl px-4 py-6">
-          <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold">
-            <Tag className="h-5 w-5 text-red-500" /> Descuentos y eventos activos
-          </h2>
-          {discountsLoading ? (
-            <div className="flex gap-4 overflow-x-auto pb-2">
-              {Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="h-44 w-64 shrink-0 rounded-xl bg-muted animate-pulse" />
-              ))}
-            </div>
-          ) : (
-            <div className="flex gap-4 overflow-x-auto pb-2">
-              {discounts.map((p) => (
-                <div key={p.id} className="w-64 shrink-0"><PostCard post={p} /></div>
-              ))}
-            </div>
+      {/* Sin búsqueda → FEED social. Con búsqueda → directorio de locales. */}
+      {!(search || category || city) ? (
+        <SocialFeed />
+      ) : (
+        <>
+          {/* Descuentos */}
+          {(discountsLoading || discounts.length > 0) && (
+            <section className="mx-auto max-w-7xl px-4 py-6">
+              <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold">
+                <Tag className="h-5 w-5 text-red-500" /> Descuentos y eventos activos
+              </h2>
+              {discountsLoading ? (
+                <div className="flex gap-4 overflow-x-auto pb-2">
+                  {Array.from({ length: 4 }).map((_, i) => (
+                    <div key={i} className="h-44 w-64 shrink-0 rounded-xl bg-muted animate-pulse" />
+                  ))}
+                </div>
+              ) : (
+                <div className="flex gap-4 overflow-x-auto pb-2">
+                  {discounts.map((p) => (
+                    <div key={p.id} className="w-64 shrink-0"><PostCard post={p} /></div>
+                  ))}
+                </div>
+              )}
+            </section>
           )}
-        </section>
+
+          {/* Listado */}
+          <section className="mx-auto max-w-7xl px-4 py-8">
+            <div className="mb-4 flex items-center justify-between">
+              <p className="text-sm text-muted-foreground">
+                {loading ? "Buscando…" : `${locals.length} local${locals.length !== 1 ? "es" : ""} encontrado${locals.length !== 1 ? "s" : ""}`}
+              </p>
+              <button onClick={clearFilters} className="text-sm text-primary hover:underline">Limpiar filtros</button>
+            </div>
+
+            {loading ? (
+              <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <div key={i} className="h-64 rounded-xl bg-muted animate-pulse" />
+                ))}
+              </div>
+            ) : locals.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-24 text-muted-foreground">
+                <Building2 className="mb-4 h-12 w-12 opacity-30" />
+                <p className="text-lg font-medium">No se encontraron locales</p>
+                <p className="text-sm">Intenta con otros términos o limpia los filtros</p>
+              </div>
+            ) : (
+              <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                {locals.map((local) => <LocalCard key={local.id} local={local} />)}
+              </div>
+            )}
+          </section>
+        </>
       )}
-
-      {/* Listado */}
-      <section className="mx-auto max-w-7xl px-4 py-8">
-        <div className="mb-4 flex items-center justify-between">
-          <p className="text-sm text-muted-foreground">
-            {loading ? "Buscando…" : `${locals.length} local${locals.length !== 1 ? "es" : ""} encontrado${locals.length !== 1 ? "s" : ""}`}
-          </p>
-          {(search || category || city) && (
-            <button onClick={clearFilters} className="text-sm text-primary hover:underline">Limpiar filtros</button>
-          )}
-        </div>
-
-        {loading ? (
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="h-64 rounded-xl bg-muted animate-pulse" />
-            ))}
-          </div>
-        ) : locals.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-24 text-muted-foreground">
-            <Building2 className="mb-4 h-12 w-12 opacity-30" />
-            <p className="text-lg font-medium">No se encontraron locales</p>
-            <p className="text-sm">Intenta con otros términos o limpia los filtros</p>
-          </div>
-        ) : (
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {locals.map((local) => <LocalCard key={local.id} local={local} />)}
-          </div>
-        )}
-      </section>
     </div>
   );
 }

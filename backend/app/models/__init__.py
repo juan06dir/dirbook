@@ -6,3 +6,5 @@ from app.models.follow import Follow
 from app.models.rating import Rating
 from app.models.password_reset import PasswordResetToken
 from app.models.notification import Notification
+from app.models.like import PostLike
+from app.models.comment import PostComment

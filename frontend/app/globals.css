@@ -176,7 +176,50 @@
   box-shadow: 0 12px 28px -8px rgb(0 0 0 / 0.18);
 }
 
+/* Anillo dorado tipo "story" (gradiente girado) */
+.story-ring {
+  background: conic-gradient(from 140deg, #fde047, #f59e0b, #facc15, #fde047);
+}
+
+/* Corazón al dar like (pop) */
+@keyframes heart-pop {
+  0%   { transform: scale(1); }
+  35%  { transform: scale(1.4); }
+  60%  { transform: scale(0.9); }
+  100% { transform: scale(1); }
+}
+.animate-heart-pop { animation: heart-pop 0.45s ease-in-out; }
+
+/* Esqueleto con brillo (shimmer) en vez de gris plano */
+@keyframes shimmer {
+  100% { transform: translateX(100%); }
+}
+.skeleton-shimmer {
+  position: relative;
+  overflow: hidden;
+  background: var(--muted);
+}
+.skeleton-shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgb(255 255 255 / 0.06),
+    transparent
+  );
+  animation: shimmer 1.6s infinite;
+}
+
+/* Resplandor dorado reutilizable para CTAs */
+.glow-gold {
+  box-shadow: 0 0 30px -6px rgb(250 204 21 / 0.5);
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .animate-fade-up, .animate-float-slow, .animate-float-slower { animation: none; }
+  .animate-fade-up, .animate-float-slow, .animate-float-slower,
+  .animate-heart-pop, .skeleton-shimmer::after { animation: none; }
   .card-hover:hover { transform: none; }
 }

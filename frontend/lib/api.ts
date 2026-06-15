@@ -214,12 +214,80 @@ export async function createPost(data: PostCreate): Promise<PostOut> {
   return request<PostOut>("/posts", { method: "POST", body: JSON.stringify(data) });
 }
 
-export async function getFeed(params?: { skip?: number; limit?: number; post_type?: PostType }): Promise<PostOut[]> {
+// Feed enriquecido estilo red social (autor + likes + comentarios)
+export interface FeedPost {
+  id: string;
+  post_type: PostType;
+  title: string | null;
+  content: string;
+  image_url: string | null;
+  event_start: string | null;
+  event_end: string | null;
+  discount_pct: number | null;
+  created_at: string;
+  local_id: string | null;
+  local_name: string | null;
+  local_category: string | null;
+  local_city: string | null;
+  local_logo: string | null;
+  local_cover: string | null;
+  professional_id: string | null;
+  professional_name: string | null;
+  professional_profession: string | null;
+  professional_avatar: string | null;
+  likes_count: number;
+  comments_count: number;
+  liked_by_me: boolean;
+}
+
+export async function getFeed(params?: { skip?: number; limit?: number; post_type?: PostType }): Promise<FeedPost[]> {
   const qs = new URLSearchParams();
   if (params?.skip !== undefined)  qs.set("skip",  String(params.skip));
   if (params?.limit !== undefined) qs.set("limit", String(params.limit));
   if (params?.post_type)           qs.set("post_type", params.post_type);
-  return request<PostOut[]>(`/posts/feed?${qs}`);
+  return request<FeedPost[]>(`/posts/feed?${qs}`);
+}
+
+// ── Likes ─────────────────────────────────────────────────────────────────────
+
+export interface LikeStatus {
+  liked: boolean;
+  likes_count: number;
+}
+
+export async function likePost(postId: string): Promise<LikeStatus> {
+  return request<LikeStatus>(`/posts/${postId}/like`, { method: "POST" });
+}
+
+export async function unlikePost(postId: string): Promise<LikeStatus> {
+  return request<LikeStatus>(`/posts/${postId}/like`, { method: "DELETE" });
+}
+
+// ── Comentarios ───────────────────────────────────────────────────────────────
+
+export interface CommentOut {
+  id: string;
+  post_id: string;
+  user_id: string;
+  user_name: string;
+  user_avatar: string | null;
+  content: string;
+  created_at: string;
+}
+
+export async function getComments(postId: string): Promise<CommentOut[]> {
+  return request<CommentOut[]>(`/posts/${postId}/comments`);
+}
+
+export async function addComment(postId: string, content: string): Promise<CommentOut> {
+  return request<CommentOut>(`/posts/${postId}/comments`, {
+    method: "POST",
+    body: JSON.stringify({ content }),
+  });
+}
+
+export async function deleteComment(commentId: string): Promise<void> {
+  return request<void>(`/posts/comments/${commentId}`, { method: "DELETE" });
 }
 
 export async function getActiveDiscounts(): Promise<PostOut[]> {

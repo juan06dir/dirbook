@@ -5,7 +5,7 @@ import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import {
-  Building2, LogOut, LayoutDashboard, LogIn, UserPlus, Users, Menu, X, Map, Bell, MessageSquare, ShieldCheck, CalendarDays,
+  Building2, LogOut, LayoutDashboard, LogIn, UserPlus, Users, Menu, X, Map, Bell, MessageSquare, ShieldCheck, CalendarDays, Home,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getNotifications, markNotificationsRead, NotificationOut } from "@/lib/api";
@@ -117,7 +117,10 @@ export default function Navbar() {
 
         {/* Nav links — desktop */}
         <nav className="hidden sm:flex items-center gap-1 text-sm">
-          <Link href="/" className="px-3 py-1.5 rounded-md hover:bg-muted transition-colors">Locales</Link>
+          <Link href="/" className="flex items-center gap-1 px-3 py-1.5 rounded-md hover:bg-muted transition-colors">
+            <Home className="h-3.5 w-3.5" /> Inicio
+          </Link>
+          <Link href="/locals" className="px-3 py-1.5 rounded-md hover:bg-muted transition-colors">Locales</Link>
           <Link href="/professionals" className="px-3 py-1.5 rounded-md hover:bg-muted transition-colors">Profesionales</Link>
           <Link href="/events" className="flex items-center gap-1 px-3 py-1.5 rounded-md hover:bg-muted transition-colors font-medium text-primary">
             <CalendarDays className="h-3.5 w-3.5" /> Eventos
@@ -215,6 +218,10 @@ export default function Navbar() {
       {menuOpen && (
         <div className="sm:hidden border-t border-white/10 bg-black/95 backdrop-blur-xl px-4 py-3 space-y-1">
           <Link href="/" onClick={() => setMenuOpen(false)}
+            className="flex items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-muted transition-colors">
+            <Home className="h-4 w-4 text-muted-foreground" /> Inicio
+          </Link>
+          <Link href="/locals" onClick={() => setMenuOpen(false)}
             className="flex items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-muted transition-colors">
             <Building2 className="h-4 w-4 text-muted-foreground" /> Locales
           </Link>

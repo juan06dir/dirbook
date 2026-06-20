@@ -34,8 +34,12 @@ function ResetPasswordContent() {
     e.preventDefault();
     setError("");
 
-    if (password.length < 6) {
-      setError("La contraseña debe tener al menos 6 caracteres");
+    if (password.length < 8) {
+      setError("La contraseña debe tener al menos 8 caracteres");
+      return;
+    }
+    if (!/[A-Za-z]/.test(password) || !/\d/.test(password)) {
+      setError("La contraseña debe incluir al menos una letra y un número");
       return;
     }
     if (password !== confirm) {
@@ -141,7 +145,7 @@ function ResetPasswordContent() {
                 <div>
                   <h2 className="font-semibold text-lg">Nueva contraseña</h2>
                   <p className="text-sm text-muted-foreground">
-                    Debe tener al menos 6 caracteres.
+                    Debe tener al menos 8 caracteres, con letras y números.
                   </p>
                 </div>
               </div>

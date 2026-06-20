@@ -20,8 +20,12 @@ export default function RegisterPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    if (password.length < 6) {
-      setError("La contraseña debe tener al menos 6 caracteres");
+    if (password.length < 8) {
+      setError("La contraseña debe tener al menos 8 caracteres");
+      return;
+    }
+    if (!/[A-Za-z]/.test(password) || !/\d/.test(password)) {
+      setError("La contraseña debe incluir al menos una letra y un número");
       return;
     }
     setLoading(true);
@@ -78,7 +82,7 @@ export default function RegisterPage() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Mínimo 6 caracteres"
+                placeholder="Mínimo 8 caracteres, con letras y números"
                 autoComplete="new-password"
               />
             </div>
@@ -93,6 +97,14 @@ export default function RegisterPage() {
               <UserPlus className="mr-2 h-4 w-4" />
               {loading ? "Creando cuenta…" : "Crear cuenta"}
             </Button>
+
+            <p className="text-center text-xs text-muted-foreground">
+              Al crear una cuenta aceptas nuestros{" "}
+              <Link href="/terminos" className="font-medium text-primary hover:underline">
+                Términos y Condiciones
+              </Link>{" "}
+              y eres responsable del contenido que publiques.
+            </p>
           </form>
 
           <p className="mt-4 text-center text-sm text-muted-foreground">

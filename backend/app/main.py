@@ -1,11 +1,14 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from sqlalchemy import text
+from slowapi.errors import RateLimitExceeded
 from app.database import engine, Base, get_db
 from app.routers import auth, locals, professionals, posts, upload, follows, ratings, social
 from app.core.dependencies import get_current_user
+from app.core.limiter import limiter
 from app.models.user import User
 import app.models
 import os
@@ -16,16 +19,26 @@ from pydantic import BaseModel
 
 app = FastAPI(title="Dirbook API", version="1.0.0")
 
-# CORS — dominios permitidos explícitamente
+# Rate limiting (anti fuerza bruta) — el limitador se comparte con los routers
+app.state.limiter = limiter
+
+
+@app.exception_handler(RateLimitExceeded)
+async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
+    return JSONResponse(
+        status_code=429,
+        content={"detail": "Demasiados intentos. Espera un momento e inténtalo de nuevo."},
+    )
+
+# CORS — dominios permitidos explícitamente (solo tus dominios y previews de tu proyecto)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:3000",
         "https://dirbook.com.co",
         "https://www.dirbook.com.co",
-        "https://dirbook-fk6i-git-main-juan06dirs-projects.vercel.app",
     ],
-    allow_origin_regex=r"https://.*\.vercel\.app",
+    allow_origin_regex=r"https://dirbook-[a-z0-9-]+\.vercel\.app",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

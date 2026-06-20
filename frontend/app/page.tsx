@@ -444,6 +444,7 @@ function LandingPage() {
           <div>
             <p className="mb-3 font-semibold text-white">Legal</p>
             <ul className="space-y-2">
+              <li><Link href="/terminos" className="hover:text-yellow-300 transition-colors">Términos y Condiciones</Link></li>
               <li><Link href="/child-safety" className="hover:text-yellow-300 transition-colors">Seguridad infantil</Link></li>
               <li><Link href="/delete-account" className="hover:text-yellow-300 transition-colors">Eliminar cuenta</Link></li>
               <li><Link href="/delete-data" className="hover:text-yellow-300 transition-colors">Eliminar datos</Link></li>

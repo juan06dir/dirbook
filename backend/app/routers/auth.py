@@ -1,7 +1,7 @@
 import secrets
 import datetime
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from app.core.dependencies import get_current_user
@@ -13,18 +13,21 @@ from app.schemas.user import (
     UserCreate, Token, UserOut,
     ForgotPasswordRequest, ResetPasswordRequest,
 )
-from app.core.security import hash_password, verify_password, create_access_token
+from app.core.security import hash_password, verify_password, create_access_token, validate_password_strength
 from app.core.config import settings
 from app.core.email import send_reset_email
+from app.core.limiter import limiter
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
 
 @router.post("/register", response_model=Token, status_code=201)
-def register(data: UserCreate, db: Session = Depends(get_db)):
+@limiter.limit("5/hour")
+def register(request: Request, data: UserCreate, db: Session = Depends(get_db)):
     existing = db.query(User).filter(User.email == data.email).first()
     if existing:
         raise HTTPException(status_code=400, detail="El email ya está registrado")
+    validate_password_strength(data.password)
     user = User(
         name=data.name,
         email=data.email,
@@ -38,7 +41,8 @@ def register(data: UserCreate, db: Session = Depends(get_db)):
 
 
 @router.post("/login", response_model=Token)
-def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+@limiter.limit("8/minute")
+def login(request: Request, form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == form_data.username).first()
     if not user or not verify_password(form_data.password, user.password):
         raise HTTPException(status_code=401, detail="Credenciales incorrectas")
@@ -49,7 +53,8 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
 
 
 @router.post("/forgot-password")
-def forgot_password(data: ForgotPasswordRequest, db: Session = Depends(get_db)):
+@limiter.limit("4/hour")
+def forgot_password(request: Request, data: ForgotPasswordRequest, db: Session = Depends(get_db)):
     """Genera un token de recuperación y (si hay SMTP) envía el correo.
     Siempre devuelve el mismo mensaje para no revelar si el email existe.
     """
@@ -96,10 +101,10 @@ def verify_reset_token(token: str, db: Session = Depends(get_db)):
 
 
 @router.post("/reset-password")
-def reset_password(data: ResetPasswordRequest, db: Session = Depends(get_db)):
+@limiter.limit("5/hour")
+def reset_password(request: Request, data: ResetPasswordRequest, db: Session = Depends(get_db)):
     """Consume el token y actualiza la contraseña del usuario."""
-    if len(data.new_password) < 6:
-        raise HTTPException(status_code=400, detail="La contraseña debe tener al menos 6 caracteres")
+    validate_password_strength(data.new_password)
 
     record = db.query(PasswordResetToken).filter(
         PasswordResetToken.token      == data.token,

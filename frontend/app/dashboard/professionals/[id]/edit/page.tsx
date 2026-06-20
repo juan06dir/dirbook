@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft, Upload } from "lucide-react";
+import { PROFESSIONS } from "@/lib/categories";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -17,11 +18,6 @@ function imageUrl(path: string | null) {
   if (path.startsWith("http")) return path;
   return `${API_URL}${path}`;
 }
-
-const PROFESSIONS = [
-  "Abogado", "Arquitecto", "Programador", "Médico", "Contador",
-  "Diseñador", "Psicólogo", "Ingeniero", "Fotógrafo", "Otro",
-];
 
 export default function EditProfessionalPage() {
   const { id } = useParams<{ id: string }>();

@@ -5,11 +5,7 @@ import { LocalCreate, uploadImage } from "@/lib/api";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ImagePlus, X, Loader2 } from "lucide-react";
-
-const CATEGORIES = [
-  "Restaurante", "Cafetería", "Bar", "Tienda", "Servicio",
-  "Salud", "Educación", "Tecnología", "Moda", "Otro",
-];
+import { LOCAL_CATEGORIES as CATEGORIES } from "@/lib/categories";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 

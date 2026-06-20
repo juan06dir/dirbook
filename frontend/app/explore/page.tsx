@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { getLocals, LocalOut, getFeed, PostOut } from "@/lib/api";
+import { LOCAL_CATEGORIES } from "@/lib/categories";
 import { GeoLocal } from "@/components/ExploreMap";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -17,10 +18,7 @@ const ExploreMap = dynamic(() => import("@/components/ExploreMap"), {
   loading: () => <div className="h-full w-full bg-muted animate-pulse rounded-xl" />,
 });
 
-const CATEGORIES = [
-  "Todos", "Restaurante", "Cafetería", "Bar", "Tienda", "Servicio",
-  "Salud", "Educación", "Tecnología", "Moda", "Otro",
-];
+const CATEGORIES = ["Todos", ...LOCAL_CATEGORIES];
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 const DEFAULT_CENTER: [number, number] = [4.711, -74.0721]; // Bogotá por defecto

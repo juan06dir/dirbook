@@ -8,11 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Search, Building2, SlidersHorizontal } from "lucide-react";
 import { useSearchParams } from "next/navigation";
-
-const CATEGORIES = [
-  "Restaurante", "Cafetería", "Bar", "Tienda", "Servicio",
-  "Salud", "Educación", "Tecnología", "Moda", "Otro",
-];
+import { LOCAL_CATEGORIES as CATEGORIES } from "@/lib/categories";
 
 function LocalsContent() {
   const params = useSearchParams();

@@ -9,11 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Search, UserCircle2 } from "lucide-react";
 import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-
-const PROFESSIONS = [
-  "Abogado", "Arquitecto", "Programador", "Médico", "Contador",
-  "Diseñador", "Psicólogo", "Ingeniero", "Fotógrafo", "Otro",
-];
+import { PROFESSIONS } from "@/lib/categories";
 
 function ProfessionalsContent() {
   const params = useSearchParams();

@@ -8,11 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft, Upload } from "lucide-react";
-
-const PROFESSIONS = [
-  "Abogado", "Arquitecto", "Programador", "Médico", "Contador",
-  "Diseñador", "Psicólogo", "Ingeniero", "Fotógrafo", "Otro",
-];
+import { PROFESSIONS } from "@/lib/categories";
 
 export default function NewProfessionalPage() {
   const router = useRouter();

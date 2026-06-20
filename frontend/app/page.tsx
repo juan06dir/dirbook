@@ -21,13 +21,10 @@ import {
   Lock, Sparkles, X,
 } from "lucide-react";
 
+import { LOCAL_CATEGORIES as CATEGORIES } from "@/lib/categories";
+
 type FeedFilter = "" | "discount" | "event";
 const PAGE = 10;
-
-const CATEGORIES = [
-  "Restaurante", "Cafetería", "Bar", "Tienda", "Servicio",
-  "Salud", "Educación", "Tecnología", "Moda", "Otro",
-];
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 function imageUrl(path: string | null) {

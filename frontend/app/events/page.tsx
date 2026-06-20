@@ -7,16 +7,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-
-const LOCAL_CATEGORIES = [
-  "Restaurante", "Tienda", "Servicio", "Salud", "Educación",
-  "Tecnología", "Moda", "Entretenimiento", "Otro",
-];
-
-const PROFESSIONS = [
-  "Abogado", "Médico", "Arquitecto", "Contador",
-  "Programador", "Diseñador", "Psicólogo", "Ingeniero",
-];
+import { LOCAL_CATEGORIES, PROFESSIONS } from "@/lib/categories";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 

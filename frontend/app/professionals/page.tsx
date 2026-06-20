@@ -5,7 +5,7 @@ import { getProfessionals, ProfessionalOut } from "@/lib/api";
 import ProfessionalCard from "@/components/ProfessionalCard";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import CategoryFilter from "@/components/CategoryFilter";
 import { Search, UserCircle2 } from "lucide-react";
 import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
@@ -71,18 +71,15 @@ function ProfessionalsContent() {
 
       {/* Filtro por profesión */}
       <section className="border-b border-white/10 bg-card py-3">
-        <div className="mx-auto max-w-7xl overflow-x-auto px-4">
-          <div className="flex gap-2 pb-1">
-            {PROFESSIONS.map((p) => (
-              <button key={p} onClick={() => selectProfession(p)}>
-                <Badge
-                  variant={profession === p ? "default" : "outline"}
-                  className="cursor-pointer whitespace-nowrap hover:bg-primary hover:text-primary-foreground transition-colors"
-                >
-                  {p}
-                </Badge>
-              </button>
-            ))}
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-2 px-4">
+          <span className="text-sm font-medium text-muted-foreground">Profesión:</span>
+          <div className="w-full sm:w-72">
+            <CategoryFilter
+              options={PROFESSIONS}
+              value={profession}
+              onChange={selectProfession}
+              placeholder="Todas las profesiones"
+            />
           </div>
         </div>
       </section>

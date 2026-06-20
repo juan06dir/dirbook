@@ -5,7 +5,7 @@ import { getLocals, LocalOut } from "@/lib/api";
 import LocalCard from "@/components/LocalCard";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import CategoryFilter from "@/components/CategoryFilter";
 import { Search, Building2, SlidersHorizontal } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { LOCAL_CATEGORIES as CATEGORIES } from "@/lib/categories";
@@ -94,18 +94,15 @@ function LocalsContent() {
 
       {/* Categorías */}
       <section className="border-b border-white/10 bg-card py-3">
-        <div className="mx-auto max-w-7xl overflow-x-auto px-4">
-          <div className="flex gap-2 pb-1">
-            {CATEGORIES.map((cat) => (
-              <button key={cat} onClick={() => selectCategory(cat)}>
-                <Badge
-                  variant={category === cat ? "default" : "outline"}
-                  className="cursor-pointer whitespace-nowrap hover:bg-primary hover:text-primary-foreground transition-colors"
-                >
-                  {cat}
-                </Badge>
-              </button>
-            ))}
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-2 px-4">
+          <span className="text-sm font-medium text-muted-foreground">Categoría:</span>
+          <div className="w-full sm:w-72">
+            <CategoryFilter
+              options={CATEGORIES}
+              value={category}
+              onChange={selectCategory}
+              placeholder="Todas las categorías"
+            />
           </div>
         </div>
       </section>

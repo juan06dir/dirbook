@@ -260,34 +260,38 @@ def get_active_discounts(
     return query.order_by(Post.event_start.asc(), Post.created_at.desc()).offset(skip).limit(limit).all()
 
 
-@router.get("/professional/{prof_id}", response_model=List[PostOut])
+@router.get("/professional/{prof_id}", response_model=List[FeedPostOut])
 def get_professional_posts(
     prof_id: UUID,
     post_type: Optional[str] = Query(None),
     skip: int = Query(0, ge=0),
     limit: int = Query(20, ge=1, le=100),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: Optional[User] = Depends(get_optional_user),
 ):
-    """Posts de un perfil profesional."""
-    query = db.query(Post).filter(Post.professional_id == prof_id)
+    """Posts de un perfil profesional (feed enriquecido con autor y métricas)."""
+    query = db.query(Post).options(joinedload(Post.local), joinedload(Post.professional)).filter(Post.professional_id == prof_id)
     if post_type:
         query = query.filter(Post.post_type == post_type)
-    return query.order_by(Post.created_at.desc()).offset(skip).limit(limit).all()
+    posts = query.order_by(Post.created_at.desc()).offset(skip).limit(limit).all()
+    return _build_feed_items(posts, current_user, db)
 
 
-@router.get("/local/{local_id}", response_model=List[PostOut])
+@router.get("/local/{local_id}", response_model=List[FeedPostOut])
 def get_local_posts(
     local_id: UUID,
     post_type: Optional[str] = Query(None),
     skip: int = Query(0, ge=0),
     limit: int = Query(20, ge=1, le=100),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: Optional[User] = Depends(get_optional_user),
 ):
-    """Posts de un local específico."""
-    query = db.query(Post).filter(Post.local_id == local_id)
+    """Posts de un local específico (feed enriquecido con autor y métricas)."""
+    query = db.query(Post).options(joinedload(Post.local), joinedload(Post.professional)).filter(Post.local_id == local_id)
     if post_type:
         query = query.filter(Post.post_type == post_type)
-    return query.order_by(Post.created_at.desc()).offset(skip).limit(limit).all()
+    posts = query.order_by(Post.created_at.desc()).offset(skip).limit(limit).all()
+    return _build_feed_items(posts, current_user, db)
 
 
 @router.get("/{post_id}", response_model=PostOut)

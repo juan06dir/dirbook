@@ -23,6 +23,22 @@ class PostCreate(BaseModel):
             raise ValueError("discount_pct debe estar entre 1 y 100")
         return v
 
+class PostUpdate(BaseModel):
+    post_type:    Optional[PostType] = None
+    title:        Optional[str] = None
+    content:      Optional[str] = None
+    image_url:    Optional[str] = None
+    event_start:  Optional[datetime] = None
+    event_end:    Optional[datetime] = None
+    discount_pct: Optional[float] = None
+
+    @field_validator("discount_pct")
+    @classmethod
+    def validate_discount(cls, v):
+        if v is not None and not (0 < v <= 100):
+            raise ValueError("discount_pct debe estar entre 1 y 100")
+        return v
+
 class PostOut(BaseModel):
     id:           UUID
     post_type:    str

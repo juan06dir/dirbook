@@ -5,7 +5,7 @@ from app.database import get_db
 from app.models.post import Post
 from app.models.local import Local
 from app.models.professional import ProfessionalProfile
-from app.schemas.post import PostCreate, PostOut
+from app.schemas.post import PostCreate, PostOut, PostUpdate
 from app.core.dependencies import get_current_user, get_optional_user
 from app.models.user import User
 from app.models.like import PostLike
@@ -302,6 +302,51 @@ def get_post(post_id: UUID, db: Session = Depends(get_db)):
     return post
 
 
+def _post_owner_check(post, current_user, db) -> bool:
+    """True si current_user es dueño del local o perfil del post."""
+    if post.local_id:
+        local = db.query(Local).filter(
+            Local.id == post.local_id,
+            Local.owner_id == current_user.id
+        ).first()
+        if local is not None:
+            return True
+    if post.professional_id:
+        profile = db.query(ProfessionalProfile).filter(
+            ProfessionalProfile.id == post.professional_id,
+            ProfessionalProfile.owner_id == current_user.id
+        ).first()
+        if profile is not None:
+            return True
+    return False
+
+
+@router.put("/{post_id}", response_model=FeedPostOut)
+def update_post(
+    post_id: UUID,
+    data: PostUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    post = (
+        db.query(Post)
+        .options(joinedload(Post.local), joinedload(Post.professional))
+        .filter(Post.id == post_id)
+        .first()
+    )
+    if not post:
+        raise HTTPException(status_code=404, detail="Post no encontrado")
+    if not _post_owner_check(post, current_user, db):
+        raise HTTPException(status_code=403, detail="No autorizado")
+
+    changes = data.model_dump(exclude_unset=True)
+    for k, v in changes.items():
+        setattr(post, k, v)
+    db.commit()
+    db.refresh(post)
+    return _build_feed_items([post], current_user, db)[0]
+
+
 @router.delete("/{post_id}", status_code=204)
 def delete_post(
     post_id: UUID,
@@ -312,21 +357,7 @@ def delete_post(
     if not post:
         raise HTTPException(status_code=404, detail="Post no encontrado")
 
-    is_owner = False
-    if post.local_id:
-        local = db.query(Local).filter(
-            Local.id == post.local_id,
-            Local.owner_id == current_user.id
-        ).first()
-        is_owner = local is not None
-    if not is_owner and post.professional_id:
-        profile = db.query(ProfessionalProfile).filter(
-            ProfessionalProfile.id == post.professional_id,
-            ProfessionalProfile.owner_id == current_user.id
-        ).first()
-        is_owner = profile is not None
-
-    if not is_owner:
+    if not _post_owner_check(post, current_user, db):
         raise HTTPException(status_code=403, detail="No autorizado")
 
     db.delete(post)

@@ -36,10 +36,12 @@ class FeedPostOut(BaseModel):
     local_city: Optional[str]
     local_logo: Optional[str]
     local_cover: Optional[str]
+    local_owner_id: Optional[UUID]
     professional_id: Optional[UUID]
     professional_name: Optional[str]
     professional_profession: Optional[str]
     professional_avatar: Optional[str]
+    professional_owner_id: Optional[UUID]
     # Métricas sociales
     likes_count: int
     comments_count: int
@@ -91,10 +93,12 @@ def _build_feed_items(posts, current_user, db) -> List[FeedPostOut]:
             local_city=p.local.city if p.local else None,
             local_logo=p.local.logo if p.local else None,
             local_cover=p.local.cover_image if p.local else None,
+            local_owner_id=p.local.owner_id if p.local else None,
             professional_id=p.professional_id,
             professional_name=p.professional.name if p.professional else None,
             professional_profession=p.professional.profession if p.professional else None,
             professional_avatar=p.professional.avatar if p.professional else None,
+            professional_owner_id=p.professional.owner_id if p.professional else None,
             likes_count=likes_map.get(p.id, 0),
             comments_count=comments_map.get(p.id, 0),
             liked_by_me=p.id in mine,

@@ -150,6 +150,27 @@ export default function LocalDetailScreen({ route, navigation }) {
             </View>
           </View>
 
+          {!user && (
+            <View style={styles.gate}>
+              <View style={styles.gateIcon}>
+                <Ionicons name="lock-closed" size={26} color={colors.primary} />
+              </View>
+              <Text style={styles.gateTitle}>Regístrate para ver más</Text>
+              <Text style={styles.gateText}>
+                Crea una cuenta gratis para ver la información completa, publicaciones y reseñas de {local.name}.
+              </Text>
+              <TouchableOpacity style={styles.gatePrimary} onPress={() => navigation.navigate('Register')} activeOpacity={0.85}>
+                <Ionicons name="person-add" size={16} color="#000" />
+                <Text style={styles.gatePrimaryText}>Crear cuenta gratis</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.gateSecondary} onPress={() => navigation.navigate('Login')} activeOpacity={0.7}>
+                <Text style={styles.gateSecondaryText}>Ya tengo cuenta · Iniciar sesión</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
+          {user && <>
+
           {/* Stats */}
           <View style={styles.statsRow}>
             {local.avg_rating > 0 && (
@@ -192,7 +213,11 @@ export default function LocalDetailScreen({ route, navigation }) {
               <Text style={styles.actionBtnPrimaryText}>Calificar</Text>
             </TouchableOpacity>
           </View>
+
+          </>}
         </View>
+
+        {user && <>
 
         {/* Tabs */}
         <View style={styles.tabs}>
@@ -314,6 +339,8 @@ export default function LocalDetailScreen({ route, navigation }) {
                 </View>
           )}
         </View>
+
+        </>}
       </ScrollView>
 
       {/* Rating Modal */}
@@ -396,6 +423,27 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.5, shadowRadius: 14, elevation: 6,
   },
   actionBtnPrimaryText: { fontSize: 14, fontWeight: '700', color: '#000' },
+  gate: {
+    alignItems: 'center', marginTop: spacing.sm,
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg, borderWidth: 1, borderColor: colors.border,
+    padding: spacing.xl,
+  },
+  gateIcon: {
+    width: 56, height: 56, borderRadius: 28,
+    backgroundColor: colors.primaryFaded,
+    justifyContent: 'center', alignItems: 'center', marginBottom: spacing.md,
+  },
+  gateTitle: { ...typography.h3, textAlign: 'center', marginBottom: spacing.sm },
+  gateText: { fontSize: 14, color: colors.textSecondary, textAlign: 'center', lineHeight: 20, marginBottom: spacing.lg },
+  gatePrimary: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: spacing.sm,
+    backgroundColor: colors.primary, paddingVertical: 14, paddingHorizontal: spacing.xl,
+    borderRadius: radius.full, alignSelf: 'stretch',
+  },
+  gatePrimaryText: { fontSize: 15, fontWeight: '800', color: '#000' },
+  gateSecondary: { paddingVertical: spacing.md },
+  gateSecondaryText: { fontSize: 14, color: colors.primary, fontWeight: '600' },
   tabs: { flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: colors.border, marginHorizontal: spacing.lg },
   tab: { flex: 1, paddingVertical: 12, alignItems: 'center' },
   tabActive: { borderBottomWidth: 2, borderBottomColor: colors.primary },

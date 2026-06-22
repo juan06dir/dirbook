@@ -11,12 +11,12 @@ import {
   Animated,
   Platform,
 } from 'react-native';
-import MapView, { Marker, Callout, PROVIDER_DEFAULT } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { getLocals, followLocal, unfollowLocal, getMyFollows } from '../../api';
+import { getLocals, getLocal, followLocal, unfollowLocal, getMyFollows } from '../../api';
 import LocalCard from '../../components/LocalCard';
+import MapWebView from '../../components/MapWebView';
 import CategoryPill from '../../components/CategoryPill';
 import { colors, spacing, radius, shadow } from '../../theme';
 import { useAuth } from '../../context/AuthContext';
@@ -24,68 +24,12 @@ import { useAuth } from '../../context/AuthContext';
 // ─── Constants ───────────────────────────────────────────────────────────────
 
 const BOGOTA = { latitude: 4.7109, longitude: -74.0721 };
-const DELTA = { latitudeDelta: 0.08, longitudeDelta: 0.08 };
 const LIMIT = 20;
 
 const CATEGORIES = [
   'Todos', 'Restaurante', 'Tienda', 'Servicio', 'Salud',
   'Educación', 'Tecnología', 'Moda', 'Entretenimiento', 'Otro',
 ];
-
-// Dark map style for Google/Apple maps
-const DARK_MAP_STYLE = [
-  { elementType: 'geometry', stylers: [{ color: '#1a1a1a' }] },
-  { elementType: 'labels.text.stroke', stylers: [{ color: '#0a0a0a' }] },
-  { elementType: 'labels.text.fill', stylers: [{ color: '#888888' }] },
-  { featureType: 'road', elementType: 'geometry', stylers: [{ color: '#2a2a2a' }] },
-  { featureType: 'road', elementType: 'geometry.stroke', stylers: [{ color: '#1a1a1a' }] },
-  { featureType: 'road.highway', elementType: 'geometry', stylers: [{ color: '#353535' }] },
-  { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#0d0d0d' }] },
-  { featureType: 'poi', elementType: 'geometry', stylers: [{ color: '#1e1e1e' }] },
-  { featureType: 'poi', elementType: 'labels.text.fill', stylers: [{ color: '#666666' }] },
-  { featureType: 'transit', elementType: 'geometry', stylers: [{ color: '#1a1a1a' }] },
-  { featureType: 'administrative', elementType: 'geometry', stylers: [{ color: '#2a2a2a' }] },
-  { featureType: 'administrative.country', elementType: 'labels.text.fill', stylers: [{ color: '#777777' }] },
-  { featureType: 'administrative.locality', elementType: 'labels.text.fill', stylers: [{ color: '#aaaaaa' }] },
-];
-
-// ─── Marker bubble ───────────────────────────────────────────────────────────
-
-function BusinessMarker({ local }) {
-  const initial = local.name ? local.name.charAt(0).toUpperCase() : '?';
-  return (
-    <View style={markerStyles.bubble}>
-      <Text style={markerStyles.initial}>{initial}</Text>
-    </View>
-  );
-}
-
-const markerStyles = StyleSheet.create({
-  bubble: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
-    backgroundColor: colors.primary,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: colors.bg,
-    ...Platform.select({
-      android: { elevation: 4 },
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.4,
-        shadowRadius: 3,
-      },
-    }),
-  },
-  initial: {
-    fontSize: 14,
-    fontWeight: '800',
-    color: colors.bg,
-  },
-});
 
 // ─── Screen ──────────────────────────────────────────────────────────────────
 
@@ -235,21 +179,25 @@ export default function ExploreScreen({ navigation }) {
   // ── Map helpers ───────────────────────────────────────────────────────────
 
   const centerOnUser = () => {
-    if (!userLocation || !mapRef.current) return;
-    mapRef.current.animateToRegion(
-      { ...userLocation, ...DELTA },
-      600,
-    );
+    mapRef.current?.centerOnUser();
   };
 
-  const mapLocals = locals.filter(
-    (l) => l.latitude != null && l.longitude != null,
-  );
+  const mapLocals = locals.filter((l) => l.address || l.city);
 
-  const initialRegion = {
-    ...(userLocation || BOGOTA),
-    ...DELTA,
-  };
+  // Al tocar un marcador del mapa abrimos el detalle (cargamos el local por id)
+  const openLocalById = useCallback(async (id) => {
+    const cached = locals.find((l) => l.id === id);
+    if (cached) {
+      navigation.navigate('LocalDetalle', { local: cached });
+      return;
+    }
+    try {
+      const local = await getLocal(id);
+      navigation.navigate('LocalDetalle', { local });
+    } catch (e) {
+      console.warn('openLocalById:', e);
+    }
+  }, [locals, navigation]);
 
   // ── Render helpers ────────────────────────────────────────────────────────
 
@@ -396,52 +344,12 @@ export default function ExploreScreen({ navigation }) {
             </View>
           ) : (
             <>
-              <MapView
+              <MapWebView
                 ref={mapRef}
-                style={styles.map}
-                provider={PROVIDER_DEFAULT}
-                initialRegion={initialRegion}
-                customMapStyle={DARK_MAP_STYLE}
-                showsUserLocation
-                showsMyLocationButton={false}
-                showsCompass={false}
-                toolbarEnabled={false}
-              >
-                {/* Business markers */}
-                {mapLocals.map((local) => (
-                  <Marker
-                    key={String(local.id)}
-                    coordinate={{
-                      latitude: local.latitude,
-                      longitude: local.longitude,
-                    }}
-                  >
-                    <BusinessMarker local={local} />
-
-                    <Callout
-                      onPress={() => navigation.navigate('LocalDetalle', { local })}
-                      style={styles.callout}
-                    >
-                      <View style={styles.calloutInner}>
-                        <Text style={styles.calloutName} numberOfLines={1}>
-                          {local.name}
-                        </Text>
-                        {local.avg_rating > 0 && (
-                          <View style={styles.calloutRating}>
-                            <Ionicons name="star" size={12} color={colors.primary} />
-                            <Text style={styles.calloutRatingText}>
-                              {local.avg_rating.toFixed(1)}
-                            </Text>
-                          </View>
-                        )}
-                        <View style={styles.calloutBtn}>
-                          <Text style={styles.calloutBtnText}>Ver detalles</Text>
-                        </View>
-                      </View>
-                    </Callout>
-                  </Marker>
-                ))}
-              </MapView>
+                locals={mapLocals}
+                userLocation={userLocation}
+                onSelectLocal={openLocalById}
+              />
 
               {/* Mi ubicación FAB */}
               <TouchableOpacity

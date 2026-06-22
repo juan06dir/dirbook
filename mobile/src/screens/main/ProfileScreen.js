@@ -6,7 +6,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { getMyLocals, getMyFollows, getLocal, unfollowLocal } from '../../api';
+import { getMyLocals, getMyProfessionals, getMyFollows, getLocal, unfollowLocal } from '../../api';
 import { useAuth } from '../../context/AuthContext';
 import LocalCard from '../../components/LocalCard';
 import { colors, spacing, radius, typography } from '../../theme';
@@ -26,18 +26,32 @@ function getInitials(name) {
 export default function ProfileScreen({ navigation }) {
   const insets = useSafeAreaInsets();
   const { user, signOut } = useAuth();
-  const [activeTab, setActiveTab] = useState('negocios'); // 'negocios' | 'siguiendo'
+  const [activeTab, setActiveTab] = useState('negocios'); // 'negocios' | 'profesional' | 'siguiendo'
   const [myLocals, setMyLocals] = useState([]);
+  const [myProfessionals, setMyProfessionals] = useState([]);
   const [followedLocals, setFollowedLocals] = useState([]);
   const [loadingLocals, setLoadingLocals] = useState(false);
+  const [loadingProfs, setLoadingProfs] = useState(false);
   const [loadingFollows, setLoadingFollows] = useState(false);
 
   useEffect(() => {
     if (user) {
       loadMyLocals();
+      loadMyProfessionals();
       loadFollowing();
     }
   }, [user]);
+
+  useEffect(() => {
+    const unsub = navigation.addListener('focus', () => {
+      if (user) {
+        loadMyLocals();
+        loadMyProfessionals();
+        loadFollowing();
+      }
+    });
+    return unsub;
+  }, [navigation, user]);
 
   async function loadMyLocals() {
     setLoadingLocals(true);
@@ -48,6 +62,18 @@ export default function ProfileScreen({ navigation }) {
       console.warn(e);
     } finally {
       setLoadingLocals(false);
+    }
+  }
+
+  async function loadMyProfessionals() {
+    setLoadingProfs(true);
+    try {
+      const data = await getMyProfessionals();
+      setMyProfessionals(data || []);
+    } catch (e) {
+      console.warn(e);
+    } finally {
+      setLoadingProfs(false);
     }
   }
 
@@ -162,6 +188,26 @@ export default function ProfileScreen({ navigation }) {
         </View>
       </View>
 
+      {/* Publicar en Dirbook */}
+      <View style={styles.publishRow}>
+        <TouchableOpacity
+          style={styles.publishBtn}
+          onPress={() => navigation.navigate('CrearLocal')}
+          activeOpacity={0.85}
+        >
+          <Ionicons name="storefront" size={20} color="#000" />
+          <Text style={styles.publishText}>Crear negocio</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.publishBtn, styles.publishBtnAlt]}
+          onPress={() => navigation.navigate('CrearProfesional')}
+          activeOpacity={0.85}
+        >
+          <Ionicons name="briefcase" size={20} color={colors.primary} />
+          <Text style={[styles.publishText, styles.publishTextAlt]}>Perfil profesional</Text>
+        </TouchableOpacity>
+      </View>
+
       {/* Accesos rápidos */}
       <View style={styles.quickGrid}>
         {[
@@ -193,7 +239,21 @@ export default function ProfileScreen({ navigation }) {
             color={activeTab === 'negocios' ? colors.primary : colors.textMuted}
           />
           <Text style={[styles.tabText, activeTab === 'negocios' && styles.tabTextActive]}>
-            Mis negocios
+            Negocios
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.tab, activeTab === 'profesional' && styles.tabActive]}
+          onPress={() => setActiveTab('profesional')}
+          activeOpacity={0.7}
+        >
+          <Ionicons
+            name="briefcase-outline"
+            size={16}
+            color={activeTab === 'profesional' ? colors.primary : colors.textMuted}
+          />
+          <Text style={[styles.tabText, activeTab === 'profesional' && styles.tabTextActive]}>
+            Profesional
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -225,11 +285,30 @@ export default function ProfileScreen({ navigation }) {
           ) : myLocals.length > 0 ? (
             <View style={{ paddingHorizontal: spacing.lg }}>
               {myLocals.map((l) => (
-                <LocalCard
-                  key={String(l.id)}
-                  local={l}
-                  onPress={() => navigation.navigate('LocalDetalle', { local: l })}
-                />
+                <View key={String(l.id)} style={{ marginBottom: spacing.md }}>
+                  <LocalCard
+                    local={l}
+                    onPress={() => navigation.navigate('LocalDetalle', { local: l })}
+                  />
+                  <View style={styles.ownerActions}>
+                    <TouchableOpacity
+                      style={styles.ownerBtn}
+                      onPress={() => navigation.navigate('CrearLocal', { local: l })}
+                      activeOpacity={0.8}
+                    >
+                      <Ionicons name="create-outline" size={16} color={colors.primary} />
+                      <Text style={styles.ownerBtnText}>Editar</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[styles.ownerBtn, styles.ownerBtnPrimary]}
+                      onPress={() => navigation.navigate('CrearPublicacion', { local: l })}
+                      activeOpacity={0.8}
+                    >
+                      <Ionicons name="add-circle" size={16} color="#000" />
+                      <Text style={[styles.ownerBtnText, { color: '#000' }]}>Publicar</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
               ))}
             </View>
           ) : (
@@ -237,6 +316,75 @@ export default function ProfileScreen({ navigation }) {
               <Ionicons name="storefront-outline" size={48} color={colors.textMuted} />
               <Text style={styles.emptyTitle}>Sin negocios</Text>
               <Text style={styles.emptyText}>Aún no tienes negocios registrados</Text>
+              <TouchableOpacity
+                style={styles.exploreBtn}
+                onPress={() => navigation.navigate('CrearLocal')}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.exploreBtnText}>Crear negocio</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
+      ) : activeTab === 'profesional' ? (
+        <View style={styles.section}>
+          {loadingProfs ? (
+            <ActivityIndicator color={colors.primary} style={{ marginTop: 20 }} />
+          ) : myProfessionals.length > 0 ? (
+            <View style={{ paddingHorizontal: spacing.lg }}>
+              {myProfessionals.map((p) => (
+                <View key={String(p.id)} style={styles.profCard}>
+                  <TouchableOpacity
+                    style={styles.profCardTap}
+                    onPress={() => navigation.navigate('ProfesionalDetalle', { professional: p })}
+                    activeOpacity={0.8}
+                  >
+                    {imageUrl(p.avatar) ? (
+                      <Image source={{ uri: imageUrl(p.avatar) }} style={styles.profAvatar} />
+                    ) : (
+                      <View style={styles.profAvatarPlaceholder}>
+                        <Text style={styles.profInitials}>{getInitials(p.name)}</Text>
+                      </View>
+                    )}
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.profName} numberOfLines={1}>{p.name}</Text>
+                      <Text style={styles.profProfession} numberOfLines={1}>{p.profession}</Text>
+                    </View>
+                    <Ionicons name="chevron-forward" size={18} color={colors.textMuted} />
+                  </TouchableOpacity>
+                  <View style={styles.ownerActions}>
+                    <TouchableOpacity
+                      style={styles.ownerBtn}
+                      onPress={() => navigation.navigate('CrearProfesional', { professional: p })}
+                      activeOpacity={0.8}
+                    >
+                      <Ionicons name="create-outline" size={16} color={colors.primary} />
+                      <Text style={styles.ownerBtnText}>Editar</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[styles.ownerBtn, styles.ownerBtnPrimary]}
+                      onPress={() => navigation.navigate('CrearPublicacion', { professional: p })}
+                      activeOpacity={0.8}
+                    >
+                      <Ionicons name="add-circle" size={16} color="#000" />
+                      <Text style={[styles.ownerBtnText, { color: '#000' }]}>Publicar</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              ))}
+            </View>
+          ) : (
+            <View style={styles.emptyWrap}>
+              <Ionicons name="briefcase-outline" size={48} color={colors.textMuted} />
+              <Text style={styles.emptyTitle}>Sin perfil profesional</Text>
+              <Text style={styles.emptyText}>Crea tu perfil profesional para que te encuentren y poder publicar</Text>
+              <TouchableOpacity
+                style={styles.exploreBtn}
+                onPress={() => navigation.navigate('CrearProfesional')}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.exploreBtnText}>Crear perfil profesional</Text>
+              </TouchableOpacity>
             </View>
           )}
         </View>
@@ -335,6 +483,31 @@ const styles = StyleSheet.create({
   statLabel: { fontSize: 12, color: colors.textMuted, marginTop: 2 },
   statDivider: { width: 1, backgroundColor: colors.border },
 
+  // Publicar
+  publishRow: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+    paddingHorizontal: spacing.lg,
+    marginTop: spacing.lg,
+  },
+  publishBtn: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.sm,
+    backgroundColor: colors.primary,
+    height: 50,
+    borderRadius: radius.full,
+  },
+  publishBtnAlt: {
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.primary + '55',
+  },
+  publishText: { fontSize: 14, fontWeight: '800', color: '#000' },
+  publishTextAlt: { color: colors.primary },
+
   // Quick actions
   quickGrid: {
     flexDirection: 'row',
@@ -409,6 +582,37 @@ const styles = StyleSheet.create({
   },
 
   section: { marginTop: spacing.lg },
+
+  // Acciones de dueño (editar / publicar)
+  ownerActions: { flexDirection: 'row', gap: spacing.sm, marginTop: spacing.sm },
+  ownerBtn: {
+    flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6,
+    paddingVertical: 10, borderRadius: radius.md,
+    backgroundColor: colors.surface,
+    borderWidth: 1, borderColor: colors.primary + '55',
+  },
+  ownerBtnPrimary: { backgroundColor: colors.primary, borderColor: colors.primary },
+  ownerBtnText: { fontSize: 13, fontWeight: '700', color: colors.primary },
+
+  // Tarjeta de perfil profesional
+  profCard: {
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
+    borderWidth: 1, borderColor: colors.border,
+    padding: spacing.md,
+    marginBottom: spacing.md,
+  },
+  profCardTap: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
+  profAvatar: { width: 52, height: 52, borderRadius: 26 },
+  profAvatarPlaceholder: {
+    width: 52, height: 52, borderRadius: 26,
+    backgroundColor: colors.primaryFaded,
+    justifyContent: 'center', alignItems: 'center',
+  },
+  profInitials: { fontSize: 18, fontWeight: '800', color: colors.primary },
+  profName: { fontSize: 15, fontWeight: '700', color: colors.text },
+  profProfession: { fontSize: 13, color: colors.primary, marginTop: 2, textTransform: 'uppercase', letterSpacing: 0.3 },
+
   emptyWrap: {
     alignItems: 'center',
     paddingVertical: spacing.xl * 1.5,

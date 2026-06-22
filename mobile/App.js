@@ -1,12 +1,17 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { AuthProvider, useAuth } from './src/context/AuthContext';
 import AppNavigator from './src/navigation';
-import { View, ActivityIndicator, Text } from 'react-native';
+import AnimatedSplash from './src/screens/AnimatedSplash';
+import OnboardingScreen from './src/screens/OnboardingScreen';
+import { View, Text } from 'react-native';
 import { colors } from './src/theme';
+
+const ONBOARDING_KEY = 'dirbook_onboarded_v1';
 
 try { SplashScreen.preventAutoHideAsync(); } catch {}
 
@@ -62,21 +67,50 @@ class ErrorBoundary extends React.Component {
 // ─── Raíz de la app ───────────────────────────────────────────────────────────
 function Root() {
   const { loading } = useAuth();
+  const [introDone, setIntroDone] = useState(false);     // intro animada de marca
+  const [needsOnboarding, setNeedsOnboarding] = useState(null); // null = sin verificar
 
+  // Verificar si el usuario ya vio el onboarding (primera vez que instala)
   useEffect(() => {
-    if (!loading) {
+    AsyncStorage.getItem(ONBOARDING_KEY)
+      .then((v) => setNeedsOnboarding(v !== '1'))
+      .catch(() => setNeedsOnboarding(false));
+  }, []);
+
+  // Ocultar splash nativo en cuanto sabemos el estado de sesión y onboarding
+  useEffect(() => {
+    if (!loading && needsOnboarding !== null) {
       SplashScreen.hideAsync().catch(() => {});
     }
-  }, [loading]);
+  }, [loading, needsOnboarding]);
 
-  if (loading) {
+  async function finishOnboarding() {
+    try { await AsyncStorage.setItem(ONBOARDING_KEY, '1'); } catch {}
+    setNeedsOnboarding(false);
+  }
+
+  // Mientras carga sesión o estado de onboarding, mantenemos el splash nativo (sin parpadeo)
+  if (loading || needsOnboarding === null) {
+    return <View style={{ flex: 1, backgroundColor: colors.bg }} />;
+  }
+
+  // 1) Intro animada de marca (siempre al abrir)
+  if (!introDone) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.bg }}>
-        <ActivityIndicator size="large" color={colors.primary} />
+      <View style={{ flex: 1, backgroundColor: colors.bg }}>
+        {/* En usuarios recurrentes mostramos la app detrás para que aparezca al desvanecer */}
+        {!needsOnboarding && <AppNavigator />}
+        <AnimatedSplash onFinish={() => setIntroDone(true)} />
       </View>
     );
   }
 
+  // 2) Onboarding la primera vez que se instala
+  if (needsOnboarding) {
+    return <OnboardingScreen onFinish={finishOnboarding} />;
+  }
+
+  // 3) App
   return <AppNavigator />;
 }
 

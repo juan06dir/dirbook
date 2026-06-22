@@ -16,13 +16,30 @@ export function AuthProvider({ children }) {
   async function restoreSession() {
     try {
       const savedToken = await AsyncStorage.getItem('token');
-      if (savedToken) {
-        setToken(savedToken);
+      if (!savedToken) return;
+
+      setToken(savedToken);
+
+      // Mostrar de inmediato el usuario cacheado para no perder la sesión
+      const cached = await AsyncStorage.getItem('user');
+      if (cached) {
+        try { setUser(JSON.parse(cached)); } catch {}
+      }
+
+      // Refrescar el perfil en segundo plano
+      try {
         const me = await getMe();
         setUser(me);
+        await AsyncStorage.setItem('user', JSON.stringify(me));
+      } catch (e) {
+        // Solo cerrar sesión si el token es inválido/expirado (401/403).
+        // Ante errores de red o servidor frío (Render), mantener la sesión.
+        if (e?.status === 401 || e?.status === 403) {
+          await AsyncStorage.multiRemove(['token', 'user']);
+          setToken(null);
+          setUser(null);
+        }
       }
-    } catch {
-      await AsyncStorage.removeItem('token');
     } finally {
       setLoading(false);
     }
@@ -30,12 +47,13 @@ export function AuthProvider({ children }) {
 
   async function signIn(tokenValue, userData) {
     await AsyncStorage.setItem('token', tokenValue);
+    if (userData) await AsyncStorage.setItem('user', JSON.stringify(userData));
     setToken(tokenValue);
     setUser(userData);
   }
 
   async function signOut() {
-    await AsyncStorage.removeItem('token');
+    await AsyncStorage.multiRemove(['token', 'user']);
     setToken(null);
     setUser(null);
   }

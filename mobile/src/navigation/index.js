@@ -2,6 +2,7 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 
 import LoginScreen from '../screens/auth/LoginScreen';
@@ -14,6 +15,9 @@ import NotificationsScreen from '../screens/main/NotificationsScreen';
 import ProfileScreen from '../screens/main/ProfileScreen';
 import LocalDetailScreen from '../screens/detail/LocalDetailScreen';
 import ProfessionalDetailScreen from '../screens/detail/ProfessionalDetailScreen';
+import CreateLocalScreen from '../screens/main/CreateLocalScreen';
+import CreateProfessionalScreen from '../screens/main/CreateProfessionalScreen';
+import CreatePostScreen from '../screens/main/CreatePostScreen';
 
 import { colors } from '../theme';
 
@@ -29,6 +33,7 @@ const TAB_ICONS = {
 };
 
 function MainTabs() {
+  const insets = useSafeAreaInsets();
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -37,8 +42,8 @@ function MainTabs() {
           backgroundColor: '#0D0D0D',
           borderTopColor: 'rgba(250,204,21,0.15)',
           borderTopWidth: 1,
-          height: 64,
-          paddingBottom: 9,
+          height: 64 + insets.bottom,
+          paddingBottom: 9 + insets.bottom,
           paddingTop: 7,
         },
         tabBarActiveTintColor: colors.primary,
@@ -81,6 +86,9 @@ export default function AppNavigator() {
         <Stack.Screen name="LocalDetalle"      component={LocalDetailScreen} />
         <Stack.Screen name="ProfesionalDetalle" component={ProfessionalDetailScreen} />
         <Stack.Screen name="Notificaciones"    component={NotificationsScreen} />
+        <Stack.Screen name="CrearLocal"        component={CreateLocalScreen} />
+        <Stack.Screen name="CrearProfesional"  component={CreateProfessionalScreen} />
+        <Stack.Screen name="CrearPublicacion"  component={CreatePostScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

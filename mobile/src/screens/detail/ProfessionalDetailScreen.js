@@ -7,9 +7,10 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { getProfessional, getProfessionalRatings, rateProfessional } from '../../api';
+import { getProfessional, getProfessionalRatings, getProfessionalPosts, rateProfessional } from '../../api';
 import { useAuth } from '../../context/AuthContext';
 import StarRating from '../../components/StarRating';
+import PostCard from '../../components/PostCard';
 import { colors, spacing, radius, typography } from '../../theme';
 import { API_URL } from '../../api';
 
@@ -30,6 +31,7 @@ export default function ProfessionalDetailScreen({ route, navigation }) {
   const { professional: initial } = route.params;
   const [prof, setProf] = useState(initial);
   const [ratings, setRatings] = useState([]);
+  const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showRating, setShowRating] = useState(false);
   const [myScore, setMyScore] = useState(0);
@@ -40,12 +42,14 @@ export default function ProfessionalDetailScreen({ route, navigation }) {
 
   async function loadAll() {
     try {
-      const [fresh, r] = await Promise.all([
+      const [fresh, r, p] = await Promise.all([
         getProfessional(initial.id),
         getProfessionalRatings(initial.id),
+        getProfessionalPosts(initial.id),
       ]);
       setProf(fresh);
       setRatings(r || []);
+      setPosts(p || []);
     } catch (e) { console.warn(e); }
     finally { setLoading(false); }
   }
@@ -108,6 +112,27 @@ export default function ProfessionalDetailScreen({ route, navigation }) {
           <Text style={styles.name}>{prof.name}</Text>
           <Text style={styles.profession}>{prof.profession}</Text>
 
+          {!user && (
+            <View style={styles.gate}>
+              <View style={styles.gateIcon}>
+                <Ionicons name="lock-closed" size={26} color={colors.primary} />
+              </View>
+              <Text style={styles.gateTitle}>Regístrate para ver más</Text>
+              <Text style={styles.gateText}>
+                Crea una cuenta gratis para ver el perfil completo, contacto y publicaciones de {prof.name}.
+              </Text>
+              <TouchableOpacity style={styles.gatePrimary} onPress={() => navigation.navigate('Register')} activeOpacity={0.85}>
+                <Ionicons name="person-add" size={16} color="#000" />
+                <Text style={styles.gatePrimaryText}>Crear cuenta gratis</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.gateSecondary} onPress={() => navigation.navigate('Login')} activeOpacity={0.7}>
+                <Text style={styles.gateSecondaryText}>Ya tengo cuenta · Iniciar sesión</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
+          {user && <>
+
           {prof.avg_rating > 0 && (
             <View style={styles.ratingRow}>
               <StarRating value={Math.round(prof.avg_rating)} readonly size={16} />
@@ -163,6 +188,22 @@ export default function ProfessionalDetailScreen({ route, navigation }) {
               )}
             </View>
           )}
+
+          </>}
+        </View>
+
+        {user && <>
+
+        {/* Publicaciones */}
+        <View style={styles.postsSection}>
+          <Text style={styles.reviewsTitle}>Publicaciones ({posts.length})</Text>
+          {posts.length > 0 ? (
+            posts.map((p) => <PostCard key={p.id} post={p} />)
+          ) : (
+            <View style={styles.emptyReviews}>
+              <Text style={styles.emptyText}>Aún no hay publicaciones</Text>
+            </View>
+          )}
         </View>
 
         {/* Reseñas */}
@@ -189,6 +230,8 @@ export default function ProfessionalDetailScreen({ route, navigation }) {
             </View>
           )}
         </View>
+
+        </>}
       </ScrollView>
 
       {/* Rating Modal */}
@@ -261,6 +304,28 @@ const styles = StyleSheet.create({
   actionChipText: { fontSize: 13, fontWeight: '600', color: colors.primary },
   rateChip: { backgroundColor: colors.primary, borderColor: colors.primary },
   socialRow: { flexDirection: 'row', gap: spacing.xl, marginTop: spacing.lg },
+  gate: {
+    alignSelf: 'stretch', alignItems: 'center', marginTop: spacing.lg,
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg, borderWidth: 1, borderColor: colors.border,
+    padding: spacing.xl,
+  },
+  gateIcon: {
+    width: 56, height: 56, borderRadius: 28,
+    backgroundColor: colors.primaryFaded,
+    justifyContent: 'center', alignItems: 'center', marginBottom: spacing.md,
+  },
+  gateTitle: { ...typography.h3, textAlign: 'center', marginBottom: spacing.sm },
+  gateText: { fontSize: 14, color: colors.textSecondary, textAlign: 'center', lineHeight: 20, marginBottom: spacing.lg },
+  gatePrimary: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: spacing.sm,
+    backgroundColor: colors.primary, paddingVertical: 14, paddingHorizontal: spacing.xl,
+    borderRadius: radius.full, alignSelf: 'stretch',
+  },
+  gatePrimaryText: { fontSize: 15, fontWeight: '800', color: '#000' },
+  gateSecondary: { paddingVertical: spacing.md },
+  gateSecondaryText: { fontSize: 14, color: colors.primary, fontWeight: '600' },
+  postsSection: { paddingHorizontal: spacing.lg, marginBottom: spacing.md },
   reviewsSection: { paddingHorizontal: spacing.lg },
   reviewsTitle: { ...typography.h3, marginBottom: spacing.md },
   reviewCard: {

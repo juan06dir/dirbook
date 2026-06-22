@@ -31,7 +31,9 @@ async function request(path, options = {}) {
     const detail = Array.isArray(err.detail)
       ? err.detail.map((e) => e.msg ?? JSON.stringify(e)).join(', ')
       : err.detail;
-    throw new Error(detail || 'Error del servidor');
+    const error = new Error(detail || 'Error del servidor');
+    error.status = res.status;
+    throw error;
   }
   if (res.status === 204) return null;
   return res.json();
@@ -76,11 +78,51 @@ export const getProfessionals = (params = {}) =>
 
 export const getProfessional = (id) => request(`/professionals/${id}`);
 
+export const getMyProfessionals = () => request('/professionals/mine');
+
+export const createProfessional = (data) =>
+  request('/professionals', { method: 'POST', body: JSON.stringify(data) });
+
+export const updateProfessional = (id, data) =>
+  request(`/professionals/${id}`, { method: 'PUT', body: JSON.stringify(data) });
+
+export const deleteProfessional = (id) =>
+  request(`/professionals/${id}`, { method: 'DELETE' });
+
 // ─── POSTS ───────────────────────────────────────────────────────────────────
 export const getPosts = (params = {}) =>
   request(`/posts/feed${buildQuery(params)}`);
 
 export const getLocalPosts = (localId) => request(`/posts/local/${localId}`);
+
+export const getProfessionalPosts = (profId) => request(`/posts/professional/${profId}`);
+
+export const createPost = (data) =>
+  request('/posts', { method: 'POST', body: JSON.stringify(data) });
+
+export const updatePost = (postId, data) =>
+  request(`/posts/${postId}`, { method: 'PUT', body: JSON.stringify(data) });
+
+export const deletePost = (postId) =>
+  request(`/posts/${postId}`, { method: 'DELETE' });
+
+// ─── SOCIAL (likes y comentarios) ────────────────────────────────────────────
+export const likePost = (postId) =>
+  request(`/posts/${postId}/like`, { method: 'POST' });
+
+export const unlikePost = (postId) =>
+  request(`/posts/${postId}/like`, { method: 'DELETE' });
+
+export const getComments = (postId) => request(`/posts/${postId}/comments`);
+
+export const addComment = (postId, content) =>
+  request(`/posts/${postId}/comments`, {
+    method: 'POST',
+    body: JSON.stringify({ content }),
+  });
+
+export const deleteComment = (commentId) =>
+  request(`/posts/comments/${commentId}`, { method: 'DELETE' });
 
 // ─── FOLLOWS ─────────────────────────────────────────────────────────────────
 export const followLocal = (localId) =>
@@ -93,20 +135,21 @@ export const getMyFollows = () => request('/follows/mine');
 
 // ─── RATINGS ─────────────────────────────────────────────────────────────────
 export const rateLocal = (localId, score, comment = '') =>
-  request('/ratings/local', {
+  request(`/ratings/${localId}`, {
     method: 'POST',
-    body: JSON.stringify({ local_id: localId, score, comment }),
+    body: JSON.stringify({ score, comment }),
   });
+
+export const getLocalRatings = (localId) => request(`/ratings/${localId}/reviews`);
 
 export const rateProfessional = (profId, score, comment = '') =>
-  request('/ratings/professional', {
+  request(`/ratings/professional/${profId}`, {
     method: 'POST',
-    body: JSON.stringify({ professional_id: profId, score, comment }),
+    body: JSON.stringify({ score, comment }),
   });
 
-export const getLocalRatings = (localId) => request(`/ratings/local/${localId}`);
-
-export const getProfessionalRatings = (profId) => request(`/ratings/professional/${profId}`);
+export const getProfessionalRatings = (profId) =>
+  request(`/ratings/professional/${profId}/reviews`);
 
 // ─── EVENTS ──────────────────────────────────────────────────────────────────
 export const getEvents = (params = {}) =>

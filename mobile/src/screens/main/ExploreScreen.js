@@ -59,6 +59,7 @@ export default function ExploreScreen({ navigation }) {
   // Follows
   const [followedIds, setFollowedIds] = useState(new Set());
   const [followLoading, setFollowLoading] = useState(new Set()); // IDs currently being toggled
+  const [loadError, setLoadError] = useState(null);
 
   // ── Location ──────────────────────────────────────────────────────────────
 
@@ -145,6 +146,7 @@ export default function ExploreScreen({ navigation }) {
   const loadLocals = useCallback(async (reset = false) => {
     if (loading) return;
     setLoading(true);
+    if (reset) setLoadError(null);
     try {
       const skip = reset ? 0 : page * LIMIT;
       const params = { limit: LIMIT, skip };
@@ -165,6 +167,7 @@ export default function ExploreScreen({ navigation }) {
       setHasMore(results.length === LIMIT);
     } catch (e) {
       console.warn('ExploreScreen loadLocals:', e);
+      if (reset) setLoadError(e.message || 'No se pudo conectar al servidor');
     } finally {
       setLoading(false);
     }
@@ -212,11 +215,27 @@ export default function ExploreScreen({ navigation }) {
   );
 
   const listEmpty = !loading && (
-    <View style={styles.empty}>
-      <Ionicons name="storefront-outline" size={52} color={colors.textMuted} />
-      <Text style={styles.emptyTitle}>Sin resultados</Text>
-      <Text style={styles.emptySubtitle}>Prueba con otros filtros o ciudad</Text>
-    </View>
+    loadError ? (
+      <View style={styles.empty}>
+        <Ionicons name="cloud-offline-outline" size={52} color={colors.textMuted} />
+        <Text style={styles.emptyTitle}>Sin conexión</Text>
+        <Text style={styles.emptySubtitle}>{loadError}</Text>
+        <TouchableOpacity
+          style={styles.retryBtn}
+          onPress={() => loadLocals(true)}
+          activeOpacity={0.8}
+        >
+          <Ionicons name="refresh" size={16} color="#000" />
+          <Text style={styles.retryBtnText}>Reintentar</Text>
+        </TouchableOpacity>
+      </View>
+    ) : (
+      <View style={styles.empty}>
+        <Ionicons name="storefront-outline" size={52} color={colors.textMuted} />
+        <Text style={styles.emptyTitle}>Sin resultados</Text>
+        <Text style={styles.emptySubtitle}>Prueba con otros filtros o ciudad</Text>
+      </View>
+    )
   );
 
   const listFooter = loading ? (
@@ -496,7 +515,20 @@ const styles = StyleSheet.create({
   emptySubtitle: {
     fontSize: 13,
     color: colors.textMuted,
+    textAlign: 'center',
+    paddingHorizontal: spacing.lg,
   },
+  retryBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: colors.primary,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: 11,
+    borderRadius: radius.full,
+    marginTop: spacing.md,
+  },
+  retryBtnText: { fontSize: 14, fontWeight: '800', color: '#000' },
 
   // ── Map ──
   mapContainer: {

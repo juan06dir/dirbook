@@ -8,7 +8,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   getLocal, getLocalPosts, getLocalRatings,
-  followLocal, unfollowLocal, getMyFollows, rateLocal,
+  followLocal, unfollowLocal, getFollowStatus, rateLocal,
 } from '../../api';
 import { useAuth } from '../../context/AuthContext';
 import PostCard from '../../components/PostCard';
@@ -44,18 +44,20 @@ export default function LocalDetailScreen({ route, navigation }) {
 
   async function loadAll() {
     try {
-      const [fresh, postsData, ratingsData] = await Promise.all([
+      const [freshResult, postsResult, ratingsResult] = await Promise.allSettled([
         getLocal(initialLocal.id),
         getLocalPosts(initialLocal.id),
         getLocalRatings(initialLocal.id),
       ]);
-      setLocal(fresh);
-      setPosts(postsData || []);
-      setRatings(ratingsData || []);
+      if (freshResult.status === 'fulfilled' && freshResult.value) setLocal(freshResult.value);
+      setPosts(postsResult.status === 'fulfilled' ? (postsResult.value || []) : []);
+      setRatings(ratingsResult.status === 'fulfilled' ? (ratingsResult.value || []) : []);
 
       if (user) {
-        const follows = await getMyFollows();
-        setIsFollowing((follows || []).some(f => f.local_id === initialLocal.id));
+        try {
+          const status = await getFollowStatus(initialLocal.id);
+          setIsFollowing(status?.following ?? false);
+        } catch {}
       }
     } catch (e) {
       console.warn(e);

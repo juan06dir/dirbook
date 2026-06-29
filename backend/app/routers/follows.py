@@ -75,6 +75,15 @@ def unfollow_local(
     return FollowStatus(following=False, followers_count=count)
 
 
+@router.get("/mine")
+def my_follows(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    follows = db.query(Follow).filter(Follow.user_id == current_user.id).all()
+    return [{"local_id": str(f.local_id)} for f in follows]
+
+
 @router.get("/{local_id}/status", response_model=FollowStatus)
 def follow_status(
     local_id: UUID,

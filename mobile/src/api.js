@@ -24,19 +24,33 @@ async function request(path, options = {}) {
     delete headers['Content-Type'];
   }
 
-  const res = await fetch(`${API_URL}${path}`, { ...options, headers });
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 12000);
 
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: 'Error desconocido' }));
-    const detail = Array.isArray(err.detail)
-      ? err.detail.map((e) => e.msg ?? JSON.stringify(e)).join(', ')
-      : err.detail;
-    const error = new Error(detail || 'Error del servidor');
-    error.status = res.status;
-    throw error;
+  try {
+    const res = await fetch(`${API_URL}${path}`, { ...options, headers, signal: controller.signal });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: 'Error desconocido' }));
+      const detail = Array.isArray(err.detail)
+        ? err.detail.map((e) => e.msg ?? JSON.stringify(e)).join(', ')
+        : err.detail;
+      const error = new Error(detail || 'Error del servidor');
+      error.status = res.status;
+      throw error;
+    }
+    if (res.status === 204) return null;
+    return res.json();
+  } catch (e) {
+    if (e.name === 'AbortError') {
+      const error = new Error('Servidor tardó demasiado. Inténtalo de nuevo.');
+      error.status = 408;
+      throw error;
+    }
+    throw e;
+  } finally {
+    clearTimeout(timeoutId);
   }
-  if (res.status === 204) return null;
-  return res.json();
 }
 
 // ─── AUTH ────────────────────────────────────────────────────────────────────
@@ -126,10 +140,12 @@ export const deleteComment = (commentId) =>
 
 // ─── FOLLOWS ─────────────────────────────────────────────────────────────────
 export const followLocal = (localId) =>
-  request('/follows', { method: 'POST', body: JSON.stringify({ local_id: localId }) });
+  request(`/follows/${localId}`, { method: 'POST' });
 
 export const unfollowLocal = (localId) =>
   request(`/follows/${localId}`, { method: 'DELETE' });
+
+export const getFollowStatus = (localId) => request(`/follows/${localId}/status`);
 
 export const getMyFollows = () => request('/follows/mine');
 
